@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Inquiry {
+  id               String    @id @default(cuid())
+  studentName      String
+  email            String?
+  phone            String
+  course           String?
+  preferredContact String?
+  experience       String?
+  message          String?
+  status           String    @default("New")
+  consent          Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Course {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  category      String
+  level         String?
+  description   String?
+  icon          String?
+  audience      String?
+  prerequisites String?
+  duration      String?
+  price         String?
+  image         String?
+  skills        String   // JSON array serialized as string, e.g. ["skill1","skill2"]
+  published     Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+  @@index([published])
+}
+
+model TrainingGallery {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  image       String
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LibraryResource {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  description String?
+  format      String?
+  level       String?
+  status      String   @default("Coming Soon")
+  price       String?
+  pages       String?
+  fileUrl     String?
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([status])
+}
+
+model AdminUser {
+  id        String         @id @default(cuid())
+  email     String         @unique
+  name      String?
+  password  String
+  role      String         @default("editor")
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  sessions  AdminSession[]
+}
+
+model AdminSession {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model LoginAttempt {
+  id       String   @id @default(cuid())
+  key      String
+  failedAt DateTime @default(now())
+
+  @@index([key, failedAt])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  type      String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
