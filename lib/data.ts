@@ -1,300 +1,87 @@
-// School configuration and data
+// School configuration and static promotional data
+// Note: Courses, Categories, Training Gallery, and Digital Library items are now 
+// synchronized to the real database and managed dynamically via Prisma / Admin portal.
+
 export const schoolConfig = {
-  name: 'Electronics Maintenance School',
+  name: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ',
+  englishName: 'Hello TVET',
+  brandSubtitle: 'Hello Technical and Vocational Training',
   tagline: 'Build Practical Skills. Repair with Confidence.',
-  phone: '+251-XX-XXX-XXXX',
-  email: 'info@emschool.edu.et',
-  whatsappPhone: '251-XX-XXX-XXXX',
-  address: '[School Address - Edit in settings]',
-  businessHours: 'Monday - Friday: 8:00 AM - 5:00 PM',
+  phone: '09 47 74 70 70',
+  alternatePhone: '09 82 48 43 28',
+  email: 'info@hellotvet.edu.et',
+  whatsappPhone: '251947747070',
+  telegram: 'https://t.me/helloschool_et',
+  telegramHandle: '@helloschool_et',
+  facebook: 'https://web.facebook.com/people/Hello-Technology-of-Institute-%E1%88%84%E1%88%8E-%E1%8B%A8%E1%88%99%E1%8B%AB-%E1%88%9B%E1%88%B0%E1%88%8D%E1%8C%A0%E1%8A%9B-%E1%89%B0%E1%89%8B%E1%88%9D/100063821901962/?locale=af_ZA',
+  address: 'ባ/ዳር ፓፒረስ ሆቴል ፊት ለፊት ሲግናል ሞል ህንፃ 4ኛ ፎቅ ቢሮ ቁ.409, Bahir Dar, Ethiopia',
+  englishAddress: 'Signal Mall Building, 4th Floor, Office No. 409 (In front of Papyrus Hotel), Bahir Dar, Ethiopia',
+  googleMapsUrl: 'https://maps.google.com/?q=Papyrus+Hotel+Bahir+Dar+Ethiopia',
+  businessHours: 'Monday – Friday: 8:30 AM – 5:30 PM | Saturday: 9:00 AM – 1:00 PM',
+  specialPromotion: 'በነፃ፦ ከሁለት በላይ ት/ት ለሚመዘገብ አንድ በነፃ (Register for more than two courses, get one free!)',
+  accreditation: 'ሙሉ ዕውቅና ያለው በሁሉም የትምህርት ዓይነት ደረጃ (Fully accredited for all educational levels)',
+  cocCertifications: [
+    'Basic Electrical Electronics Equipment Level',
+    'Industrial Electrical Machines & Drives Servicing Level',
+  ],
   description:
-    'A premier technical training institution in Ethiopia specializing in mobile phone repair, computer maintenance, electronics troubleshooting, and practical hands-on learning.',
-  mission: 'To equip students with practical electronics repair skills and professional expertise.',
-  vision:
-    'To be the leading provider of technical training and digital learning resources in East Africa.',
+    'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET - Hello Technical and Vocational Training) — Leading accredited technical trade and vocational training institute in Bahir Dar providing hands-on workshops in electronics, computing, electrical installations, digital media, coding, and industrial equipment maintenance.',
+  mission: 'To equip Ethiopian youth and professionals with accredited, job-ready technical trade skills, practical diagnostic problem-solving abilities, and workbench mastery.',
+  vision: 'To be the most trusted center for accredited technical vocational education and hardware trade competence in East Africa.',
 }
 
-export const courses = [
-  {
-    id: 'mobile-repair',
-    title: 'Mobile Phone Repair & Maintenance',
-    category: 'Mobile Repair',
-    level: 'Beginner to Advanced',
-    description:
-      'Learn to diagnose and repair smartphones, tablets, and mobile devices. Master screen replacement, battery issues, charging problems, and software troubleshooting.',
-    icon: 'Smartphone',
-    skills: [
-      'Screen and display repair',
-      'Battery replacement and testing',
-      'Charging port troubleshooting',
-      'Software diagnostics',
-      'Component-level repairs',
-    ],
-    audience: 'Students interested in mobile device repair careers',
-    prerequisites: 'None',
-    duration: '[Contact for details]',
-    price: '[Contact for details]',
-    image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=85',
-  },
-  {
-    id: 'computer-repair',
-    title: 'Computer & Laptop Maintenance',
-    category: 'Computer and Laptop Repair',
-    level: 'Beginner to Intermediate',
-    description:
-      'Master computer hardware troubleshooting, repair, and upgrades. Learn diagnostics, component replacement, and system optimization.',
-    icon: 'Laptop',
-    skills: [
-      'Hardware diagnostics',
-      'Component replacement',
-      'Hard drive and SSD issues',
-      'RAM and memory upgrades',
-      'Thermal management and cooling',
-    ],
-    audience: 'Tech enthusiasts and aspiring IT technicians',
-    prerequisites: 'Basic computer knowledge recommended',
-    duration: '[Contact for details]',
-    price: '[Contact for details]',
-    image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=900&q=85',
-  },
-  {
-    id: 'electronics-troubleshooting',
-    title: 'Electronics Troubleshooting & Diagnostics',
-    category: 'Electronics',
-    level: 'Intermediate to Advanced',
-    description:
-      'Deep dive into circuit analysis, component testing, power supply issues, and systematic troubleshooting of consumer electronics.',
-    icon: 'Zap',
-    skills: [
-      'Multimeter and oscilloscope usage',
-      'Circuit board analysis',
-      'Component identification and testing',
-      'Power supply troubleshooting',
-      'Signal tracing techniques',
-    ],
-    audience: 'Electronics enthusiasts and advanced learners',
-    prerequisites: 'Basic electronics knowledge helpful',
-    duration: '[Contact for details]',
-    price: '[Contact for details]',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=900&q=85',
-  },
-  {
-    id: 'tv-repair',
-    title: 'TV & Electronic Device Repair',
-    category: 'TV and Other Devices',
-    level: 'Intermediate',
-    description:
-      'Learn to repair televisions, audio equipment, microwave ovens, and other household electronics using systematic diagnostic methods.',
-    icon: 'Monitor',
-    skills: [
-      'Display panel diagnostics',
-      'Power board troubleshooting',
-      'Audio system repair',
-      'Remote and sensor issues',
-      'Microwave and appliance repair',
-    ],
-    audience: 'Technicians and electronics repair professionals',
-    prerequisites: 'Basic electronics knowledge',
-    duration: '[Contact for details]',
-    price: '[Contact for details]',
-    image: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=900&q=85',
-  },
-]
-
 export const trainingHighlights = [
+
   {
-    title: 'Practical, Hands-On Learning',
+    title: 'የተግባርና የላብራቶሪ ስልጠና (Hands-On Lab Training)',
     description:
-      'Work with real electronic components, circuit boards, and equipment in our fully-equipped workshops.',
+      'Work with real electronic components, circuit boards, and industrial equipment in our fully-equipped workshops.',
     icon: 'GraduationCap',
   },
   {
-    title: 'Technical Troubleshooting Skills',
-    description: 'Learn systematic diagnostic methods using industry-standard tools and equipment.',
-    icon: 'Wrench',
+    title: 'የCOC እና ሙሉ ዕውቅና ያለው (COC & Full Accreditation)',
+    description:
+      'Fully accredited for all educational levels. Specialized preparation for Basic Electrical Electronics & Industrial Electrical Machines COC exams.',
+    icon: 'ShieldCheck',
   },
   {
-    title: 'Real Electronic Components',
+    title: 'ልዩ ማበረታቻ፦ 2+1 በነፃ (Special Promotion: 2+1 Free)',
     description:
-      'Repair actual mobile phones, computers, and electronics as part of your training curriculum.',
-    icon: 'Cpu',
+      'በነፃ፦ ከሁለት በላይ ት/ት ለሚመዘገብ አንድ ተጨማሪ ትምህርት በነፃ ይሰጣል። Register for more than two courses, get one completely free!',
+    icon: 'Sparkles',
   },
   {
-    title: 'Career-Oriented Education',
+    title: 'የኤሌክትሮኒክስ መጻህፍትና ዲጂታል ላይብረሪ (Technical Books Library)',
     description:
-      'Build skills that lead to employment opportunities in the growing electronics repair industry.',
-    icon: 'Briefcase',
+      'የኤሌክትሮኒክስ መጻህፍት አሉ። Comprehensive technical schematics, boardview files, and electronics reference handbooks available for all students.',
+    icon: 'BookOpen',
   },
 ]
 
-export const trainingGallery = [
-  {
-    id: 'workshop-1',
-    title: 'Soldering Station Workshop',
-    description:
-      'Students practice precision soldering and component-level repairs using professional-grade equipment.',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=85',
-  },
-  {
-    id: 'workshop-2',
-    title: 'Mobile Repair Workbench',
-    description:
-      'Specialized workstations equipped with microscopes and precision tools for smartphone repairs.',
-    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=85',
-  },
-  {
-    id: 'workshop-3',
-    title: 'Electronics Laboratory',
-    description: 'Equipped with oscilloscopes, multimeters, and diagnostic equipment for advanced troubleshooting.',
-    image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1000&q=85',
-  },
-  {
-    id: 'workshop-4',
-    title: 'Laptop Repair Station',
-    description:
-      'Complete setup for laptop hardware diagnostics, upgrades, and component-level repairs.',
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1000&q=85',
-  },
-  {
-    id: 'workshop-5',
-    title: 'Testing & Diagnostics Area',
-    description: 'Validation and testing equipment to ensure repairs meet quality standards.',
-    image: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=1000&q=85',
-  },
-  {
-    id: 'workshop-6',
-    title: 'Parts & Components Library',
-    description:
-      'Organized inventory of replacement parts, components, and repair supplies used in training.',
-    image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=1000&q=85',
-  },
-]
 
-export const digitalLibraryResources = [
+export const faqs = [
   {
-    id: 'manual-1',
-    title: 'Complete Mobile Phone Repair Manual',
-    category: 'Mobile Phone Repair Guides',
-    description: 'Comprehensive guide covering common mobile phone issues and repair procedures.',
-    format: 'PDF Guide',
-    level: 'Beginner to Intermediate',
-    status: 'Coming Soon',
-    price: '[Contact for pricing]',
-    pages: '250+',
+    q: 'Do I need previous electronics background to enroll?',
+    a: 'No prior experience is necessary. Our foundation modules start with core electrical concepts, meter measurements, and workbench safety before advancing to diagnosis and soldering.',
   },
   {
-    id: 'manual-2',
-    title: 'Laptop Hardware Troubleshooting Guide',
-    category: 'Computer and Laptop Maintenance',
-    description: 'Systematic approaches to diagnosing and fixing common laptop hardware problems.',
-    format: 'PDF Guide',
-    level: 'Intermediate',
-    status: 'Coming Soon',
-    price: '[Contact for pricing]',
-    pages: '180+',
+    q: 'ሙሉ ዕውቅና እና የCOC ስልጠና ይሰጣል? (Are courses accredited & COC aligned?)',
+    a: 'አዎ! ስልጠናዎቻችን ሙሉ ዕውቅና ያላቸው ሲሆን ለBasic Electrical Electronics እና Industrial Electrical Machines & Drives የCOC ፈተና ሙሉ ዝግጅት ይሰጣሉ። Yes, our institute is fully accredited for all educational levels and prepares students for national COC examinations.',
   },
   {
-    id: 'manual-3',
-    title: 'Electronics Circuit Board Analysis',
-    category: 'Electronics Troubleshooting',
-    description: 'Learn to read schematics, identify components, and analyze circuit board failures.',
-    format: 'PDF Guide',
-    level: 'Advanced',
-    status: 'Coming Soon',
-    price: '[Contact for pricing]',
-    pages: '320+',
+    q: 'ልዩ ቅናሽ ወይም ማበረታቻ አለ? (Is there a special promotion?)',
+    a: 'አዎ! በነፃ፦ ከሁለት በላይ ትምህርት ለሚመዘገብ አንድ ተጨማሪ ስልጠና በነፃ ይሰጣል (Register for more than two courses, get one free!). እንዲሁም ለሙሉ ክፍያ 10% ቅናሽ አለ።',
   },
   {
-    id: 'manual-4',
-    title: 'TV & Display Repair Procedures',
-    category: 'TV Repair',
-    description: 'Step-by-step procedures for repairing television displays and power systems.',
-    format: 'PDF Guide',
-    level: 'Intermediate',
-    status: 'Coming Soon',
-    price: '[Contact for pricing]',
-    pages: '200+',
+    q: 'Are tools and practice boards provided during the workshop?',
+    a: 'Yes! Every enrolled student is assigned a dedicated workbench station with professional soldering gear, diagnostic meters, microscopes, and practice motherboards.',
   },
   {
-    id: 'manual-5',
-    title: 'Diagnostic Tools & Equipment Guide',
-    category: 'Tools and Diagnostic Methods',
-    description:
-      'Complete reference for using multimeters, oscilloscopes, and other diagnostic equipment.',
-    format: 'PDF Guide',
-    level: 'Beginner to Advanced',
-    status: 'Coming Soon',
-    price: '[Contact for pricing]',
-    pages: '150+',
+    q: 'Can this program help me start my own repair shop in Ethiopia?',
+    a: 'Absolutely. Many alumni launch independent device repair shops or work as specialized hardware technicians. We include practical guidance on sourcing parts, shop tooling, and customer quotation.',
   },
   {
-    id: 'course-1',
-    title: 'Online Mobile Repair Basics Course',
-    category: 'Mobile Phone Repair Guides',
-    description: 'Recorded video course introducing mobile phone repair fundamentals.',
-    format: 'Video Course',
-    level: 'Beginner',
-    status: 'Coming Soon',
-    price: '[Contact for pricing]',
-    pages: '12 modules',
+    q: 'What are the class schedules and intake dates?',
+    a: 'We run weekday morning (8:30 AM – 12:00 PM), afternoon (1:30 PM – 5:00 PM), and Saturday intensive (9:00 AM – 4:30 PM) cohorts. Cohorts start every month with limited seats of 10 students.',
   },
-]
-
-export const adminMockData = {
-  inquiries: [
-    {
-      id: 'INQ-001',
-      studentName: 'Abebe Wolde',
-      email: 'abebe@example.com',
-      phone: '+251-91-123-4567',
-      course: 'Mobile Phone Repair & Maintenance',
-      preferredContact: 'Phone',
-      experience: 'Beginner',
-      status: 'New',
-      submittedAt: '2024-01-15',
-    },
-    {
-      id: 'INQ-002',
-      studentName: 'Selamawit Tadesse',
-      email: 'selamawit@example.com',
-      phone: '+251-92-234-5678',
-      course: 'Computer & Laptop Maintenance',
-      preferredContact: 'WhatsApp',
-      experience: 'Intermediate',
-      status: 'Contacted',
-      submittedAt: '2024-01-14',
-    },
-    {
-      id: 'INQ-003',
-      studentName: 'Yohannes Kebede',
-      email: 'yohannes@example.com',
-      phone: '+251-93-345-6789',
-      course: 'Electronics Troubleshooting & Diagnostics',
-      preferredContact: 'Email',
-      experience: 'Intermediate',
-      status: 'Converted',
-      submittedAt: '2024-01-13',
-    },
-  ],
-  overview: {
-    totalInquiries: 47,
-    newInquiries: 12,
-    registeredStudents: 34,
-    libraryInterest: 18,
-  },
-}
-
-export const categories = [
-  'Mobile Repair',
-  'Computer and Laptop Repair',
-  'Electronics',
-  'TV and Other Devices',
-]
-
-export const libraryCategories = [
-  'Mobile Phone Repair Guides',
-  'Computer and Laptop Maintenance',
-  'Electronics Troubleshooting',
-  'TV Repair',
-  'Tools and Diagnostic Methods',
 ]

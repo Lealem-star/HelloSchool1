@@ -10,10 +10,11 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "db:seed": "ts-node --compiler-options \"{\\\"module\\\":\\\"CommonJS\\\"}\" prisma/seed.ts"
+    "db:seed": "npx tsx scripts/sync-data.ts",
+    "db:sync": "npx tsx scripts/sync-data.ts"
   },
   "prisma": {
-    "seed": "ts-node --compiler-options \"{\\\"module\\\":\\\"CommonJS\\\"}\" prisma/seed.ts"
+    "seed": "npx tsx scripts/sync-data.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

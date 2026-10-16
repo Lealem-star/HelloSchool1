@@ -1,6 +1,6 @@
-# HelloSchool
+# ሄሎ የቴክኒክና ሙያ ማሰልጠኛ | Hello TVET
 
-HelloSchool is a technical education website for practical training in mobile phone repair, computer maintenance, and electronics troubleshooting.
+Hello TVET (Hello Technical and Vocational Training - ሄሎ የቴክኒክና ሙያ ማሰልጠኛ) is an accredited technical education and vocational training website for practical workbench education in mobile phone repair, computer maintenance, electronics, electrical installation, coding, video editing, and industrial troubleshooting in Bahir Dar, Ethiopia.
 
 ## Stack
 

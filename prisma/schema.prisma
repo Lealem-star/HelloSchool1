@@ -15,7 +15,7 @@ model Inquiry {
   course           String?
   preferredContact String?
   experience       String?
-  message          String?
+  message          String?   @db.Text
   status           String    @default("New")
   consent          Boolean   @default(false)
   createdAt        DateTime  @default(now())
@@ -31,14 +31,15 @@ model Course {
   title         String
   category      String
   level         String?
-  description   String?
+  description   String?  @db.Text
   icon          String?
   audience      String?
   prerequisites String?
   duration      String?
   price         String?
   image         String?
-  skills        String   // JSON array serialized as string, e.g. ["skill1","skill2"]
+  skills        String   @db.Text // JSON array serialized as string, e.g. ["skill1","skill2"]
+  syllabus      String?  @db.Text // JSON array serialized: [{ title, duration, description, lessons, labMilestone }]
   published     Boolean  @default(true)
   sortOrder     Int      @default(0)
   createdAt     DateTime @default(now())
@@ -85,6 +86,7 @@ model AdminUser {
   name      String?
   password  String
   role      String         @default("editor")
+  avatarUrl String?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   sessions  AdminSession[]
@@ -117,3 +119,166 @@ model Category {
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
 }
+
+model Instructor {
+  id          String   @id @default(cuid())
+  name        String
+  role        String
+  experience  String?
+  bio         String?  @db.Text
+  specialties String   @db.Text // JSON array serialized as string, e.g. ["Micro-soldering","Diagnostics"]
+  image       String?
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+}
+
+model WorkshopFacility {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  icon        String?
+  image       String?
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+}
+
+model StudentProject {
+  id                String   @id @default(cuid())
+  title             String
+  category          String?
+  device            String?
+  fault             String?  @db.Text
+  diagnosticProcess String?  @db.Text
+  solution          String?  @db.Text
+  outcome           String?  @db.Text
+  technician        String?
+  badge             String?
+  image             String?
+  published         Boolean  @default(true)
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([category])
+  @@index([published])
+}
+
+model Registration {
+  id                 String    @id @default(cuid())
+  registrationNumber String    @unique
+  fullName           String
+  phone              String
+  email              String?
+  telegramUsername   String?
+  city               String?
+  courseTitle        String
+  shift              String
+  education          String?
+  experienceYears    String?
+  paymentPlan        String    @default("full")
+  paymentMethod      String    @default("telebirr")
+  basePrice          Int       @default(2999)
+  discount           Int       @default(0)
+  finalPrice         Int       @default(2999)
+  couponCode         String?
+  transactionRef     String?
+  receiptUrl         String?   @db.Text
+  confirmationLink   String?   @db.Text
+  status             String    @default("Pending") // 'Pending', 'Approved', 'Rejected', 'Enrolled'
+  adminNotes         String?   @db.Text
+  approvedAt         DateTime?
+  approvedBy         String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  studentId          String?
+  student            Student?  @relation(fields: [studentId], references: [id], onDelete: SetNull)
+  institutionalEmail String?
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([phone])
+  @@index([registrationNumber])
+  @@index([studentId])
+  @@index([institutionalEmail])
+}
+
+model Student {
+  id                 String           @id @default(cuid())
+  studentId          String           @unique // e.g. STU-26-8921
+  fullName           String
+  institutionalEmail String           @unique // e.g. lealem.meseret@hellotvet.edu.et
+  personalEmail      String?
+  phone              String
+  telegramUsername   String?
+  password           String           // bcrypt hash
+  city               String?
+  avatarUrl          String?
+  status             String           @default("Active") // 'Active', 'Suspended'
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  registrations      Registration[]
+  sessions           StudentSession[]
+
+  @@index([phone])
+  @@index([institutionalEmail])
+}
+
+model StudentSession {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([studentId])
+  @@index([expiresAt])
+}
+
+model CompanyInquiry {
+  id              String   @id @default(cuid())
+  companyName     String
+  institutionType String   // "Hospital & Healthcare", "Industrial & Manufacturing", "University & Higher Ed", "Telecom & IT", "Banking & Finance", "Government & NGO", "Other"
+  contactPerson   String
+  jobTitle        String?
+  email           String
+  phone           String
+  employeeCount   String?  // e.g. "1-5 staff", "6-15 staff", "16-30 staff", "30+ staff"
+  trainingFocus   String?  // e.g. "Medical Equipment Electronics", "Industrial Boards & Automation", "Hardware & Server Diagnostics", "Micro-soldering & SMT", "Customized Curriculum"
+  location        String?  // "On-site at our facility", "At HelloSchool Campus (Bahir Dar)", "Hybrid"
+  message         String?  @db.Text
+  status          String   @default("New") // "New", "Contacted", "Proposal Sent", "In Discussion", "Converted", "Archived"
+  adminNotes      String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([institutionType])
+}
+
+model TrustedPartner {
+  id          String   @id @default(cuid())
+  name        String
+  category    String?  // "Hospital", "University", "Industry", "Telecom / IT", "Enterprise"
+  logoUrl     String   @db.Text
+  websiteUrl  String?
+  description String?
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
+  @@index([sortOrder])
+}
+

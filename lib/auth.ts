@@ -15,6 +15,7 @@ export type AdminUserInfo = {
   email: string
   role: string
   name: string | null
+  avatarUrl: string | null
 }
 
 function adminSecret() {
@@ -129,7 +130,7 @@ export async function login(
   })
 
   return {
-    user: { id: user.id, email: user.email, role: user.role, name: user.name },
+    user: { id: user.id, email: user.email, role: user.role, name: user.name, avatarUrl: user.avatarUrl ?? null },
   }
 }
 
@@ -166,7 +167,7 @@ export async function getCurrentUser(): Promise<AdminUserInfo | null> {
 
   if (!session || session.expiresAt < new Date()) {
     if (session) {
-      await prisma.adminSession.delete({ where: { id: session.id } }).catch(() => {})
+      await prisma.adminSession.delete({ where: { id: session.id } }).catch(() => { })
     }
     cookieStore.delete(ADMIN_COOKIE)
     return null
@@ -187,6 +188,7 @@ export async function getCurrentUser(): Promise<AdminUserInfo | null> {
     email: session.user.email,
     role: session.user.role,
     name: session.user.name,
+    avatarUrl: session.user.avatarUrl ?? null,
   }
 }
 

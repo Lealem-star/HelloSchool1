@@ -3,6 +3,26 @@ import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/auth'
 import { revalidatePublicSite } from '@/lib/revalidate'
 
+function parseSkills(skills: string | null | undefined): string[] {
+  if (!skills) return []
+  try {
+    const parsed = JSON.parse(skills)
+    return Array.isArray(parsed) ? parsed.map(String) : []
+  } catch {
+    return []
+  }
+}
+
+function parseSyllabus(syllabus: string | null | undefined): any[] {
+  if (!syllabus) return []
+  try {
+    const parsed = JSON.parse(syllabus)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
 export async function GET() {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -10,10 +30,11 @@ export async function GET() {
   const courses = await prisma.course.findMany({
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
   })
-  // Deserialize skills JSON string -> array
+  // Deserialize skills and syllabus JSON strings -> arrays
   const serialized = courses.map((c) => ({
     ...c,
-    skills: c.skills ? JSON.parse(c.skills) : [],
+    skills: parseSkills(c.skills),
+    syllabus: parseSyllabus(c.syllabus),
   }))
   return NextResponse.json({ items: serialized })
 }
@@ -37,6 +58,7 @@ export async function POST(request: Request) {
       price,
       image,
       skills,
+      syllabus,
       published,
       sortOrder,
     } = body
@@ -62,6 +84,7 @@ export async function POST(request: Request) {
         price: price ? String(price) : null,
         image: image ? String(image) : null,
         skills: JSON.stringify(Array.isArray(skills) ? skills : []),
+        syllabus: JSON.stringify(Array.isArray(syllabus) ? syllabus : []),
         published: typeof published === 'boolean' ? published : true,
         sortOrder: typeof sortOrder === 'number' ? sortOrder : 0,
       },
@@ -69,7 +92,11 @@ export async function POST(request: Request) {
 
     revalidatePublicSite()
     return NextResponse.json(
-      { ...course, skills: course.skills ? JSON.parse(course.skills) : [] },
+      {
+        ...course,
+        skills: parseSkills(course.skills),
+        syllabus: parseSyllabus(course.syllabus),
+      },
       { status: 201 }
     )
   } catch (e: any) {
@@ -115,6 +142,9 @@ export async function PUT(request: Request) {
     if (Array.isArray(data.skills)) {
       updateData.skills = JSON.stringify(data.skills)
     }
+    if (Array.isArray(data.syllabus)) {
+      updateData.syllabus = JSON.stringify(data.syllabus)
+    }
 
     const updated = await prisma.course.update({
       where: { id },
@@ -123,7 +153,8 @@ export async function PUT(request: Request) {
     revalidatePublicSite()
     return NextResponse.json({
       ...updated,
-      skills: updated.skills ? JSON.parse(updated.skills) : [],
+      skills: parseSkills(updated.skills),
+      syllabus: parseSyllabus(updated.syllabus),
     })
   } catch (e: any) {
     console.error(e)

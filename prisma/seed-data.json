@@ -1,0 +1,920 @@
+{
+  "categories": [
+    "Mobile Repair",
+    "Computer and Laptop Repair",
+    "Electronics",
+    "TV and Other Devices",
+    "Appliance Maintenance",
+    "Electrical Installation",
+    "Networking & IT",
+    "Digital Media & Animation",
+    "Software & Programming",
+    "Industrial Maintenance"
+  ],
+  "libraryCategories": [
+    "Mobile Phone Repair Guides",
+    "Computer and Laptop Maintenance",
+    "Electronics Troubleshooting",
+    "TV Repair",
+    "Tools and Diagnostic Methods"
+  ],
+  "courses": [
+    {
+      "id": "mobile-repair",
+      "title": "የሞባይል ጥገና ስልጠና (Mobile Maintenance Training)",
+      "category": "Mobile Repair",
+      "level": "Beginner to Advanced",
+      "description": "ተግባራዊ የስማርት ፎን እና ታብሌት ጥገና ስልጠና። ስክሪን፣ ባትሪ፣ ቻርጂንግ ፖርት፣ ማዘርቦርድ ማይክሮ-ሶልደሪንግ እና ሶፍትዌር ጥገና። Learn to diagnose and repair smartphones, tablets, and mobile devices at the micro-component level.",
+      "icon": "Smartphone",
+      "skills": [
+        "Screen and display replacement",
+        "Battery testing & power rail diagnosis",
+        "Micro-soldering & FPC connector rework",
+        "BGA IC reballing & charging circuits",
+        "Firmware flashing & software diagnostics"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Safety, Precision Tools & Hardware Teardown",
+          "duration": "2 Weeks",
+          "description": "ESD ground isolation, precision screwdrivers, heating plates, and safe battery extraction.",
+          "lessons": [
+            "Workstation safety & ground loop prevention",
+            "Heating plate & hot air adhesive softening",
+            "Display, frame, and battery extraction",
+            "Micro-bracket and screw organization"
+          ],
+          "labMilestone": "Perform clean teardown and reassembly of iPhone and Android test units."
+        },
+        {
+          "title": "Module 2: Multimeter Diagnostics & Primary Power Rails",
+          "duration": "3 Weeks",
+          "description": "Diode mode drop testing on FPC connectors, schematic reading, and DC power supply current draw analysis.",
+          "lessons": [
+            "Diode mode readings vs reference values",
+            "VBUS, VBAT & VDD_MAIN power sequencing",
+            "DC bench power supply short vs open signatures",
+            "Freeze spray and thermal short isolation"
+          ],
+          "labMilestone": "Locate shorted capacitor on main power rail and safely restore boot."
+        },
+        {
+          "title": "Module 3: Micro-Soldering & Jumper Running",
+          "duration": "3 Weeks",
+          "description": "Stereomicroscope soldering, 0.02mm insulated jumper wire routing, and charge port replacement.",
+          "lessons": [
+            "Microscope focus and ergonomics",
+            "0.02mm jumper wire routing for torn pads",
+            "UV-curable solder mask application",
+            "Type-C and micro-USB port rework"
+          ],
+          "labMilestone": "Reconstruct torn motherboard pads using jumper wire under magnification."
+        },
+        {
+          "title": "Module 4: BGA IC Reballing & Software Recovery",
+          "duration": "4 Weeks",
+          "description": "Underfill glue removal, BGA stencil reballing, PMIC replacement, and firmware flashing.",
+          "lessons": [
+            "Underfill resin softening and scraping",
+            "Direct-heat stencils and solder paste reballing",
+            "Power Management IC (PMIC) replacement",
+            "Firmware flashing and bootloop recovery"
+          ],
+          "labMilestone": "Reball and solder back a PMIC chip with verified device boot."
+        }
+      ],
+      "audience": "Students, technicians, and entrepreneurs launching phone repair shops",
+      "prerequisites": "No prior experience required",
+      "duration": "4 Months (Weekday / Weekend Cohorts)",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "tv-repair",
+      "title": "የቴሌቪዥንና ሌሎችም ጥገና ስልጠና (TV and Other Maintenance Training)",
+      "category": "TV and Other Devices",
+      "level": "Beginner to Intermediate",
+      "description": "የኤልኢዲ፣ ኤልሲዲ እና ስማርት ቴሌቪዥኖች፣ ፓወር ቦርድ (SMPS)፣ ባክላይት ድራይቨር፣ ቲ-ኮን ቦርድ እና የቤት ውስጥ ኤሌክትሮኒክስ ጥገና። Comprehensive troubleshooting for LED, LCD, smart TVs, SMPS boards, and home electronics.",
+      "icon": "Monitor",
+      "skills": [
+        "Switch-Mode Power Supply (SMPS) repair",
+        "LED backlight array replacement",
+        "T-Con board & LVDS signal timing",
+        "Tape cutoff method for panel COF shorts",
+        "Audio & household appliance troubleshooting"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: SMPS Power Supply Boards & High Voltage Inverters",
+          "duration": "2 Weeks",
+          "description": "Standby voltages (3.3V/5V), Power-ON simulation, and switching rails.",
+          "lessons": [
+            "Power board safety & capacitor discharging",
+            "PS_ON bench simulation using 1K resistors",
+            "Active PFC boost converter diagnostics",
+            "Inverter and protection shutdown circuits"
+          ],
+          "labMilestone": "Force-power an isolated TV power board with dummy load resistors."
+        },
+        {
+          "title": "Module 2: LED Backlight Arrays & Driver Circuits",
+          "duration": "2 Weeks",
+          "description": "LED strip testing, safe LCD glass removal, and current limiter modification.",
+          "lessons": [
+            "Dedicated backlight tester usage",
+            "Safe LCD glass panel suction removal",
+            "SMD LED diode replacement",
+            "Current sense resistor mod for longer lifespan"
+          ],
+          "labMilestone": "Disassemble 43\" panel, replace burnt LEDs, and perform current mod."
+        },
+        {
+          "title": "Module 3: Main Motherboards & T-Con Timing",
+          "duration": "2 Weeks",
+          "description": "Video processors, LVDS differential pairs, and T-Con voltage rails.",
+          "lessons": [
+            "Main board firmware and SPI flash recovery",
+            "LVDS clock and data differential lines",
+            "T-Con rails: VGH, VGL, AVDD, VCOM",
+            "Tape cutoff method for shorted panel glass"
+          ],
+          "labMilestone": "Isolate shorted panel ribbon using tape cutoff method to restore picture."
+        }
+      ],
+      "audience": "Electronics enthusiasts and TV repair technicians",
+      "prerequisites": "Basic electronics helpful",
+      "duration": "3 Months",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "computer-repair",
+      "title": "የኮምፒውተርና የላፕቶፕ ጥገና ስልጠና (Computer and Laptop Maintenance Training)",
+      "category": "Computer and Laptop Repair",
+      "level": "Beginner to Intermediate",
+      "description": "የዴስክቶፕ እና የላፕቶፕ ሀርድዌር ምርመራ፣ የማዘርቦርድ ፓወር ሬይል፣ ራም እና ኤስኤስዲ ማሻሻያ፣ እና የዊንዶውስ/ሊኑክስ ጥገና። Master laptop hardware diagnostics, motherboard power rails, thermal management, and system upgrades.",
+      "icon": "Laptop",
+      "skills": [
+        "Hardware diagnostics & troubleshooting",
+        "Motherboard 3.3V/5V always-on rails",
+        "RAM & NVMe SSD speed optimization",
+        "BIOS & UEFI chip reprogramming",
+        "Thermal paste & fan cleaning overhauls"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Desktop & Laptop Architecture & Teardown",
+          "duration": "2 Weeks",
+          "description": "Component identification, form factors, thermal paths, and safe disassemblies.",
+          "lessons": [
+            "CPU socket types and chipset topologies",
+            "Precision teardown of Ultrabooks and gaming laptops",
+            "Thermal cooling maintenance and fan bearing service",
+            "Display hinges, bezel, and keyboard replacements"
+          ],
+          "labMilestone": "Perform complete disassembly and thermal overhaul of modern laptops."
+        },
+        {
+          "title": "Module 2: Power Sequencing & Motherboard Diagnostics",
+          "duration": "3 Weeks",
+          "description": "S5, S3, and S0 power states, charging ICs, and buck converter troubleshooting.",
+          "lessons": [
+            "19V DC-in rail and current sensing resistors",
+            "3.3V and 5V standby PWM buck regulators",
+            "Embedded Controller (EC / KBC) signal lines",
+            "Power sequence timing from button press to POST"
+          ],
+          "labMilestone": "Diagnose non-powering laptop motherboard and replace shorted mosfet."
+        },
+        {
+          "title": "Module 3: BIOS Programming & OS Recovery",
+          "duration": "2 Weeks",
+          "description": "SPI flash programmer (CH341A), ME region cleaning, and fast operating system deployment.",
+          "lessons": [
+            "EEPROM flash chip extraction and clip programming",
+            "Intel Management Engine (ME) clean dump injection",
+            "Bootable diagnostic USB tools and drive cloning",
+            "Data recovery from damaged file systems"
+          ],
+          "labMilestone": "Flash corrupt BIOS chip on board and restore complete POST boot."
+        }
+      ],
+      "audience": "Aspiring IT technicians, PC builders, and computer support specialists",
+      "prerequisites": "Basic computer familiarity",
+      "duration": "3 Months",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "refrigerator-repair",
+      "title": "የፍሪጅ ጥገና ስልጠና (Refrigerator Maintenance Training)",
+      "category": "Appliance Maintenance",
+      "level": "Beginner to Advanced",
+      "description": "የቤት ውስጥ እና የንግድ ፍሪጆች ኮምፕረሰር ጥገና፣ ጋዝ ሙሌት (R134a/R600a)፣ ቴርሞስታት፣ የካፒላሪ ቱቦ እና የኤሌክትሪክ ሰርኪውት ስልጠና። Practical training on compressors, refrigerants, gas leak detection, brazing, and cooling circuit calibration.",
+      "icon": "Wrench",
+      "skills": [
+        "Compressor testing & relay replacement",
+        "Gas charging (R134a, R600a) & vacuuming",
+        "Copper tube brazing & flare joints",
+        "Thermostat & defrost timer wiring",
+        "Leak detection with manifold gauges"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Refrigeration Cycle & Mechanical Components",
+          "duration": "2 Weeks",
+          "description": "Vapor-compression cycle, evaporator, condenser, capillary tube, and compressor operation.",
+          "lessons": [
+            "Thermodynamics of cooling and heat transfer",
+            "Hermetic compressor internal mechanics",
+            "Condenser heat dissipation and filter driers",
+            "Capillary tube sizing and expansion"
+          ],
+          "labMilestone": "Test compressor windings for resistance and ground shorts using multimeter."
+        },
+        {
+          "title": "Module 2: Copper Brazing, Flaring & Vacuuming",
+          "duration": "3 Weeks",
+          "description": "Oxygen-acetylene / propane torch brazing, tube bending, flare fittings, and deep vacuuming.",
+          "lessons": [
+            "Safe torch operation and brazing rod alloys",
+            "Copper-to-copper and copper-to-steel joints",
+            "Two-stage vacuum pump operation and micron measurement",
+            "Nitrogen pressure testing for micro-leaks"
+          ],
+          "labMilestone": "Braze service valve, pull deep vacuum, and prove zero pressure loss."
+        },
+        {
+          "title": "Module 3: Gas Charging & Electrical Controls",
+          "duration": "3 Weeks",
+          "description": "Weighing R134a / R600a charges, defrost thermostats, bi-metal sensors, and inverter cooling boards.",
+          "lessons": [
+            "Refrigerant charging by digital scale weight",
+            "PTC starting relay, overload protector, and run capacitor",
+            "Defrost timer, heating element, and drain trough service",
+            "Inverter compressor DC driver boards and error codes"
+          ],
+          "labMilestone": "Complete full vacuum and gas recharge cycle to restore sub-zero cooling."
+        }
+      ],
+      "audience": "Technicians and trainees seeking high-demand appliance maintenance skills",
+      "prerequisites": "No prior experience required",
+      "duration": "2.5 Months",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "electrical-installation",
+      "title": "የህንፃዎች/የኤሌክትሪክ መስመር ዝርጋታ (Buildings / Electrical Line Installation)",
+      "category": "Electrical Installation",
+      "level": "Beginner to Advanced",
+      "description": "የመኖሪያ እና የንግድ ህንፃዎች የኤሌክትሪክ መስመር ዝርጋታ፣ የፓናል ቦርድ ገጠማ፣ የሰርኪውት ብሬከር ስሌት እና የደህንነት መርሆዎች። Residential and commercial electrical conduit layout, distribution panel installation, circuit breaker sizing, and grounding.",
+      "icon": "Zap",
+      "skills": [
+        "Conduit bending and surface/flush mounting",
+        "Single-phase & three-phase distribution panels",
+        "MCB, MCCB, and RCD earth leakage breakers",
+        "Lighting, two-way switching, and power sockets",
+        "Earthing rod installation & insulation testing"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Electrical Safety, Tools & Schematics",
+          "duration": "2 Weeks",
+          "description": "Ethiopian building electrical codes, schematic drawing, and wire gauge calculation.",
+          "lessons": [
+            "High voltage safety and lockout/tagout procedures",
+            "Electrical blueprint and conduit routing symbols",
+            "Wire gauge (AWG / mm²) calculation based on ampacity",
+            "Conduit types (PVC, EMT) and bending tools"
+          ],
+          "labMilestone": "Draft schematic and bend PVC conduits with clean 90° bends on simulation wall."
+        },
+        {
+          "title": "Module 2: Distribution Board Wiring & Protection",
+          "duration": "3 Weeks",
+          "description": "Main switch, RCD / ELCB shock prevention, busbars, and individual circuit breakers.",
+          "lessons": [
+            "Sub-panel vs main distribution board layouts",
+            "Sizing MCB breakers for lighting vs motor loads",
+            "Residual Current Devices (RCD) sensitivity and testing",
+            "Earth-neutral separation and busbar balancing"
+          ],
+          "labMilestone": "Wire complete 8-way distribution board with operational RCD trip testing."
+        },
+        {
+          "title": "Module 3: Residential & Commercial Circuit Installation",
+          "duration": "3 Weeks",
+          "description": "Intermediate switches, motion sensors, automatic water pump controllers, and generator changeovers.",
+          "lessons": [
+            "Two-way and intermediate staircase lighting circuits",
+            "High-power appliance circuits (water heaters, stoves)",
+            "Manual and automatic transfer switch (ATS) wiring",
+            "Megger insulation resistance testing"
+          ],
+          "labMilestone": "Wire full apartment mock-up with lighting, power circuits, and changeover switch."
+        }
+      ],
+      "audience": "Electricians, construction contractors, and technicians preparing for COC certification",
+      "prerequisites": "None",
+      "duration": "3 Months (Aligned with COC Basic Electrical Standards)",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "network-installation",
+      "title": "የኔትወርክ ዝርጋታ (Network Installation)",
+      "category": "Networking & IT",
+      "level": "Beginner to Intermediate",
+      "description": "የላን (LAN) እና ዋይፋይ ኔትወርክ መስመር ዝርጋታ፣ የኢተርኔት ኬብል ክሪምፒንግ፣ ራውተር/ስዊች ማስተካከል እና የኔትወርክ ደህንነት። Structured Ethernet cabling, fiber patch cords, Wi-Fi access point deployment, patch panel punching, and router configuration.",
+      "icon": "Wifi",
+      "skills": [
+        "Cat6 RJ45 crimping & punch-down patch panels",
+        "LAN switch & VLAN segmentation",
+        "Wi-Fi router & Access Point setup",
+        "IP addressing, DHCP, and DNS configuration",
+        "Network cable certification & speed testing"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Structured Cabling & Physical Infrastructure",
+          "duration": "2 Weeks",
+          "description": "T568A/T568B wiring standards, keystones, server racks, and cable management.",
+          "lessons": [
+            "Cat5e, Cat6, Cat6a, and fiber optic cable types",
+            "Precision RJ45 crimping and continuity testing",
+            "110-type punch down on 24-port patch panels",
+            "Cable management channels and server rack layout"
+          ],
+          "labMilestone": "Terminate patch panel and wall keystone jacks with 100% pass on cable tester."
+        },
+        {
+          "title": "Module 2: Network Equipment Configuration & Wi-Fi",
+          "duration": "3 Weeks",
+          "description": "Managed switches, Wi-Fi heatmaps, VLANs, and broadband router setup.",
+          "lessons": [
+            "Managed switch port configuration and VLAN tagging",
+            "Commercial Access Points (MikroTik / UniFi) deployment",
+            "Wi-Fi channel planning and 2.4GHz / 5GHz interference reduction",
+            "DHCP reservation, static IPs, and port forwarding"
+          ],
+          "labMilestone": "Deploy office network connecting 10 client devices with roaming Wi-Fi."
+        }
+      ],
+      "audience": "IT administrators, network installers, and office technicians",
+      "prerequisites": "Basic computer understanding",
+      "duration": "2 Months",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "dish-installation",
+      "title": "የዲሽ ተከላና ጥገና (Dish Installation and Maintenance)",
+      "category": "Electronics",
+      "level": "Beginner",
+      "description": "የሳተላይት ዲሽ ተከላ እና አቅጣጫ ማስተካከል፣ ባለብዙ ኤልኤንቢ (LNB) ገጠማ፣ የሪሲቨር ሶፍትዌር መጫን እና የሲግናል ማስተካከል ስልጠና። Satellite dish alignment (NSS 12, Eutelsat, Amos), multi-LNB brackets, DiSEqC switches, and digital receiver programming.",
+      "icon": "Radio",
+      "skills": [
+        "Azimuth, elevation, and LNB skew alignment",
+        "Digital satellite finder meter usage",
+        "Multi-LNB bracket configuration (Amos + Nilesat)",
+        "DiSEqC switch setup & RF coaxial cabling",
+        "Satellite receiver software flashing & channel scanning"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Satellite Orbit Fundamentals & Dish Mounting",
+          "duration": "2 Weeks",
+          "description": "Geostationary orbits, compass coordinates, rigid wall mounting, and dish assembly.",
+          "lessons": [
+            "Orbital degrees and satellite footprint coverage in Ethiopia",
+            "Plumb-line wall bracket anchoring and wind resistance",
+            "Coaxial RG-6 cable preparation and waterproof F-connectors",
+            "LNB skew angle calculation and focus distance"
+          ],
+          "labMilestone": "Mount dish mast, align to primary satellite, and achieve >85% signal quality."
+        },
+        {
+          "title": "Module 2: Multi-LNB Setup & Receiver Programming",
+          "duration": "2 Weeks",
+          "description": "Multi-satellite reception using single dish, DiSEqC switches, and receiver customization.",
+          "lessons": [
+            "Offset LNB focal points on multi-feed brackets",
+            "4-port and 8-port DiSEqC switch integration",
+            "Digital satellite receiver USB software upgrade",
+            "Blind scanning, transponder editing, and channel bouquet organization"
+          ],
+          "labMilestone": "Setup 3-LNB multi-satellite feed on single dish with auto DiSEqC switching."
+        }
+      ],
+      "audience": "Entrepreneurs, technicians, and satellite dish service providers",
+      "prerequisites": "No prior experience required",
+      "duration": "1.5 Months",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "video-editing",
+      "title": "የቪዲዮ ኤዲቲንግ (Video Editing)",
+      "category": "Digital Media & Animation",
+      "level": "Beginner to Advanced",
+      "description": "በPremiere Pro እና DaVinci Resolve ፕሮፌሽናል የቪዲዮ አቆራረጥ፣ የድምፅ ማስተካከያ፣ የቀለም ቅንብር (Color Grading) እና ሞሽን ግራፊክስ። Professional timeline editing, multi-camera cutting, cinematic color grading, sound design, and YouTube/TV exporting.",
+      "icon": "Film",
+      "skills": [
+        "Adobe Premiere Pro & DaVinci Resolve workflows",
+        "Rough cutting, pacing, and visual storytelling",
+        "Color grading (LUTs, color wheels, scopes)",
+        "Audio mixing, noise reduction, and sound effects",
+        "Text titles, lower thirds, and motion graphics"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Professional Editing Workflows & Assembly",
+          "duration": "3 Weeks",
+          "description": "Media management, codecs, proxies, timeline shortcuts, and rhythm-based assembly.",
+          "lessons": [
+            "Project setup, scratch disks, and 4K proxy workflows",
+            "Keyboard-driven timeline navigation and ripple editing",
+            "J-cuts, L-cuts, and seamless narrative transitions",
+            "Multi-camera sequence synchronization by audio waveform"
+          ],
+          "labMilestone": "Edit full 3-minute dynamic commercial from raw multi-angle footage."
+        },
+        {
+          "title": "Module 2: Cinematic Color Grading & Audio Engineering",
+          "duration": "3 Weeks",
+          "description": "Color science, waveform vectorscopes, dialogue cleanup, and final master export.",
+          "lessons": [
+            "Exposure and white balance correction using Lumetri scopes",
+            "Cinematic LUT application and skin tone protection",
+            "Dialogue leveling, EQ, compression, and background noise removal",
+            "Export settings tailored for YouTube, TikTok, and Ethiopian broadcast TV"
+          ],
+          "labMilestone": "Color grade documentary scene and mix full audio master to standard broadcast LUFS."
+        }
+      ],
+      "audience": "Content creators, video producers, and digital media enthusiasts",
+      "prerequisites": "Basic computer literacy",
+      "duration": "2.5 Months",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "animation-making",
+      "title": "አኒሜሽን አሰራር (Animation Making)",
+      "category": "Digital Media & Animation",
+      "level": "Beginner to Intermediate",
+      "description": "የ2ዲ (2D) እና 3ዲ (3D) አኒሜሽን መሰረታዊ መርሆዎች፣ የገጸ-ባህሪያት እንቅስቃሴ፣ የካርቱን ስራዎች እና የቪዥዋል ተፅእኖዎች ስልጠና። 2D and 3D character animation principles, motion design, vector rigging, keyframing, and animated video production.",
+      "icon": "Sparkles",
+      "skills": [
+        "12 Principles of Animation (Squash & Stretch, Anticipation, Timing)",
+        "Character design, rigging, and bone structures",
+        "Keyframing and graph editor speed curves",
+        "2D Vector animation in Adobe After Effects",
+        "Background illustration and visual storytelling"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Principles of Movement & 2D Vector Rigging",
+          "duration": "3 Weeks",
+          "description": "Physics of weight, bouncing balls, walk cycles, and character skeletal rigging.",
+          "lessons": [
+            "The 12 fundamental animation principles explained",
+            "Creating puppet joints and rigging character limbs",
+            "Fluid walk and run cycles with secondary action",
+            "Facial expression keyframing and lip-syncing to Amharic dialogue"
+          ],
+          "labMilestone": "Animate full character walk cycle with organic body weight and head turn."
+        },
+        {
+          "title": "Module 2: Motion Graphics & Short Film Production",
+          "duration": "3 Weeks",
+          "description": "Commercial motion design, logo animation, camera transitions, and audio sync.",
+          "lessons": [
+            "Kinetic typography and animated brand reveals",
+            "Parallax 2.5D background depth with virtual camera",
+            "Particle effects and stylized sound-design integration",
+            "Rendering optimized formats for web, games, and broadcast"
+          ],
+          "labMilestone": "Produce a 30-second animated story complete with character motion, music, and sound effects."
+        }
+      ],
+      "audience": "Graphic designers, animators, and digital artists",
+      "prerequisites": "Basic computer proficiency; drawing ability helpful but not required",
+      "duration": "3 Months",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "coding-programming",
+      "title": "የኮዲንግና ሶፍትዌር ፕሮግራሚንግ (Coding and Software Programming)",
+      "category": "Software & Programming",
+      "level": "Beginner to Advanced",
+      "description": "ተግባራዊ የኮምፒውተር ፕሮግራሚንግ፣ የዌብሳይት እና የዳታቤዝ አሰራር (HTML, CSS, JavaScript, Python)፣ እና የሶፍትዌር ፕሮጀክቶች ግንባታ። Hands-on programming fundamentals, web development, algorithm logic, and full-stack project building.",
+      "icon": "Code",
+      "skills": [
+        "JavaScript & Python core programming fundamentals",
+        "HTML5, modern CSS, and responsive UI layouts",
+        "Frontend framework components (React / Next.js concepts)",
+        "Backend REST APIs and SQL databases",
+        "Git version control and GitHub portfolio deployment"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Core Programming Logic & Modern Web Foundations",
+          "duration": "4 Weeks",
+          "description": "Variables, loops, data structures, algorithms, and responsive web styling.",
+          "lessons": [
+            "Computational thinking, conditional logic, and functions",
+            "HTML semantics and modern responsive layout (Flexbox & Grid)",
+            "JavaScript DOM manipulation and event-driven interactivity",
+            "Git version control, repositories, and collaborative branching"
+          ],
+          "labMilestone": "Build an interactive responsive portfolio website deployed live on the internet."
+        },
+        {
+          "title": "Module 2: Backend APIs, Databases & Project Architecture",
+          "duration": "4 Weeks",
+          "description": "Server development, relational databases, user authentication, and API endpoints.",
+          "lessons": [
+            "Node.js / Python backend servers and JSON endpoints",
+            "SQL database tables, relationships, and queries",
+            "User authentication, session tokens, and security best practices",
+            "Full-stack integration linking frontend UI to database storage"
+          ],
+          "labMilestone": "Develop and deploy a complete web application with functional user database."
+        }
+      ],
+      "audience": "Beginners seeking tech careers, students, and aspiring software developers",
+      "prerequisites": "Basic computer usage",
+      "duration": "4 Months",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "basic-computer",
+      "title": "መሰረታዊ የኮምፒውተር (Basic Computer)",
+      "category": "Computer and Laptop Repair",
+      "level": "Beginner",
+      "description": "የኮምፒውተር መሰረታዊ እውቀት፣ ማይክሮሶፍት ኦፊስ (Word, Excel, PowerPoint)፣ የኢንተርኔት እና የኢሜይል አጠቃቀም እና ፈጣን ታይፒንግ። Comprehensive computer literacy, professional document formatting, spreadsheet calculations, email etiquette, and cyber hygiene.",
+      "icon": "Layers",
+      "skills": [
+        "Windows OS navigation & file directory organization",
+        "Microsoft Word: Professional reports, tables, and letters",
+        "Microsoft Excel: Formulas, charts, and budget spreadsheets",
+        "Microsoft PowerPoint: Slide presentations & animations",
+        "Touch typing (Amharic & English) and email correspondence"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Operating System Literacy & Word Processing",
+          "duration": "2 Weeks",
+          "description": "Hardware overview, mouse/keyboard mastery, folder management, and Microsoft Word.",
+          "lessons": [
+            "Computer hardware parts and peripheral connections",
+            "Windows desktop customization and file organization",
+            "Touch typing speed drills (English and Fidel)",
+            "Microsoft Word document drafting, formatting, and PDF export"
+          ],
+          "labMilestone": "Format a 5-page formal business report with cover page, table of contents, and graphics."
+        },
+        {
+          "title": "Module 2: Spreadsheets, Presentations & Internet Proficiency",
+          "duration": "2 Weeks",
+          "description": "Excel calculations, presentation design, cloud storage, and secure web browsing.",
+          "lessons": [
+            "Excel rows/columns, math formulas (SUM, AVERAGE, IF), and charts",
+            "PowerPoint slide deck design and presentation skills",
+            "Google Drive cloud backup and file sharing",
+            "Email drafting, professional attachments, and internet safety"
+          ],
+          "labMilestone": "Create automated inventory spreadsheet and deliver slide presentation."
+        }
+      ],
+      "audience": "Students, office workers, job seekers, and anyone beginning their computer journey",
+      "prerequisites": "None",
+      "duration": "1.5 Months",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=900&q=85"
+    },
+    {
+      "id": "industrial-equipment",
+      "title": "የኢንዱስትሪ ዕቃዎች ጥገና ስልጠና (Industrial Equipment Maintenance Training)",
+      "category": "Industrial Maintenance",
+      "level": "Intermediate to Advanced",
+      "description": "የፋብሪካ እና የኢንዱስትሪ ማሽነሪዎች ጥገና፣ የኤሌክትሪክ ሞተሮች እና ድራይቮች (Drives & Inverters)፣ የሴንሰር ቁጥጥር እና የCOC ብቃት ስልጠና። Industrial electrical machines, motor controls, variable frequency drives (VFD), sensor diagnostics, and preventive maintenance aligned with COC standards.",
+      "icon": "Cpu",
+      "skills": [
+        "AC/DC industrial motor testing & rewinding basics",
+        "Variable Frequency Drives (VFD) programming & inverter tuning",
+        "Magnetic contactors, relays, and motor starters (Star-Delta)",
+        "Industrial sensors (proximity, optical, temperature, pressure)",
+        "PLC inputs/outputs & industrial safety interlocks"
+      ],
+      "syllabus": [
+        {
+          "title": "Module 1: Industrial Electrical Machines & Motor Starters",
+          "duration": "4 Weeks",
+          "description": "Three-phase induction motors, insulation megger tests, magnetic contactors, and starter circuits.",
+          "lessons": [
+            "Three-phase motor stator winding and torque principles",
+            "Direct-On-Line (DOL) and Star-Delta starter wiring",
+            "Thermal overload relay calibration and phase failure protectors",
+            "Insulation resistance (Megger) testing against ground breakdown"
+          ],
+          "labMilestone": "Wire and commission complete automatic Star-Delta motor starter with forward/reverse control."
+        },
+        {
+          "title": "Module 2: Inverters, Variable Frequency Drives (VFD) & Sensors",
+          "duration": "4 Weeks",
+          "description": "VFD installation, acceleration/deceleration parameters, sensor wiring, and fault diagnostics.",
+          "lessons": [
+            "Inverter power stages (rectifier, DC link capacitor, IGBT inverter)",
+            "VFD parameter programming for multi-speed motor control",
+            "Industrial 24V PNP/NPN sensors and limit switches",
+            "Troubleshooting overcurrent, overvoltage, and ground fault errors"
+          ],
+          "labMilestone": "Program industrial VFD to control conveyor belt motor with optical sensor triggers."
+        }
+      ],
+      "audience": "Factory technicians, maintenance engineers, and trainees preparing for COC Level certification",
+      "prerequisites": "Basic electrical or electronics knowledge",
+      "duration": "4 Months (Aligned with COC Industrial Electrical Machines & Drives)",
+      "price": "2699 Birr (Full Access)",
+      "image": "https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=900&q=85"
+    }
+  ],
+  "trainingGallery": [
+    {
+      "id": "workshop-1",
+      "title": "Soldering Station Workshop",
+      "description": "Students practice precision soldering and component-level repairs using professional-grade equipment.",
+      "image": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=85"
+    },
+    {
+      "id": "workshop-2",
+      "title": "Mobile Repair Workbench",
+      "description": "Specialized workstations equipped with microscopes and precision tools for smartphone repairs.",
+      "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=85"
+    },
+    {
+      "id": "workshop-3",
+      "title": "Electronics Laboratory",
+      "description": "Equipped with oscilloscopes, multimeters, and diagnostic equipment for advanced troubleshooting.",
+      "image": "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1000&q=85"
+    },
+    {
+      "id": "workshop-4",
+      "title": "Laptop Repair Station",
+      "description": "Complete setup for laptop hardware diagnostics, upgrades, and component-level repairs.",
+      "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1000&q=85"
+    },
+    {
+      "id": "workshop-5",
+      "title": "Testing & Diagnostics Area",
+      "description": "Validation and testing equipment to ensure repairs meet quality standards.",
+      "image": "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=1000&q=85"
+    },
+    {
+      "id": "workshop-6",
+      "title": "Parts & Components Library",
+      "description": "Organized inventory of replacement parts, components, and repair supplies used in training.",
+      "image": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=1000&q=85"
+    }
+  ],
+  "digitalLibraryResources": [
+    {
+      "id": "manual-1",
+      "title": "Complete Mobile Phone Hardware Diagnostic Manual",
+      "category": "Mobile Phone Repair Guides",
+      "description": "Step-by-step diagnostic workflows for modern iOS and Android smartphones: battery isolation, VDD power rail tracing, short circuit detection, and screen flex bonding.",
+      "format": "PDF Guide",
+      "level": "Beginner to Intermediate",
+      "status": "Available",
+      "price": "Free Reference",
+      "pages": "250+ pages",
+      "fileUrl": "https://archive.org/details/smartphone-repair-handbook"
+    },
+    {
+      "id": "manual-2",
+      "title": "Laptop Motherboard Power Sequencing & Schematics",
+      "category": "Computer and Laptop Maintenance",
+      "description": "Systematic breakdown of Intel & AMD laptop power states (S5, S3, S0), charging IC pinout diagnostics, 3.3V/5V always-on rails, and embedded controller (EC) communications.",
+      "format": "PDF Guide",
+      "level": "Intermediate to Advanced",
+      "status": "Available",
+      "price": "Student Resource",
+      "pages": "180+ pages",
+      "fileUrl": "https://archive.org/details/laptop-schematics-guide"
+    },
+    {
+      "id": "manual-3",
+      "title": "SMD Component Identification & Marking Code Handbook",
+      "category": "Tools and Diagnostic Methods",
+      "description": "Quick-lookup guide for surface-mount resistors, ceramic capacitors, diodes, MOSFET markings, and sot-23 packages with diode mode drop values.",
+      "format": "Quick Reference",
+      "level": "All Levels",
+      "status": "Available",
+      "price": "Free Reference",
+      "pages": "85 pages",
+      "fileUrl": "https://archive.org/details/smd-code-handbook"
+    },
+    {
+      "id": "manual-4",
+      "title": "Digital Multimeter & Oscilloscope Diagnostic Cheat Sheet",
+      "category": "Tools and Diagnostic Methods",
+      "description": "Essential reference charts for signal frequency measurements, ripple voltage probing, capacitor ESR testing, and diode mode readings on micro-components.",
+      "format": "Quick Reference",
+      "level": "Beginner to Intermediate",
+      "status": "Available",
+      "price": "Free Download",
+      "pages": "32 pages",
+      "fileUrl": "https://archive.org/details/electronics-test-bench"
+    },
+    {
+      "id": "manual-5",
+      "title": "Electronics Circuit Board Multi-Layer Analysis",
+      "category": "Electronics Troubleshooting",
+      "description": "Learn how to read complex schematics, identify buried ground planes, trace high-frequency clock signals, and repair broken trace vias using jumper wire.",
+      "format": "PDF Guide",
+      "level": "Advanced",
+      "status": "Coming Soon",
+      "price": "Course Enrollees",
+      "pages": "320+ pages",
+      "fileUrl": null
+    },
+    {
+      "id": "manual-6",
+      "title": "LED & Smart TV Display Panel Repair Procedures",
+      "category": "TV Repair",
+      "description": "Systematic troubleshooting for constant-current backlight drivers, T-CON timing controller clock signals (CKV/STV), and high-voltage SMPS supplies.",
+      "format": "PDF Guide",
+      "level": "Intermediate",
+      "status": "Coming Soon",
+      "price": "Contact for details",
+      "pages": "200+ pages",
+      "fileUrl": null
+    },
+    {
+      "id": "course-1",
+      "title": "Recorded Mobile Micro-Soldering Fundamentals",
+      "category": "Mobile Phone Repair Guides",
+      "description": "Video lesson series covering microscope setup, solder paste alloys, tip temperature management, 01005 component alignment, and thermal profiles.",
+      "format": "Video Course",
+      "level": "Intermediate",
+      "status": "Coming Soon",
+      "price": "Coming Soon",
+      "pages": "12 video modules",
+      "fileUrl": null
+    }
+  ],
+  "adminMockData": {
+    "inquiries": [
+      {
+        "id": "INQ-001",
+        "studentName": "Abebe Wolde",
+        "email": "abebe@example.com",
+        "phone": "+251-91-123-4567",
+        "course": "የሞባይል ጥገና ስልጠና (Mobile Maintenance Training)",
+        "preferredContact": "Phone",
+        "experience": "Beginner",
+        "status": "New",
+        "submittedAt": "2026-10-15"
+      },
+      {
+        "id": "INQ-002",
+        "studentName": "Selamawit Tadesse",
+        "email": "selamawit@example.com",
+        "phone": "+251-92-234-5678",
+        "course": "የኮምፒውተርና የላፕቶፕ ጥገና ስልጠና (Computer and Laptop Maintenance Training)",
+        "preferredContact": "WhatsApp",
+        "experience": "Intermediate",
+        "status": "Contacted",
+        "submittedAt": "2026-10-15"
+      }
+    ],
+    "overview": {
+      "totalInquiries": 47,
+      "newInquiries": 12,
+      "registeredStudents": 34,
+      "libraryInterest": 18
+    }
+  },
+  "instructors": [
+    {
+      "id": "inst-1",
+      "name": "Eng. Dawit Haile",
+      "role": "Lead Micro-Soldering & Mobile Repair Specialist",
+      "experience": "12+ Years Experience",
+      "bio": "Former senior diagnostic engineer at leading telecom repair centers in Addis Ababa. Specializes in multi-layer PCB micro-soldering, CPU/NAND reballing, and water damage recovery.",
+      "specialties": ["Micro-soldering & BGA Reballing", "SMD Troubleshooting", "Thermal Camera Diagnostics"],
+      "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+      "sortOrder": 0
+    },
+    {
+      "id": "inst-2",
+      "name": "Eng. Bethlehem Tadesse",
+      "role": "Senior Computer Systems & Logic Board Engineer",
+      "experience": "9+ Years Experience",
+      "bio": "Certified hardware engineer with extensive background in laptop motherboard schematics, power rail sequence diagnostics, and BIOS flashing.",
+      "specialties": ["Laptop Logic Boards", "Power Rail Sequencing", "Firmware & BIOS Recovery"],
+      "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
+      "sortOrder": 1
+    },
+    {
+      "id": "inst-3",
+      "name": "Henok Bekele",
+      "role": "Industrial Electronics & Audio/Video Diagnostics Lead",
+      "experience": "14+ Years Experience",
+      "bio": "Veteran consumer electronics technician. Expert in high-voltage safety, switch-mode power supply (SMPS) design, oscilloscope waveform analysis, and TV display panels.",
+      "specialties": ["SMPS Power Supplies", "Oscilloscope Signal Tracing", "Inverter & LED Driver Boards"],
+      "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+      "sortOrder": 2
+    }
+  ],
+  "workshopFacilities": [
+    {
+      "id": "fac-1",
+      "title": "Individual Workstations",
+      "description": "Each student receives a personal workbench with ESD matting, fume extractor, and regulated power.",
+      "icon": "Wrench",
+      "sortOrder": 0
+    },
+    {
+      "id": "fac-2",
+      "title": "Stereo Inspection Microscopes",
+      "description": "High-magnification trinocular microscopes with HDMI monitors for precision micro-soldering.",
+      "icon": "Cpu",
+      "sortOrder": 1
+    },
+    {
+      "id": "fac-3",
+      "title": "SMD Rework & Soldering Stations",
+      "description": "Digital temperature-calibrated soldering irons and adjustable hot air rework stations.",
+      "icon": "Zap",
+      "sortOrder": 2
+    },
+    {
+      "id": "fac-4",
+      "title": "Diagnostic Test Bench",
+      "description": "Dual-channel digital storage oscilloscopes, precision digital multimeters, and programmable DC power supplies.",
+      "icon": "CircuitBoard",
+      "sortOrder": 3
+    },
+    {
+      "id": "fac-5",
+      "title": "Ultrasonic PCB Washers",
+      "description": "Industrial-grade ultrasonic cleaning tanks for thorough chemical and corrosion removal.",
+      "icon": "Sparkles",
+      "sortOrder": 4
+    },
+    {
+      "id": "fac-6",
+      "title": "Components & Scrap Logic Library",
+      "description": "Hundreds of practice boards and component donor donors for risk-free skill development.",
+      "icon": "Laptop",
+      "sortOrder": 5
+    }
+  ],
+  "studentProjects": [
+    {
+      "id": "proj-01",
+      "title": "iPhone 13 Short Circuit on Main Power Rail",
+      "category": "Mobile Repair",
+      "device": "Apple iPhone 13 (A2482)",
+      "fault": "Device completely dead, pulling 2.8A on DC bench power supply immediately upon connection.",
+      "diagnosticProcess": "Isolated VDD_MAIN using thermal imaging camera; discovered glowing decoupling capacitor C3204 near the power management IC.",
+      "solution": "Safely desoldered defective capacitor using micro hot tweezers under 45x magnification; replaced with matched capacitance SMD component and verified impedance with diode mode test.",
+      "outcome": "Device booted into iOS with 100% data intact. Battery charging and fast-boot validated.",
+      "technician": "Kaleb M. (Cohort 4 Trainee)",
+      "badge": "Micro-Soldering Case",
+      "sortOrder": 0
+    },
+    {
+      "id": "proj-02",
+      "title": "Dell Latitude 5420 No-POST Liquid Ingress Recovery",
+      "category": "Computer Repair",
+      "device": "Dell Latitude 5420 Core i7",
+      "fault": "Laptop refused to power on following liquid spill; charging LED blinking amber-white code.",
+      "diagnosticProcess": "Disassembled motherboard; detected mineral corrosion bridges on 3.3V/5V always-on buck converter controller (RT6575).",
+      "solution": "Ultrasonic PCB bath in 99.9% isopropyl alcohol; re-tinned oxidized solder pads, replaced two corroded pull-up resistors, and cleared CMOS NVRAM.",
+      "outcome": "Motherboard completed power-on self-test; boot sequence into Windows verified stable under full CPU stress test.",
+      "technician": "Hiwot A. (Cohort 5 Trainee)",
+      "badge": "Motherboard Restoration",
+      "sortOrder": 1
+    },
+    {
+      "id": "proj-03",
+      "title": "Samsung 55\" 4K Smart TV Power Board Reconstruction",
+      "category": "TV and Other Devices",
+      "device": "Samsung UN55TU8000",
+      "fault": "Intermittent standby clicking relay sound; backlight did not illuminate and power cycling continuously.",
+      "diagnosticProcess": "Probed power board (SMPS) with digital multimeter; detected fluctuating 13V rail and bulged filtering electrolytic capacitors.",
+      "solution": "Discharged high-voltage primary capacitor; replaced degraded Low-ESR capacitors and reseated ribbon cables to the T-CON timing controller.",
+      "outcome": "Constant 13.2V stable rail restored; crisp 4K display image and audio output fully operational.",
+      "technician": "Abel T. (Cohort 3 Trainee)",
+      "badge": "Power Supply Diagnostics",
+      "sortOrder": 2
+    }
+  ]
+}

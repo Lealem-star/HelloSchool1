@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 
 const ADMIN_COOKIE = 'ems_admin_session'
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   if (pathname === '/api/admin/login') return NextResponse.next()
 
