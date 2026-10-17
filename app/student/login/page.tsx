@@ -54,12 +54,12 @@ export default function StudentLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between">
+    <div className="min-h-screen bg-transparent text-foreground flex flex-col justify-between">
       <Header />
 
       <main className="flex-1 flex items-center justify-center px-4 py-12 md:py-20 relative overflow-hidden">
         {/* Subtle background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-blue-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
         <div className="w-full max-w-md">
           {/* Top Brand Box */}
@@ -71,14 +71,14 @@ export default function StudentLoginPage() {
                 className="h-12 w-auto rounded-xl object-contain bg-white/95 p-1 shadow-md transition-transform group-hover:scale-105"
               />
             </Link>
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-bold text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 mb-2">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-600 dark:text-sky-400 border border-blue-500/20 mb-2">
               <GraduationCap className="size-3.5" /> Hello TVET Student Portal
             </div>
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
               Log In
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Access your enrolled workbench, syllabus, and technical learning resources.
+              Access your enrolled cohort courses, syllabus, and technical learning resources.
             </p>
           </div>
 
@@ -101,7 +101,7 @@ export default function StudentLoginPage() {
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder="e.g. lealem.meseret@hellotvet.edu.et or 0911..."
-                    className="h-11 w-full rounded-xl border border-input bg-background/80 pl-10 pr-3.5 text-sm outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    className="h-11 w-full rounded-xl border border-input bg-background/80 pl-10 pr-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                     autoFocus
                   />
@@ -117,7 +117,7 @@ export default function StudentLoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="h-11 w-full rounded-xl border border-input bg-background/80 pl-10 pr-10 text-sm outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    className="h-11 w-full rounded-xl border border-input bg-background/80 pl-10 pr-10 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                   />
                   <button
@@ -135,7 +135,7 @@ export default function StudentLoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 text-slate-950 font-bold hover:opacity-95 transition shadow-lg shadow-cyan-500/20"
+                className="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-lg shadow-blue-500/25"
               >
                 {loading ? (
                   <>
@@ -151,13 +151,13 @@ export default function StudentLoginPage() {
 
             {/* Institutional Email Info Tip */}
             <div className="mt-6 pt-5 border-t border-border/60">
-              <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/5 p-3.5 flex items-start gap-3">
-                <Sparkles className="size-4 text-cyan-500 shrink-0 mt-0.5" />
+              <div className="rounded-2xl border border-blue-500/25 bg-blue-500/5 p-3.5 flex items-start gap-3">
+                <Sparkles className="size-4 text-sky-500 shrink-0 mt-0.5" />
                 <div className="text-xs text-muted-foreground leading-relaxed">
                   <span className="font-semibold text-foreground">How your email is formatted:</span>
                   <br />
                   Your institutional login is automatically generated from your name and father&apos;s name:{' '}
-                  <span className="font-mono text-cyan-600 dark:text-cyan-400 font-bold">
+                  <span className="font-mono text-blue-600 dark:text-sky-400 font-bold">
                     firstname.fathername@hellotvet.edu.et
                   </span>
                   <br />
@@ -175,7 +175,7 @@ export default function StudentLoginPage() {
               Don&apos;t have an enrolled student account yet?{' '}
               <Link
                 href="/register"
-                className="font-bold text-cyan-600 dark:text-cyan-400 hover:underline inline-flex items-center gap-1"
+                className="font-bold text-blue-600 dark:text-sky-400 hover:underline inline-flex items-center gap-1"
               >
                 Register for a Course <ArrowRight className="size-3" />
               </Link>

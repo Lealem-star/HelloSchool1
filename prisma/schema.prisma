@@ -202,6 +202,8 @@ model Registration {
   studentId          String?
   student            Student?  @relation(fields: [studentId], references: [id], onDelete: SetNull)
   institutionalEmail String?
+  batchId            String?
+  batch              Batch?    @relation(fields: [batchId], references: [id], onDelete: SetNull)
 
   @@index([status])
   @@index([createdAt])
@@ -209,6 +211,7 @@ model Registration {
   @@index([registrationNumber])
   @@index([studentId])
   @@index([institutionalEmail])
+  @@index([batchId])
 }
 
 model Student {
@@ -281,4 +284,26 @@ model TrustedPartner {
   @@index([published])
   @@index([sortOrder])
 }
+
+model Batch {
+  id                   String         @id @default(cuid())
+  batchNumber          String         @unique // e.g. "Batch 01", "Batch 02", "Batch 12"
+  title                String         // e.g. "October 2026 Intake - Practical TVET Cohort"
+  description          String?        @db.Text
+  startDate            DateTime?
+  endDate              DateTime?
+  registrationDeadline DateTime?
+  status               String         @default("Open") // 'Open' (Enrolling), 'Active' (In Training), 'Completed', 'Upcoming' (Opening Soon)
+  capacity             Int            @default(60) // Target enrollment capacity across all courses
+  campus               String         @default("Bahir Dar Campus")
+  notes                String?        @db.Text
+  sortOrder            Int            @default(0)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  registrations        Registration[]
+
+  @@index([status])
+  @@index([sortOrder])
+}
+
 

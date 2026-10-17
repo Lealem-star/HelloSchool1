@@ -266,7 +266,7 @@ const DEFAULT_PARTNERS: PublicTrustedPartner[] = [
     name: 'Bahir Dar University (BDU)',
     category: 'Universities & Higher Ed',
     logoUrl: '/images/helloschool.jpg',
-    description: 'Electronics lab technicians & hardware repair workbench cohorts.',
+    description: 'Electronics lab technicians & hardware repair practical batches.',
   },
   {
     id: 'default-3',

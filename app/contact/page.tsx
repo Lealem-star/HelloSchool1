@@ -50,7 +50,7 @@ export default async function ContactPage() {
               <div className="mt-7 flex flex-col gap-6">
                 {/* Phone */}
                 <div className="flex items-start gap-4">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400">
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400">
                     <Phone className="size-5" />
                   </span>
                   <div>
@@ -62,7 +62,7 @@ export default async function ContactPage() {
 
                 {/* Email */}
                 <div className="flex items-start gap-4">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400">
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400">
                     <Mail className="size-5" />
                   </span>
                   <div>
@@ -74,7 +74,7 @@ export default async function ContactPage() {
 
                 {/* Address */}
                 <div className="flex items-start gap-4">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400">
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400">
                     <MapPin className="size-5" />
                   </span>
                   <div>
@@ -84,7 +84,7 @@ export default async function ContactPage() {
                       href={schoolConfig.googleMapsUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:underline"
+                      className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline"
                     >
                       View on Google Maps <ExternalLink className="size-3" />
                     </a>
@@ -93,7 +93,7 @@ export default async function ContactPage() {
 
                 {/* Hours */}
                 <div className="flex items-start gap-4">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400">
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400">
                     <Clock3 className="size-5" />
                   </span>
                   <div>
@@ -117,7 +117,7 @@ export default async function ContactPage() {
             {/* Directions & Transit Card */}
             <div className="rounded-3xl border bg-muted/40 p-6 card-hover-lift">
               <div className="flex items-center gap-3">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400">
+                <span className="flex size-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-sky-400">
                   <Navigation className="size-4" />
                 </span>
                 <h3 className="font-bold">Getting to Our Workshop</h3>
@@ -133,7 +133,7 @@ export default async function ContactPage() {
           </aside>
 
           {/* Inquiry Form */}
-          <section className="rounded-3xl border bg-card p-7 shadow-xl dark:shadow-cyan-950/20 md:p-10">
+          <section className="rounded-3xl border bg-card p-7 shadow-xl dark:shadow-blue-950/20 md:p-10">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary">
               <MessageSquare className="size-3.5" /> Admissions Desk
             </span>
@@ -164,7 +164,7 @@ export default async function ContactPage() {
 
             <div className="grid gap-5 md:grid-cols-2">
               {faqs.map((faq) => (
-                <div key={faq.q} className="card-hover-lift rounded-3xl border bg-card p-6 shadow-sm hover:border-cyan-500/40">
+                <div key={faq.q} className="card-hover-lift rounded-3xl border bg-card p-6 shadow-sm hover:border-blue-500/40">
                   <h3 className="font-bold text-base text-foreground">{faq.q}</h3>
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">{faq.a}</p>
                 </div>

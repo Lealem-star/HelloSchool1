@@ -11,17 +11,44 @@ export async function GET() {
       return NextResponse.json({ student: null }, { status: 401 })
     }
 
-    // Get all registrations for this student
-    const registrations = await (prisma as any).registration.findMany({
-      where: {
-        OR: [
-          { studentId: student.id },
-          { institutionalEmail: student.institutionalEmail },
-          { phone: student.phone },
-        ],
-      },
-      orderBy: { createdAt: 'desc' },
-    })
+    // Get all registrations for this student, including their linked Batch
+    let registrations: any[] = []
+    try {
+      registrations = await (prisma as any).registration.findMany({
+        where: {
+          OR: [
+            { studentId: student.id },
+            { institutionalEmail: student.institutionalEmail },
+            { phone: student.phone },
+          ],
+        },
+        include: {
+          batch: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      })
+    } catch {
+      registrations = await (prisma as any).registration.findMany({
+        where: {
+          OR: [
+            { studentId: student.id },
+            { institutionalEmail: student.institutionalEmail },
+            { phone: student.phone },
+          ],
+        },
+        orderBy: { createdAt: 'desc' },
+      })
+      try {
+        const rawBatches = (await (prisma as any).$queryRaw`
+          SELECT * FROM Batch
+        `) as any[]
+        const map = new Map(rawBatches.map((b) => [b.id, b]))
+        registrations = registrations.map((r) => ({
+          ...r,
+          batch: r.batchId ? map.get(r.batchId) || null : null,
+        }))
+      } catch {}
+    }
 
     // Get courses info for enrolled course syllabus & workshop specs
     const courses = await (prisma as any).course.findMany({

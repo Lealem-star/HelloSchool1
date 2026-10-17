@@ -51,7 +51,7 @@ export async function generateMetadata({
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: `${course.title} Workbench Curriculum`,
+          alt: `${course.title} Practical Curriculum`,
         },
       ],
     },
@@ -81,30 +81,30 @@ export default async function CourseDetail({ params }: { params: Promise<{ slug:
     <SiteShell>
       <JsonLd data={courseSchema} />
       <main>
-        <section className="relative overflow-hidden bg-slate-950 px-5 py-16 text-white lg:px-8 lg:py-24 circuit-grid-bg">
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-transparent to-slate-950 pointer-events-none" />
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] px-5 py-16 text-white lg:px-8 lg:py-24 circuit-grid-bg">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.2),transparent_45%)] pointer-events-none" />
           <div className="container relative mx-auto max-w-7xl">
             <Link
               href="/courses"
-              className="inline-flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-cyan-300"
+              className="inline-flex items-center gap-2 text-sm text-blue-100 transition-colors hover:text-white"
             >
               <ArrowLeft className="size-4" /> All courses
             </Link>
             <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_0.8fr] lg:items-center">
               <div className="animate-fade-in-up">
-                <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-cyan-300 animate-float-slow">
-                  <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white animate-float-slow backdrop-blur-md">
+                  <span className="size-2 rounded-full bg-white animate-pulse" />
                   {course.category}
                 </div>
                 <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl text-white">
                   {course.title}
                 </h1>
-                <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">{course.description}</p>
+                <p className="mt-6 max-w-2xl text-lg leading-8 text-blue-50">{course.description}</p>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   <Link href={`/register?course=${course.slug}`}>
                     <Button
                       size="lg"
-                      className="rounded-xl bg-cyan-400 px-6 font-bold text-slate-950 transition-all duration-300 hover:bg-cyan-300 hover:shadow-lg hover:shadow-cyan-400/25 hover:scale-[1.02]"
+                      className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]"
                     >
                       Register for this course <ArrowRight data-icon="inline-end" />
                     </Button>
@@ -113,26 +113,26 @@ export default async function CourseDetail({ params }: { params: Promise<{ slug:
                     <Button
                       size="lg"
                       variant="outline"
-                      className="rounded-xl border-slate-700 bg-slate-900/60 text-slate-300 hover:bg-slate-800"
+                      className="rounded-xl border-white/40 bg-white/10 text-white hover:bg-white/20 hover:border-white"
                     >
                       Quick Question
                     </Button>
                   </a>
                   {course.duration ? (
-                    <span className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-2.5 text-sm font-semibold text-slate-300">
-                      <Clock3 className="size-4 text-cyan-400" /> {course.duration}
+                    <span className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white">
+                      <Clock3 className="size-4 text-white" /> {course.duration}
                     </span>
                   ) : null}
                 </div>
               </div>
               {course.image ? (
-                <div className="relative group overflow-hidden rounded-3xl border border-white/15 bg-slate-900 shadow-2xl shadow-cyan-950/40">
+                <div className="relative group overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-2xl shadow-blue-950/30">
                   <img
                     src={course.image}
                     alt={course.title}
-                    className="aspect-[4/3] w-full rounded-3xl object-cover opacity-90 transition-transform duration-700 ease-out group-hover:scale-105"
+                    className="aspect-[4/3] w-full rounded-3xl object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c3694]/60 via-transparent to-transparent" />
                 </div>
               ) : null}
             </div>
@@ -141,17 +141,17 @@ export default async function CourseDetail({ params }: { params: Promise<{ slug:
 
         {/* ─── Practical Curriculum & Lab Milestones ─── */}
         {course.syllabus && course.syllabus.length > 0 && (
-          <section className="border-b bg-slate-900/70 py-16 lg:py-24 text-white">
+          <section className="border-b bg-slate-50/70 dark:bg-card/50 py-16 lg:py-24 text-foreground">
             <div className="container mx-auto max-w-7xl px-5 lg:px-8">
               <div className="max-w-3xl">
-                <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-300 mb-3">
+                <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-bold text-[#155DFC] dark:text-sky-400 mb-3">
                   <Layers className="size-3.5" /> Hands-On Curriculum Outline
                 </div>
-                <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
+                <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                   Step-by-step modular training roadmap
                 </h2>
-                <p className="mt-4 text-base text-slate-300">
-                  Each module pairs component-level circuit theory with independent workbench lab milestones.
+                <p className="mt-4 text-base text-muted-foreground">
+                  Each module pairs component-level circuit theory with independent practical lab milestones.
                 </p>
               </div>
 
@@ -159,43 +159,43 @@ export default async function CourseDetail({ params }: { params: Promise<{ slug:
                 {course.syllabus.map((mod, idx) => (
                   <div
                     key={idx}
-                    className="card-hover-lift group flex flex-col justify-between rounded-3xl border border-slate-800 bg-slate-950/90 p-6 shadow-xl lg:p-8 hover:border-cyan-500/40"
+                    className="card-hover-lift group flex flex-col justify-between rounded-3xl border bg-card p-6 shadow-sm lg:p-8 hover:border-[#155DFC]/50 hover:shadow-lg"
                   >
                     <div>
-                      <div className="flex items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
-                        <span className="inline-flex items-center rounded-lg bg-cyan-950/80 border border-cyan-800/60 px-3 py-1 text-xs font-bold text-cyan-300">
+                      <div className="flex items-center justify-between gap-3 border-b pb-4">
+                        <span className="inline-flex items-center rounded-lg bg-blue-500/10 border border-blue-500/25 px-3 py-1 text-xs font-bold text-[#155DFC] dark:text-sky-400">
                           Module {String(idx + 1).padStart(2, '0')}
                         </span>
                         {mod.duration && (
-                          <span className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                            <Clock3 className="size-3.5 text-cyan-400" />
+                          <span className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                            <Clock3 className="size-3.5 text-[#155DFC] dark:text-sky-400" />
                             {mod.duration}
                           </span>
                         )}
                       </div>
 
-                      <h3 className="mt-4 text-xl font-bold text-white transition-colors group-hover:text-cyan-300">
+                      <h3 className="mt-4 text-xl font-bold text-foreground transition-colors group-hover:text-[#155DFC]">
                         {mod.title}
                       </h3>
 
                       {mod.description && (
-                        <p className="mt-2 text-sm leading-6 text-slate-300">
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
                           {mod.description}
                         </p>
                       )}
 
                       {mod.lessons && mod.lessons.length > 0 && (
                         <div className="mt-5 space-y-2">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Topics Covered:
                           </p>
                           <ul className="space-y-2">
                             {mod.lessons.map((lesson, lIdx) => (
                               <li
                                 key={lIdx}
-                                className="flex items-start gap-2.5 text-xs text-slate-300 transition-colors hover:text-white"
+                                className="flex items-start gap-2.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
                               >
-                                <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-cyan-400" />
+                                <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-[#155DFC]" />
                                 <span>{lesson}</span>
                               </li>
                             ))}
@@ -205,12 +205,12 @@ export default async function CourseDetail({ params }: { params: Promise<{ slug:
                     </div>
 
                     {mod.labMilestone && (
-                      <div className="mt-6 rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-4 shadow-sm">
-                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-300">
+                      <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm">
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">
                           <Wrench className="size-3.5" />
                           Practical Lab Milestone
                         </div>
-                        <p className="mt-1.5 text-xs font-medium leading-relaxed text-amber-100">
+                        <p className="mt-1.5 text-xs font-medium leading-relaxed text-foreground">
                           {mod.labMilestone}
                         </p>
                       </div>
@@ -243,7 +243,7 @@ export default async function CourseDetail({ params }: { params: Promise<{ slug:
               </p>
             </div>
           </div>
-          <div id="inquire" className="rounded-3xl border bg-card p-7 shadow-xl dark:shadow-cyan-950/20 md:p-9 scroll-mt-24">
+          <div id="inquire" className="rounded-3xl border bg-card p-7 shadow-xl dark:shadow-blue-950/20 md:p-9 scroll-mt-24">
             <h2 className="text-2xl font-bold">Ask about this course</h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               Share your details and the school can follow up with dates, requirements, and pricing.

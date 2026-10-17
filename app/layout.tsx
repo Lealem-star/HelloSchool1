@@ -4,6 +4,7 @@ import Script from 'next/script'
 import './globals.css'
 import { getOrganizationSchema, JsonLd } from '@/lib/schema'
 import { AppProviders } from '@/components/providers'
+import { GeometricBackground } from '@/components/geometric-background'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://helloschool.edu.et'
 
@@ -106,9 +107,12 @@ export default function RootLayout({
         />
         <JsonLd data={orgSchema} />
       </head>
-      <body className="antialiased">
+      <body className="antialiased min-h-screen bg-background relative selection:bg-blue-600 selection:text-white">
         <AppProviders>
-          {children}
+          <GeometricBackground />
+          <div className="relative z-10 flex min-h-screen flex-col">
+            {children}
+          </div>
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </AppProviders>
       </body>

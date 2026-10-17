@@ -33,7 +33,7 @@ export function LanguageToggle({ className = '', size = 'md' }: LanguageTogglePr
     <div
       role="group"
       aria-label={t('languageToggle')}
-      className={`inline-flex items-center rounded-xl border border-border/70 bg-card/70 p-1 shadow-sm backdrop-blur-md transition-colors hover:border-cyan-400/50 ${className}`}
+      className={`inline-flex items-center rounded-xl border border-border/70 bg-card/70 p-1 shadow-sm backdrop-blur-md transition-colors hover:border-blue-500/50 ${className}`}
     >
       <div className="flex items-center pl-1 pr-1.5 text-muted-foreground" aria-hidden="true">
         <Globe className="size-3.5" />
@@ -47,7 +47,7 @@ export function LanguageToggle({ className = '', size = 'md' }: LanguageTogglePr
           aria-label="Amharic / አማርኛ"
           className={`rounded-lg px-2 py-1 text-xs font-semibold transition-all duration-200 ${
             language === 'am'
-              ? 'bg-cyan-500 text-slate-950 shadow-sm font-bold'
+              ? 'bg-blue-600 text-white shadow-sm font-bold'
               : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
           }`}
         >
@@ -61,7 +61,7 @@ export function LanguageToggle({ className = '', size = 'md' }: LanguageTogglePr
           aria-label="English"
           className={`rounded-lg px-2 py-1 text-xs font-semibold transition-all duration-200 ${
             language === 'en'
-              ? 'bg-cyan-500 text-slate-950 shadow-sm font-bold'
+              ? 'bg-blue-600 text-white shadow-sm font-bold'
               : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground'
           }`}
         >

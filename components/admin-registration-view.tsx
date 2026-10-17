@@ -24,8 +24,12 @@ import {
   CreditCard,
   Send,
   Sparkles,
+  Plus,
+  Layers,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useConfirm } from '@/components/ui/dialog-modal'
+import type { BatchItem } from './admin-batch-view'
 
 export type AdminRegistration = {
   id: string
@@ -54,6 +58,13 @@ export type AdminRegistration = {
   approvedBy: string | null
   createdAt: string
   updatedAt?: string
+  batchId?: string | null
+  batch?: {
+    id: string
+    batchNumber: string
+    title: string
+    status: string
+  } | null
 }
 
 export type RegistrationOverview = {
@@ -97,6 +108,7 @@ const STATUS_CONFIG: Record<
 export function RegistrationsView({
   items,
   overview,
+  batches = [],
   loading,
   search,
   setSearch,
@@ -108,9 +120,13 @@ export function RegistrationsView({
   onDelete,
   onBulkDelete,
   onSaveNotes,
+  onAssignToBatch,
+  onRemoveFromBatch,
+  onNavigateToBatches,
 }: {
   items: AdminRegistration[]
   overview: RegistrationOverview
+  batches?: BatchItem[]
   loading: boolean
   search: string
   setSearch: (v: string) => void
@@ -122,10 +138,22 @@ export function RegistrationsView({
   onDelete: (id: string) => Promise<void>
   onBulkDelete: (ids: string[]) => Promise<void>
   onSaveNotes: (id: string, notes: string) => Promise<void>
+  onAssignToBatch?: (data: {
+    batchId: string
+    registrationId?: string
+    studentName?: string
+    phone?: string
+    courseTitle: string
+    shift: string
+    status?: string
+  }) => Promise<boolean>
+  onRemoveFromBatch?: (registrationId: string) => Promise<boolean>
+  onNavigateToBatches?: () => void
 }) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [inspectItem, setInspectItem] = useState<AdminRegistration | null>(null)
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
+  const [batchFilter, setBatchFilter] = useState<string>('All')
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text)
@@ -157,7 +185,14 @@ export function RegistrationsView({
         ? r.status === 'Rejected'
         : true
 
-    return matchesQuery && matchesStatus
+    const matchesBatch =
+      batchFilter === 'All'
+        ? true
+        : batchFilter === 'unassigned'
+        ? !r.batchId && !r.batch
+        : r.batchId === batchFilter || r.batch?.id === batchFilter
+
+    return matchesQuery && matchesStatus && matchesBatch
   })
 
   const allSelected = filtered.length > 0 && selectedIds.length === filtered.length
@@ -176,13 +211,13 @@ export function RegistrationsView({
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div
           onClick={() => setStatusFilter('All')}
-          className={`cursor-pointer rounded-2xl border bg-card p-5 shadow-sm transition hover:border-cyan-500/50 ${
-            statusFilter === 'All' ? 'ring-2 ring-cyan-500' : ''
+          className={`cursor-pointer rounded-2xl border bg-card p-5 shadow-sm transition hover:border-blue-500/50 ${
+            statusFilter === 'All' ? 'ring-2 ring-blue-500' : ''
           }`}
         >
           <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             <span>Total Applications</span>
-            <FileText className="size-4 text-cyan-500" />
+            <FileText className="size-4 text-blue-600 dark:text-sky-400" />
           </div>
           <p className="mt-2 text-2xl font-black text-foreground">{overview.total}</p>
           <p className="mt-1 text-xs text-muted-foreground">All course applicants</p>
@@ -252,13 +287,13 @@ export function RegistrationsView({
               onClick={() => setStatusFilter(st)}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                 statusFilter === st
-                  ? 'bg-cyan-500 text-slate-950 shadow-sm'
+                  ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
               {st}
               {st === 'Pending' && overview.pending > 0 && (
-                <span className="ml-1.5 rounded-full bg-amber-500 px-1.5 py-0.2 text-[10px] font-black text-slate-950">
+                <span className="ml-1.5 rounded-full bg-amber-500 px-1.5 py-0.2 text-[10px] font-black text-white">
                   {overview.pending}
                 </span>
               )}
@@ -267,14 +302,35 @@ export function RegistrationsView({
         </div>
 
         {/* Right actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Batch (ዙር) Filter */}
+          {batches.length > 0 && (
+            <div className="flex items-center gap-1.5 rounded-xl border bg-card px-2.5 py-1.5 text-xs shadow-xs">
+              <Layers className="size-3.5 text-blue-600 dark:text-sky-400 shrink-0" />
+              <span className="font-semibold text-muted-foreground text-[11px]">Batch:</span>
+              <select
+                value={batchFilter}
+                onChange={(e) => setBatchFilter(e.target.value)}
+                className="bg-transparent font-bold text-foreground outline-none cursor-pointer text-xs"
+              >
+                <option value="All">All Batches (ሁሉም ዙሮች)</option>
+                <option value="unassigned">Unassigned (No Batch)</option>
+                {batches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.batchNumber} · {b.status} ({b.enrolledCount || 0} students)
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, phone, course, Reg#..."
-              className="h-10 w-full min-w-[260px] rounded-xl border bg-card pl-9 pr-4 text-xs outline-none focus:ring-2 focus:ring-cyan-500"
+              className="h-10 w-full min-w-[260px] rounded-xl border bg-card pl-9 pr-4 text-xs outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -291,9 +347,9 @@ export function RegistrationsView({
 
       {/* ── BULK ACTION BAR ── */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center justify-between rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-3.5 text-xs font-medium text-foreground">
+        <div className="flex items-center justify-between rounded-2xl border border-blue-500/30 bg-blue-500/10 p-3.5 text-xs font-medium text-foreground">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-cyan-600 dark:text-cyan-400">
+            <span className="font-bold text-blue-600 dark:text-sky-400">
               {selectedIds.length} registration{selectedIds.length > 1 ? 's' : ''} selected
             </span>
           </div>
@@ -335,7 +391,7 @@ export function RegistrationsView({
                 <th className="w-10 px-4 py-3.5">
                   <button onClick={toggleSelectAll} className="flex items-center">
                     {allSelected ? (
-                      <CheckSquare className="size-4 text-cyan-500" />
+                      <CheckSquare className="size-4 text-blue-600" />
                     ) : (
                       <Square className="size-4 text-muted-foreground" />
                     )}
@@ -352,7 +408,7 @@ export function RegistrationsView({
               {loading ? (
                 <tr>
                   <td colSpan={6} className="py-16 text-center">
-                    <Loader2 className="mx-auto size-6 animate-spin text-cyan-500" />
+                    <Loader2 className="mx-auto size-6 animate-spin text-blue-600" />
                     <p className="mt-2 text-xs text-muted-foreground">Loading applications...</p>
                   </td>
                 </tr>
@@ -373,7 +429,7 @@ export function RegistrationsView({
                     <tr
                       key={item.id}
                       className={`transition-colors hover:bg-muted/40 ${
-                        isSelected ? 'bg-cyan-500/5' : ''
+                        isSelected ? 'bg-blue-500/5' : ''
                       }`}
                     >
                       {/* Checkbox */}
@@ -383,7 +439,7 @@ export function RegistrationsView({
                           className="flex items-center"
                         >
                           {isSelected ? (
-                            <CheckSquare className="size-4 text-cyan-500" />
+                            <CheckSquare className="size-4 text-blue-600" />
                           ) : (
                             <Square className="size-4 text-muted-foreground" />
                           )}
@@ -405,7 +461,7 @@ export function RegistrationsView({
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
                             <a
                               href={`tel:${item.phone}`}
-                              className="inline-flex items-center gap-1 font-medium text-cyan-600 hover:underline dark:text-cyan-400"
+                              className="inline-flex items-center gap-1 font-medium text-blue-600 hover:underline dark:text-sky-400"
                             >
                               <Phone className="size-3" /> {item.phone}
                             </a>
@@ -440,9 +496,31 @@ export function RegistrationsView({
                           <span className="font-semibold text-foreground line-clamp-1">
                             {item.courseTitle}
                           </span>
-                          <span className="inline-flex items-center gap-1 text-[11px] text-cyan-700 dark:text-cyan-300 font-medium">
+                          <span className="inline-flex items-center gap-1 text-[11px] text-blue-700 dark:text-sky-300 font-medium">
                             <Clock className="size-3 shrink-0" /> {item.shift}
                           </span>
+
+                          <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                            {/* Academic Batch (ዙር) Badge */}
+                            {item.batch ? (
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  if (onNavigateToBatches) onNavigateToBatches()
+                                }}
+                                className="inline-flex items-center gap-1 rounded bg-blue-500/10 border border-blue-500/25 px-1.5 py-0.5 text-[10px] font-bold text-blue-700 dark:text-sky-300 w-fit cursor-pointer hover:bg-blue-500/20"
+                                title={`Batch: ${item.batch.batchNumber} - ${item.batch.title}`}
+                              >
+                                <Layers className="size-2.5 text-blue-600 dark:text-sky-400 shrink-0" />
+                                {item.batch.batchNumber}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/70">
+                                <Layers className="size-2.5 text-muted-foreground/60 shrink-0" />
+                                No Batch
+                              </span>
+                            )}
+                          </div>
                           {item.education && (
                             <span className="text-[10px] text-muted-foreground">
                               Edu: {item.education}
@@ -485,7 +563,7 @@ export function RegistrationsView({
                               href={item.receiptUrl}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-600 hover:underline dark:text-cyan-400"
+                              className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline dark:text-sky-400"
                             >
                               <ExternalLink className="size-3" /> View Bank Receipt
                             </a>
@@ -580,6 +658,10 @@ export function RegistrationsView({
           open={!!inspectItem}
           onClose={() => setInspectItem(null)}
           item={inspectItem}
+          batches={batches}
+          onAssignToBatch={onAssignToBatch}
+          onRemoveFromBatch={onRemoveFromBatch}
+          onNavigateToBatches={onNavigateToBatches}
           onUpdateStatus={async (status) => {
             await onUpdateStatus(inspectItem.id, status)
             setInspectItem((prev) => (prev ? { ...prev, status } : null))
@@ -598,18 +680,41 @@ function RegistrationDetailsModal({
   open,
   onClose,
   item,
+  batches = [],
   onUpdateStatus,
   onSaveNotes,
+  onAssignToBatch,
+  onRemoveFromBatch,
+  onNavigateToBatches,
 }: {
   open: boolean
   onClose: () => void
   item: AdminRegistration
+  batches?: BatchItem[]
   onUpdateStatus: (status: string) => Promise<void>
   onSaveNotes: (notes: string) => Promise<void>
+  onAssignToBatch?: (data: {
+    batchId: string
+    registrationId?: string
+    studentName?: string
+    phone?: string
+    courseTitle: string
+    shift: string
+    status?: string
+  }) => Promise<boolean>
+  onRemoveFromBatch?: (registrationId: string) => Promise<boolean>
+  onNavigateToBatches?: () => void
 }) {
   const [notes, setNotes] = useState(item.adminNotes || '')
   const [savingNotes, setSavingNotes] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+
+  const currentBatch = batches.find((b) => b.id === (item.batchId || item.batch?.id))
+  const [selectedBatchId, setSelectedBatchId] = useState(
+    currentBatch ? currentBatch.id : batches.length > 0 ? batches[0].id : ''
+  )
+  const [assigningBatch, setAssigningBatch] = useState(false)
+  const { confirm, alert } = useConfirm()
 
   if (!open) return null
 
@@ -618,7 +723,11 @@ function RegistrationDetailsModal({
     setSavingNotes(true)
     try {
       await onSaveNotes(notes)
-      alert('Internal staff notes saved!')
+      await alert({
+        title: 'Notes Saved',
+        message: 'Internal staff notes saved successfully.',
+        variant: 'success',
+      })
     } finally {
       setSavingNotes(false)
     }
@@ -730,7 +839,7 @@ function RegistrationDetailsModal({
               <div className="mt-3 space-y-2 text-xs">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Phone:</span>
-                  <a href={`tel:${item.phone}`} className="font-semibold text-cyan-600 dark:text-cyan-400">
+                  <a href={`tel:${item.phone}`} className="font-semibold text-blue-600 dark:text-sky-400">
                     {item.phone}
                   </a>
                 </div>
@@ -771,7 +880,7 @@ function RegistrationDetailsModal({
                 </div>
                 <div className="flex justify-between pt-1">
                   <span className="text-muted-foreground">Shift:</span>
-                  <span className="font-semibold text-cyan-600 dark:text-cyan-400">{item.shift}</span>
+                  <span className="font-semibold text-blue-600 dark:text-sky-400">{item.shift}</span>
                 </div>
                 {item.education && (
                   <div className="flex justify-between">
@@ -787,6 +896,141 @@ function RegistrationDetailsModal({
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Academic Batch (ዙር / Cohort Intake) Card */}
+          <div className="rounded-2xl border border-blue-500/30 bg-blue-500/5 p-4 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="size-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                  <Layers className="size-4" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 block">
+                    Academic Batch (ዙር / Cohort Intake)
+                  </span>
+                  <p className="text-xs font-semibold text-foreground">
+                    {item.batch ? (
+                      <>
+                        Enrolled in <strong className="text-blue-600 dark:text-sky-400">{item.batch.batchNumber}</strong>: {item.batch.title}
+                        <span className="ml-2 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 text-[10px] font-bold border border-emerald-500/30">
+                          {item.batch.status}
+                        </span>
+                      </>
+                    ) : (
+                      'No batch intake allocated yet'
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {onNavigateToBatches && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose()
+                    onNavigateToBatches()
+                  }}
+                  className="text-[11px] font-bold text-blue-600 hover:underline inline-flex items-center gap-1"
+                >
+                  Manage all batches <ExternalLink className="size-3" />
+                </button>
+              )}
+            </div>
+
+            {batches.length > 0 && onAssignToBatch && (
+              <div className="rounded-xl bg-background/80 border p-3 flex flex-col sm:flex-row sm:items-center gap-2 text-xs">
+                <div className="flex-1">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
+                    Assign / Switch Academic Batch
+                  </label>
+                  <select
+                    value={selectedBatchId}
+                    onChange={(e) => setSelectedBatchId(e.target.value)}
+                    className="w-full h-9 rounded-lg border bg-background px-2.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {batches.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.batchNumber} · {b.title} ({b.status})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2 sm:self-end pt-1 sm:pt-0">
+                  <Button
+                    size="sm"
+                    disabled={assigningBatch || !selectedBatchId || selectedBatchId === item.batch?.id}
+                    onClick={async () => {
+                      setAssigningBatch(true)
+                      try {
+                        const ok = await onAssignToBatch({
+                          batchId: selectedBatchId,
+                          registrationId: item.id,
+                          studentName: item.fullName,
+                          phone: item.phone,
+                          courseTitle: item.courseTitle,
+                          shift: item.shift,
+                          status: item.status,
+                        })
+                        if (ok) {
+                          const found = batches.find((b) => b.id === selectedBatchId)
+                          if (found) {
+                            item.batch = {
+                              id: found.id,
+                              batchNumber: found.batchNumber,
+                              title: found.title,
+                              status: found.status,
+                            }
+                            item.batchId = found.id
+                          }
+                        }
+                      } finally {
+                        setAssigningBatch(false)
+                      }
+                    }}
+                    className="h-9 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm"
+                  >
+                    {assigningBatch ? (
+                      <Loader2 className="size-3.5 animate-spin mr-1" />
+                    ) : (
+                      <Sparkles className="size-3.5 mr-1" />
+                    )}
+                    {item.batch ? 'Switch Batch' : 'Assign to Batch'}
+                  </Button>
+
+                  {item.batch && onRemoveFromBatch && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={assigningBatch}
+                      onClick={async () => {
+                        const ok = await confirm({
+                          title: 'Remove Student from Batch',
+                          message: `Are you sure you want to remove ${item.fullName} from ${item.batch?.batchNumber}?`,
+                          confirmText: 'Remove',
+                          variant: 'danger',
+                        })
+                        if (!ok) return
+                        setAssigningBatch(true)
+                        try {
+                          const resOk = await onRemoveFromBatch(item.id)
+                          if (resOk) {
+                            item.batch = null
+                            item.batchId = null
+                          }
+                        } finally {
+                          setAssigningBatch(false)
+                        }
+                      }}
+                      className="h-9 text-rose-600 border-rose-300 hover:bg-rose-50 text-xs"
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Payment Proof & Ref Inspection */}
@@ -827,7 +1071,7 @@ function RegistrationDetailsModal({
                     href={item.confirmationLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-cyan-600 hover:underline dark:text-cyan-400 font-medium inline-flex items-center gap-1"
+                    className="text-blue-600 hover:underline dark:text-sky-400 font-medium inline-flex items-center gap-1"
                   >
                     Open link <ExternalLink className="size-3" />
                   </a>
@@ -837,7 +1081,7 @@ function RegistrationDetailsModal({
               {item.receiptUrl && (
                 <div className="pt-2">
                   <span className="text-muted-foreground font-medium block mb-2">Uploaded Bank Receipt:</span>
-                  <div className="rounded-xl border overflow-hidden bg-slate-950 p-2 text-center">
+                  <div className="rounded-xl border overflow-hidden bg-muted/50 p-2 text-center">
                     <img
                       src={item.receiptUrl}
                       alt="Payment Receipt"
@@ -847,7 +1091,7 @@ function RegistrationDetailsModal({
                       href={item.receiptUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-cyan-400 hover:underline"
+                      className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-sky-400 hover:underline"
                     >
                       <ExternalLink className="size-3" /> Open Full Resolution Receipt
                     </a>
@@ -867,7 +1111,7 @@ function RegistrationDetailsModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. CBE confirmation checked on 10/16, student called and confirmed morning seat..."
-              className="w-full rounded-xl border bg-background p-3 text-xs outline-none focus:ring-2 focus:ring-cyan-500"
+              className="w-full rounded-xl border bg-background p-3 text-xs outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="mt-2 flex justify-end">
               <Button type="submit" size="sm" disabled={savingNotes} className="text-xs">

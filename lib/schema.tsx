@@ -90,12 +90,12 @@ export function getCourseSchema(course: PublicCourse) {
     },
     hasCourseInstance: {
       '@type': 'CourseInstance',
-      courseMode: 'Onsite / Practical Workbench',
+      courseMode: 'Onsite / Practical Workshop',
       courseWorkload: course.duration || '4 to 6 Weeks',
       duration: course.duration || 'P6W',
       location: {
         '@type': 'Place',
-        name: `${schoolConfig.name} Technical Bench Labs`,
+        name: `${schoolConfig.name} Technical Training Labs`,
         address: {
           '@type': 'PostalAddress',
           streetAddress: 'Signal Mall Building, 4th Floor, Office No. 409 (In front of Papyrus Hotel)',

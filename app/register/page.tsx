@@ -15,19 +15,29 @@ import { PageIntro, SiteShell } from '@/components/site'
 import { getPublishedCourses } from '@/lib/content'
 import { CourseRegistrationWizard } from '@/components/course-registration-wizard'
 
+import prisma from '@/lib/prisma'
+
 export const revalidate = 60
 
 export const metadata = {
   title: 'Course Registration & Cohort Admissions | Hello TVET',
   description:
-    'Enroll in hands-on practical technical and vocational training at Hello TVET (ሄሎ የቴክኒክና ሙያ ማሰልጠኛ). Reserve your workbench station for the upcoming cohort.',
+    'Enroll in hands-on practical technical and vocational training at Hello TVET (ሄሎ የቴክኒክና ሙያ ማሰልጠኛ). Reserve your seat for the upcoming cohort intake.',
 }
 
 export default async function RegisterPage(props: {
   searchParams?: Promise<{ course?: string }>
 }) {
   const searchParams = (await props.searchParams) || {}
-  const publishedCourses = await getPublishedCourses()
+  const [publishedCourses, openBatches] = await Promise.all([
+    getPublishedCourses(),
+    prisma.$queryRaw<any[]>`
+      SELECT * FROM Batch WHERE status = 'Open' ORDER BY sortOrder ASC, createdAt DESC LIMIT 1
+    `.catch(() => []),
+  ])
+
+  const activeBatch = Array.isArray(openBatches) && openBatches.length > 0 ? openBatches[0] : null
+  const hasOpenBatch = Boolean(activeBatch)
 
   // Match initial course from query param (by slug or title)
   let initialCourseTitle = ''
@@ -52,12 +62,60 @@ export default async function RegisterPage(props: {
   return (
     <SiteShell>
       <PageIntro
-        eyebrow="Cohort Admissions"
-        title="Reserve your workbench for the next cohort."
-        description="Seats are strictly capped at 10 trainees per cohort to ensure every student receives 1-on-1 mentorship and dedicated equipment time. Complete the 5-step registration to reserve your workbench station."
+        eyebrow="Academic Intake Admissions"
+        title={
+          hasOpenBatch
+            ? `Enroll in ${activeBatch.batchNumber}: All Practical Courses Open`
+            : 'Upcoming Intakes: Opening Soon'
+        }
+        description={
+          hasOpenBatch
+            ? `${activeBatch.title}. Hands-on practical TVET training across all technical courses. Complete your 5-step registration below to secure your seat.`
+            : 'All seats for the current intake cohort are full. Register below to join the priority admissions waitlist for the very next batch intake.'
+        }
       />
 
       <main className="container mx-auto max-w-5xl px-5 py-12 lg:px-8">
+        {hasOpenBatch ? (
+          <div className="mb-8 rounded-3xl border border-blue-500/30 bg-blue-500/5 p-5 text-foreground flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+            <div className="flex items-center gap-3">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-blue-600 text-white font-mono font-black text-sm shadow-md">
+                {activeBatch.batchNumber.slice(-2)}
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-foreground">{activeBatch.title}</h3>
+                  <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                    Open for Enrollment
+                  </span>
+                </div>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {activeBatch.campus || 'Bahir Dar Campus'}
+                  {activeBatch.startDate ? ` • Starts: ${new Date(activeBatch.startDate).toLocaleDateString()}` : ''}
+                  {activeBatch.registrationDeadline
+                    ? ` • Deadline: ${new Date(activeBatch.registrationDeadline).toLocaleDateString()}`
+                    : ''}
+                </p>
+              </div>
+            </div>
+            <div className="text-xs font-bold text-blue-600 dark:text-sky-400 sm:text-right">
+              <span>All Courses Under {activeBatch.batchNumber}</span>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-8 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 text-amber-950 dark:text-amber-200">
+            <div className="flex items-start gap-3">
+              <span className="size-2 rounded-full bg-amber-500 mt-1.5 shrink-0 animate-ping" />
+              <div>
+                <h3 className="text-sm font-bold">Upcoming Intakes: Opening Soon</h3>
+                <p className="mt-1 text-xs text-muted-foreground dark:text-amber-300/80">
+                  Current cohort registrations are full. Submissions below are queued as priority reserves for the next intake batch.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ─── 5-Step Course Registration Flow ─── */}
         <section aria-label="Course Registration Flow">
           <CourseRegistrationWizard
@@ -70,7 +128,7 @@ export default async function RegisterPage(props: {
         <div className="mt-16 grid gap-8 md:grid-cols-2">
           {/* What happens after registration */}
           <div className="card-hover-lift rounded-3xl border bg-card p-7 shadow-sm md:p-8">
-            <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400">
+            <div className="flex items-center gap-2 text-blue-600 dark:text-sky-400">
               <Calendar className="size-4" />
               <h2 className="text-base font-bold uppercase tracking-wider text-foreground">
                 What happens after registration?
@@ -89,8 +147,8 @@ export default async function RegisterPage(props: {
                 },
                 {
                   step: '02',
-                  title: 'Workbench Station Assignment',
-                  desc: 'Your dedicated bench number, microscope, and power supply station are reserved.',
+                  title: 'Batch Intake & Schedule Confirmation',
+                  desc: 'Your cohort intake number, campus lab schedule, and seat are reserved.',
                 },
                 {
                   step: '03',
@@ -100,11 +158,11 @@ export default async function RegisterPage(props: {
                 {
                   step: '04',
                   title: 'Day 1 Practical Workshop Training',
-                  desc: 'Sit at your dedicated workbench and start diagnosing real circuit boards.',
+                  desc: 'Attend your lab workstation session and start diagnosing real circuit boards.',
                 },
               ].map((item) => (
                 <div key={item.step} className="flex gap-3.5">
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-xs font-bold text-cyan-600 dark:text-cyan-400">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-blue-500/15 text-xs font-bold text-blue-600 dark:text-sky-400">
                     {item.step}
                   </span>
                   <div>
@@ -118,7 +176,7 @@ export default async function RegisterPage(props: {
             <div className="mt-7 border-t pt-5">
               <Link
                 href="/courses"
-                className="inline-flex items-center text-xs font-semibold text-cyan-600 dark:text-cyan-400 hover:underline"
+                className="inline-flex items-center text-xs font-semibold text-blue-600 dark:text-sky-400 hover:underline"
               >
                 <ArrowLeft className="mr-1.5 size-3.5" /> Review all course curriculums
               </Link>
@@ -128,7 +186,7 @@ export default async function RegisterPage(props: {
           {/* Included with every enrollment */}
           <div className="card-hover-lift rounded-3xl border bg-card p-7 shadow-sm md:p-8 flex flex-col justify-between">
             <div>
-              <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400">
+              <div className="flex items-center gap-2 text-blue-600 dark:text-sky-400">
                 <Sparkles className="size-4" />
                 <h3 className="font-bold text-base uppercase tracking-wider text-foreground">
                   Included with enrollment
@@ -142,7 +200,7 @@ export default async function RegisterPage(props: {
                 <li className="flex items-start gap-2.5">
                   <CheckCircle2 className="size-4 text-emerald-500 shrink-0 mt-0.5" />
                   <span>
-                    <strong className="text-foreground">Dedicated personal workbench station</strong> for
+                    <strong className="text-foreground">Dedicated lab equipment & practical station</strong> for
                     the entire cohort duration with stereomicroscope and thermal camera access.
                   </span>
                 </li>
@@ -172,7 +230,7 @@ export default async function RegisterPage(props: {
 
             <div className="mt-8 rounded-2xl border bg-muted/30 p-4">
               <div className="flex items-center gap-2 text-xs font-semibold text-foreground">
-                <HelpCircle className="size-3.5 text-cyan-500" />
+                <HelpCircle className="size-3.5 text-blue-600 dark:text-sky-400" />
                 Have questions before completing payment?
               </div>
               <p className="mt-1 text-xs text-muted-foreground">

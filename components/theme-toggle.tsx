@@ -42,7 +42,7 @@ export function ThemeToggle({ className = '', size = 'md' }: ThemeToggleProps) {
       onClick={toggleTheme}
       aria-label={titleText}
       title={titleText}
-      className={`group relative flex items-center justify-center rounded-xl border border-border/70 bg-card/70 text-foreground shadow-sm backdrop-blur-md transition-all duration-300 hover:border-cyan-400/60 hover:bg-muted/70 hover:shadow-cyan-500/10 active:scale-95 ${
+      className={`group relative flex items-center justify-center rounded-xl border border-border/70 bg-card/70 text-foreground shadow-sm backdrop-blur-md transition-all duration-300 hover:border-blue-500/60 hover:bg-muted/70 hover:shadow-blue-500/15 active:scale-95 ${
         size === 'sm' ? 'size-8' : 'size-9'
       } ${className}`}
     >
@@ -53,7 +53,7 @@ export function ThemeToggle({ className = '', size = 'md' }: ThemeToggleProps) {
           }`}
         />
         <Moon
-          className={`absolute inset-0 size-full text-cyan-400 transition-all duration-300 ${
+          className={`absolute inset-0 size-full text-sky-400 transition-all duration-300 ${
             isDark ? 'scale-100 rotate-0 opacity-100' : 'scale-0 -rotate-90 opacity-0'
           }`}
         />

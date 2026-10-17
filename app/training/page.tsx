@@ -27,7 +27,7 @@ export default async function TrainingPage() {
   return (
     <SiteShell>
       <PageIntro
-        eyebrow="Practical Workbench Training"
+        eyebrow="Hands-On Technical Training"
         title="Real devices. Real tools. Confident repairs."
         description="At Hello TVET (ሄሎ የቴክኒክና ሙያ ማሰልጠኛ), we believe technical competence is forged with solder, schematics, and systematic diagnostics — not just lectures. Learn how to diagnose and repair real hardware under expert mentorship."
       />
@@ -47,10 +47,10 @@ export default async function TrainingPage() {
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="inline-flex size-10 items-center justify-center rounded-2xl bg-cyan-400/10 text-xs font-black text-cyan-600 dark:text-cyan-400">
+                    <span className="inline-flex size-10 items-center justify-center rounded-2xl bg-blue-500/10 text-xs font-black text-blue-600 dark:text-sky-400">
                       0{index + 1}
                     </span>
-                    <Sparkles className="size-4 text-muted-foreground/40 group-hover:text-cyan-400 transition-colors" />
+                    <Sparkles className="size-4 text-muted-foreground/40 group-hover:text-sky-400 transition-colors" />
                   </div>
                   <h3 className="mt-6 text-lg font-bold text-foreground transition-colors group-hover:text-primary">{item.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-muted-foreground">{item.description}</p>
@@ -64,7 +64,7 @@ export default async function TrainingPage() {
         <section className="border-y bg-muted/30 px-5 py-16 lg:px-8">
           <div className="container mx-auto max-w-7xl">
             <SectionHeading
-              eyebrow="Modern Workbench Facilities"
+              eyebrow="Modern Laboratory Facilities"
               title="Equipped for precision component-level training"
               description="Every enrolled trainee trains on dedicated professional-grade equipment in our Bahir Dar training center."
             />
@@ -74,7 +74,7 @@ export default async function TrainingPage() {
                   key={facility.title}
                   className="rounded-3xl border bg-card p-6 shadow-sm card-hover-lift group"
                 >
-                  <div className="flex size-11 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400 transition-transform duration-300 group-hover:scale-110">
+                  <div className="flex size-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-110">
                     <Wrench className="size-5" />
                   </div>
                   <h3 className="mt-5 text-base font-bold text-foreground transition-colors group-hover:text-primary">{facility.title}</h3>
@@ -111,22 +111,22 @@ export default async function TrainingPage() {
         </section>
 
         {/* ── STUDENT PROJECTS SHOWCASE ── */}
-        <section className="border-t bg-slate-950 px-5 py-20 text-white lg:px-8">
+        <section className="border-t bg-slate-50/70 dark:bg-card/50 px-5 py-20 text-foreground lg:px-8">
           <div className="container mx-auto max-w-7xl">
             <div className="mb-12 flex flex-col justify-between gap-5 md:flex-row md:items-end">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">
-                  Bench Demonstrations
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#155DFC] dark:text-sky-400">
+                  Practical Demonstrations
                 </p>
-                <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+                <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                   Real trainee case studies & repair breakthroughs
                 </h2>
-                <p className="mt-4 max-w-2xl text-base text-slate-300">
+                <p className="mt-4 max-w-2xl text-base text-muted-foreground">
                   Every trainee documents and completes real-world diagnostic case studies. Here is a sample of actual board-level repairs accomplished in our cohorts.
                 </p>
               </div>
               <Link href="/register">
-                <Button className="rounded-xl bg-cyan-400 px-6 font-bold text-slate-950 transition-all duration-300 hover:bg-cyan-300 hover:shadow-lg hover:shadow-cyan-400/25 hover:scale-[1.02]">
+                <Button className="rounded-xl bg-[#155DFC] px-6 font-bold text-white transition-all duration-300 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02]">
                   Start your training <ArrowRight data-icon="inline-end" />
                 </Button>
               </Link>
@@ -136,42 +136,42 @@ export default async function TrainingPage() {
               {studentProjects.map((project) => (
                 <div
                   key={project.id}
-                  className="card-hover-lift group flex flex-col justify-between rounded-3xl border border-slate-800 bg-slate-900 p-7 shadow-xl hover:border-cyan-500/40 hover:shadow-cyan-950/40"
+                  className="card-hover-lift group flex flex-col justify-between rounded-3xl border bg-card p-7 shadow-sm hover:border-[#155DFC]/50 hover:shadow-lg"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-3">
-                      <span className="rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-300 border border-cyan-400/20">
+                      <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold text-[#155DFC] dark:text-sky-400 border border-blue-500/20">
                         {project.badge}
                       </span>
-                      <span className="text-xs font-medium text-slate-400">{project.category}</span>
+                      <span className="text-xs font-medium text-muted-foreground">{project.category}</span>
                     </div>
 
-                    <h3 className="mt-5 text-xl font-bold text-white transition-colors group-hover:text-cyan-300">{project.title}</h3>
-                    <p className="mt-2 text-xs font-medium text-cyan-200">Device: {project.device}</p>
+                    <h3 className="mt-5 text-xl font-bold text-foreground transition-colors group-hover:text-[#155DFC]">{project.title}</h3>
+                    <p className="mt-2 text-xs font-semibold text-[#155DFC] dark:text-sky-400">Device: {project.device}</p>
 
                     <div className="mt-5 space-y-4 text-sm leading-6">
-                      <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-                        <p className="text-xs font-bold uppercase tracking-wider text-rose-300">Reported Symptom</p>
-                        <p className="mt-1 text-slate-300">{project.fault}</p>
+                      <div className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4">
+                        <p className="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Reported Symptom</p>
+                        <p className="mt-1 text-foreground">{project.fault}</p>
                       </div>
 
-                      <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-                        <p className="text-xs font-bold uppercase tracking-wider text-cyan-300">Diagnostic Process</p>
-                        <p className="mt-1 text-slate-300">{project.diagnosticProcess}</p>
+                      <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4">
+                        <p className="text-xs font-bold uppercase tracking-wider text-[#155DFC] dark:text-sky-400">Diagnostic Process</p>
+                        <p className="mt-1 text-foreground">{project.diagnosticProcess}</p>
                       </div>
 
-                      <div className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-                        <p className="text-xs font-bold uppercase tracking-wider text-emerald-300">Workbench Solution</p>
-                        <p className="mt-1 text-slate-300">{project.solution}</p>
+                      <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                        <p className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Practical Lab Solution</p>
+                        <p className="mt-1 text-foreground">{project.solution}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-6 flex items-center justify-between border-t border-slate-800 pt-4 text-xs">
-                    <span className="flex items-center gap-1.5 font-medium text-emerald-400">
+                  <div className="mt-6 flex items-center justify-between border-t pt-4 text-xs">
+                    <span className="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400">
                       <CheckCircle2 className="size-4 shrink-0" /> Tested & Fully Restored
                     </span>
-                    <span className="text-slate-400">{project.technician}</span>
+                    <span className="text-muted-foreground font-medium">{project.technician}</span>
                   </div>
                 </div>
               ))}

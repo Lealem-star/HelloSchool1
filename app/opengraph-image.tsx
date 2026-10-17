@@ -16,9 +16,9 @@ export default async function OpenGraphImage() {
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '50px 60px',
-          backgroundColor: '#030712',
+          backgroundColor: '#1048ca',
           backgroundImage:
-            'radial-gradient(circle at 20% 25%, rgba(6, 182, 212, 0.2) 0%, transparent 45%), radial-gradient(circle at 80% 75%, rgba(59, 130, 246, 0.15) 0%, transparent 45%)',
+            'linear-gradient(135deg, #1048ca 0%, #155DFC 55%, #0c3694 100%)',
           color: '#ffffff',
           fontFamily: 'sans-serif',
         }}
@@ -35,16 +35,17 @@ export default async function OpenGraphImage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div
               style={{
-                width: '48px',
-                height: '48px',
+                width: '50px',
+                height: '50px',
                 borderRadius: '14px',
-                backgroundColor: '#06b6d4',
+                backgroundColor: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#030712',
+                color: '#155DFC',
                 fontWeight: 900,
-                fontSize: '28px',
+                fontSize: '30px',
+                boxShadow: '0 8px 20px rgba(0,0,0,0.2)',
               }}
             >
               H
@@ -52,7 +53,7 @@ export default async function OpenGraphImage() {
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span
                 style={{
-                  fontSize: '26px',
+                  fontSize: '28px',
                   fontWeight: 900,
                   letterSpacing: '0.04em',
                   color: '#ffffff',
@@ -65,7 +66,7 @@ export default async function OpenGraphImage() {
                   fontSize: '12px',
                   fontWeight: 700,
                   letterSpacing: '0.12em',
-                  color: '#94a3b8',
+                  color: '#dbeafe',
                 }}
               >
                 TECHNICAL & VOCATIONAL TRAINING · BAHIR DAR
@@ -78,13 +79,13 @@ export default async function OpenGraphImage() {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '8px 20px',
+              padding: '10px 22px',
               borderRadius: '999px',
-              backgroundColor: 'rgba(6, 182, 212, 0.15)',
-              border: '1px solid rgba(6, 182, 212, 0.4)',
-              color: '#67e8f9',
+              backgroundColor: 'rgba(255, 255, 255, 0.18)',
+              border: '1px solid rgba(255, 255, 255, 0.35)',
+              color: '#ffffff',
               fontSize: '13px',
-              fontWeight: 700,
+              fontWeight: 800,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
             }}
@@ -113,14 +114,14 @@ export default async function OpenGraphImage() {
               maxWidth: '1060px',
             }}
           >
-            Build Practical Skills. <span style={{ color: '#22d3ee' }}>Repair with Confidence.</span>
+            Build Practical Skills. <span style={{ color: '#ffffff', textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.45)' }}>Repair with Confidence.</span>
           </h1>
 
           <p
             style={{
               fontSize: '22px',
               lineHeight: 1.45,
-              color: '#94a3b8',
+              color: '#eff6ff',
               margin: 0,
               maxWidth: '980px',
             }}
@@ -143,13 +144,13 @@ export default async function OpenGraphImage() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px',
-                  padding: '8px 16px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: '#e2e8f0',
+                  padding: '9px 18px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                  border: '1px solid rgba(255, 255, 255, 0.28)',
+                  fontSize: '15px',
+                  fontWeight: 700,
+                  color: '#ffffff',
                 }}
               >
                 <span>{pillar.icon}</span>
@@ -166,13 +167,13 @@ export default async function OpenGraphImage() {
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingTop: '20px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.25)',
             width: '100%',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: '#38bdf8', fontSize: '16px' }}>📍</span>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: '#cbd5e1' }}>
+            <span style={{ fontSize: '16px' }}>📍</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: '#f8fafc' }}>
               Signal Mall Building, 4th Floor (In front of Papyrus Hotel), Bahir Dar
             </span>
           </div>
@@ -180,13 +181,13 @@ export default async function OpenGraphImage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span
               style={{
-                width: '8px',
-                height: '8px',
+                width: '10px',
+                height: '10px',
                 borderRadius: '50%',
-                backgroundColor: '#22d3ee',
+                backgroundColor: '#ffffff',
               }}
             />
-            <span style={{ fontSize: '15px', fontWeight: 800, color: '#22d3ee' }}>
+            <span style={{ fontSize: '16px', fontWeight: 800, color: '#ffffff' }}>
               helloschool.edu.et
             </span>
           </div>

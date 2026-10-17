@@ -87,33 +87,79 @@ export async function POST(request: Request) {
       })
     }
 
-    // Create course registration linked to student
-    const registration = await (prisma as any).registration.create({
-      data: {
-        registrationNumber,
-        studentId: student.id,
-        institutionalEmail: student.institutionalEmail,
-        fullName: body.fullName.trim(),
-        phone: body.phone.trim(),
-        email: body.email?.trim() || null,
-        telegramUsername: body.telegramUsername?.trim() || null,
-        city: body.city?.trim() || 'Bahir Dar',
-        courseTitle: body.courseTitle.trim(),
-        shift: body.shift?.trim() || 'Morning Cohort',
-        education: body.education?.trim() || null,
-        experienceYears: body.experienceYears?.trim() || null,
-        paymentPlan: body.paymentPlan || 'full',
-        paymentMethod: body.paymentMethod || 'telebirr',
-        basePrice: typeof body.basePrice === 'number' ? body.basePrice : 2999,
-        discount: typeof body.discount === 'number' ? body.discount : 0,
-        finalPrice: typeof body.finalPrice === 'number' ? body.finalPrice : 2999,
-        couponCode: body.couponCode?.trim() || null,
-        transactionRef: body.transactionRef?.trim() || null,
-        receiptUrl: body.receiptUrl?.trim() || null,
-        confirmationLink: body.confirmationLink?.trim() || null,
-        status: 'Pending', // Pending approval by admission admin
-      },
-    })
+    // Automatically associate with the current active/open Batch
+    let activeBatchId: string | null = body.batchId || null
+    if (!activeBatchId) {
+      try {
+        if ((prisma as any).batch) {
+          const openBatch = await (prisma as any).batch.findFirst({
+            where: { status: { in: ['Open', 'Active'] } },
+            orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+          })
+          if (openBatch) {
+            activeBatchId = openBatch.id
+          }
+        }
+        if (!activeBatchId) {
+          const openBatches = await prisma.$queryRaw<any[]>`
+            SELECT id FROM Batch WHERE status IN ('Open', 'Active') ORDER BY sortOrder ASC, createdAt DESC LIMIT 1
+          `
+          if (Array.isArray(openBatches) && openBatches.length > 0) {
+            activeBatchId = openBatches[0].id
+          }
+        }
+      } catch (e) {
+        console.warn('Batch auto-assignment lookup error:', e)
+      }
+    }
+
+    // Create course registration linked to student and batch
+    const regPayload: any = {
+      registrationNumber,
+      studentId: student.id,
+      institutionalEmail: student.institutionalEmail,
+      fullName: body.fullName.trim(),
+      phone: body.phone.trim(),
+      email: body.email?.trim() || null,
+      telegramUsername: body.telegramUsername?.trim() || null,
+      city: body.city?.trim() || 'Bahir Dar',
+      courseTitle: body.courseTitle.trim(),
+      shift: body.shift?.trim() || 'Morning Cohort',
+      batchId: activeBatchId,
+      education: body.education?.trim() || null,
+      experienceYears: body.experienceYears?.trim() || null,
+      paymentPlan: body.paymentPlan || 'full',
+      paymentMethod: body.paymentMethod || 'telebirr',
+      basePrice: typeof body.basePrice === 'number' ? body.basePrice : 2999,
+      discount: typeof body.discount === 'number' ? body.discount : 0,
+      finalPrice: typeof body.finalPrice === 'number' ? body.finalPrice : 2999,
+      couponCode: body.couponCode?.trim() || null,
+      transactionRef: body.transactionRef?.trim() || null,
+      receiptUrl: body.receiptUrl?.trim() || null,
+      confirmationLink: body.confirmationLink?.trim() || null,
+      status: 'Pending', // Pending approval by admission admin
+    }
+
+    let registration: any
+    try {
+      registration = await (prisma as any).registration.create({
+        data: regPayload,
+      })
+    } catch (createErr: any) {
+      console.warn('registration.create with batchId failed, attempting fallback:', createErr.message)
+      const { batchId: _b, ...payloadWithoutBatch } = regPayload
+      registration = await (prisma as any).registration.create({
+        data: payloadWithoutBatch,
+      })
+      if (activeBatchId) {
+        try {
+          await prisma.$executeRaw`
+            UPDATE Registration SET batchId = ${activeBatchId} WHERE id = ${registration.id}
+          `
+          registration.batchId = activeBatchId
+        } catch {}
+      }
+    }
 
     // Establish student session so they are logged in right away
     await createStudentSession(student.id).catch(() => {})

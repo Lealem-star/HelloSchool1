@@ -16,9 +16,11 @@ export const translations = {
     registerNow: 'Register Now',
 
     // Announcement Ticker
-    tickerIntake: 'Upcoming Intake:',
-    tickerMessage: 'Bahir Dar Practical Workbench Sessions Enrolling · Limited Stations',
-    tickerAction: 'Reserve Bench →',
+    tickerIntake: 'Upcoming Intakes:',
+    tickerMessage: 'Bahir Dar Practical Batch Intake Enrollment · All Courses Open',
+    tickerAction: 'Enroll in Batch →',
+    tickerOpeningSoon: 'Opening Soon',
+    tickerOpeningSoonMessage: 'Bahir Dar Practical Vocational Training · Next Batch Opening Soon',
 
     // Theme tooltips
     switchToDark: 'Switch to Dark Mode',
@@ -32,7 +34,7 @@ export const translations = {
     // Quick Actions
     exploreCourses: 'Explore Courses',
     contactUs: 'Contact Us',
-    reserveBench: 'Reserve Bench',
+    reserveBench: 'Enroll Now',
   },
   am: {
     // Navigation
@@ -46,8 +48,10 @@ export const translations = {
 
     // Announcement Ticker
     tickerIntake: 'ቀጣይ ዙር ምዝገባ፡',
-    tickerMessage: 'የባህር ዳር ተግባራዊ ስልጠና ምዝገባ ተጀምሯል · ውስን ቦታዎች',
-    tickerAction: 'ቦታ ይያዙ →',
+    tickerMessage: 'የባህር ዳር ተግባራዊ ስልጠና ዙር ምዝገባ ተጀምሯል · ሁሉም የትምህርት ክፍሎች ክፍት ናቸው',
+    tickerAction: 'ይመዝገቡ →',
+    tickerOpeningSoon: 'በቅርቡ ይከፈታል',
+    tickerOpeningSoonMessage: 'የባህር ዳር ተግባራዊ ስልጠና ክፍለ-ጊዜዎች · ቀጣይ ዙር በቅርቡ ይከፈታል',
 
     // Theme tooltips
     switchToDark: 'ወደ ጨለማ ገጽታ ቀይር',
@@ -61,7 +65,7 @@ export const translations = {
     // Quick Actions
     exploreCourses: 'ስልጠናዎችን ይመልከቱ',
     contactUs: 'ያግኙን',
-    reserveBench: 'ቦታ ያስይዙ',
+    reserveBench: 'ይመዝገቡ',
   },
 } as const
 

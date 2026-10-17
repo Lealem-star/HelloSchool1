@@ -432,10 +432,10 @@ export function CourseRegistrationWizard({
   if (submitted) {
     return (
       <div className="rounded-3xl border bg-card p-8 md:p-12 shadow-xl text-center max-w-3xl mx-auto animate-fade-in-up">
-        <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
+        <div className="mx-auto flex size-20 items-center justify-center rounded-full bg-blue-500/10 text-blue-600 dark:text-sky-400">
           <CheckCircle2 className="size-10" />
         </div>
-        <span className="mt-4 inline-block rounded-full bg-cyan-500/10 px-4 py-1 text-xs font-bold text-cyan-600 dark:text-cyan-400">
+        <span className="mt-4 inline-block rounded-full bg-blue-500/10 px-4 py-1 text-xs font-bold text-blue-600 dark:text-sky-400">
           Registration Submitted
         </span>
         <h2 className="mt-3 text-3xl font-extrabold tracking-tight">
@@ -443,7 +443,7 @@ export function CourseRegistrationWizard({
         </h2>
         <p className="mt-3 text-sm text-muted-foreground max-w-lg mx-auto leading-6">
           Your course registration application and payment verification have been received. Our admissions
-          office is validating your workbench reservation.
+          office is validating your cohort intake enrollment.
         </p>
 
         <div className="mt-8 rounded-2xl border bg-muted/30 p-6 text-left space-y-3">
@@ -453,13 +453,13 @@ export function CourseRegistrationWizard({
           </div>
 
           {/* Student Account Credentials Box */}
-          <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-4 space-y-2">
-            <div className="flex items-center gap-2 text-cyan-700 dark:text-cyan-300 font-bold text-xs uppercase tracking-wider">
+          <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 space-y-2">
+            <div className="flex items-center gap-2 text-blue-700 dark:text-sky-300 font-bold text-xs uppercase tracking-wider">
               <Sparkles className="size-4" /> Official Student Account Created
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-sm pt-1">
               <span className="text-muted-foreground">Student Portal Email:</span>
-              <span className="font-mono font-bold text-cyan-600 dark:text-cyan-400">
+              <span className="font-mono font-bold text-blue-600 dark:text-sky-400">
                 {createdEmail || formatPreviewEmail(fullName)}
               </span>
             </div>
@@ -467,7 +467,7 @@ export function CourseRegistrationWizard({
               <span className="text-muted-foreground">Portal Password:</span>
               <span className="font-semibold text-foreground">•••••••• (Your chosen password)</span>
             </div>
-            <p className="text-[11px] text-muted-foreground pt-1 border-t border-cyan-500/20">
+            <p className="text-[11px] text-muted-foreground pt-1 border-t border-blue-500/20">
               Use this institutional email and your chosen password to log into your student dashboard anytime.
             </p>
           </div>
@@ -490,12 +490,12 @@ export function CourseRegistrationWizard({
           </div>
           <div className="flex justify-between items-center text-sm">
             <span className="text-muted-foreground">Amount:</span>
-            <span className="font-bold text-cyan-600 dark:text-cyan-400">{finalPrice} Birr</span>
+            <span className="font-bold text-blue-600 dark:text-sky-400">{finalPrice} Birr</span>
           </div>
           {telegramUsername && (
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Telegram Handle:</span>
-              <span className="font-semibold text-cyan-600 dark:text-cyan-400">
+              <span className="font-semibold text-blue-600 dark:text-sky-400">
                 {telegramUsername.startsWith('@') ? telegramUsername : `@${telegramUsername}`}
               </span>
             </div>
@@ -510,7 +510,7 @@ export function CourseRegistrationWizard({
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/student/dashboard">
-            <Button className="w-full sm:w-auto rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400">
+            <Button className="w-full sm:w-auto rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-500/20">
               <Sparkles className="mr-2 size-4" /> Access Student Dashboard
             </Button>
           </Link>
@@ -539,19 +539,19 @@ export function CourseRegistrationWizard({
               Course Registration
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Secure your dedicated lab workbench for the upcoming technical cohort.
+              Secure your seat for the upcoming technical cohort intake.
             </p>
             {/* Flyer Promotions & Badges */}
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
                 <Sparkles className="size-3" /> በነፃ፦ ከ2 በላይ ሲመዘገቡ 1 በነፃ! (2+1 Free Offer)
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-cyan-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+              <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-blue-600 dark:text-sky-400 border border-blue-500/20">
                 <ShieldCheck className="size-3" /> ሙሉ ዕውቅና ያለው & COC Level Aligned
               </span>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full bg-cyan-500/10 px-3.5 py-1 text-xs font-bold text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+          <span className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full bg-blue-500/10 px-3.5 py-1 text-xs font-bold text-blue-600 dark:text-sky-400 border border-blue-500/20">
             Step {currentStep} of 5
           </span>
         </div>
@@ -560,7 +560,7 @@ export function CourseRegistrationWizard({
         <div className="relative mt-6">
           <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-cyan-500 to-emerald-500 transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-blue-600 to-sky-400 transition-all duration-500 ease-out"
               style={{ width: `${(currentStep / 5) * 100}%` }}
             />
           </div>
@@ -575,7 +575,7 @@ export function CourseRegistrationWizard({
                   key={step.num}
                   className={`flex items-center justify-center gap-1.5 transition-colors ${
                     isCurrent
-                      ? 'text-cyan-600 dark:text-cyan-400 font-bold'
+                      ? 'text-blue-600 dark:text-sky-400 font-bold'
                       : isPast
                         ? 'text-foreground'
                         : 'text-muted-foreground opacity-60'
@@ -584,9 +584,9 @@ export function CourseRegistrationWizard({
                   <span
                     className={`flex size-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
                       isCurrent
-                        ? 'bg-cyan-500 text-white shadow-sm shadow-cyan-500/50'
+                        ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/50'
                         : isPast
-                          ? 'bg-cyan-500/20 text-cyan-600 dark:text-cyan-400'
+                          ? 'bg-blue-500/20 text-blue-600 dark:text-sky-400'
                           : 'bg-muted text-muted-foreground'
                     }`}
                   >
@@ -622,7 +622,7 @@ export function CourseRegistrationWizard({
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="e.g. Abebe Kebede"
-                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                   />
                 </div>
@@ -637,7 +637,7 @@ export function CourseRegistrationWizard({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="e.g. 0911234567 or +251 9..."
-                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                   />
                 </div>
@@ -646,13 +646,13 @@ export function CourseRegistrationWizard({
               <label className="flex flex-col gap-2 text-sm font-medium">
                 Telegram Username
                 <div className="relative">
-                  <Send className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-cyan-500" />
+                  <Send className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-sky-500" />
                   <input
                     type="text"
                     value={telegramUsername}
                     onChange={(e) => setTelegramUsername(e.target.value)}
                     placeholder="e.g. @username"
-                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
                 <span className="text-[11px] text-muted-foreground">
@@ -669,7 +669,7 @@ export function CourseRegistrationWizard({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="abebe@example.com"
-                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
                 <span className="text-[11px] text-muted-foreground">
@@ -680,13 +680,13 @@ export function CourseRegistrationWizard({
               <label className="flex flex-col gap-2 text-sm font-medium">
                 Create Portal Password *
                 <div className="relative">
-                  <KeyRound className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-cyan-500" />
+                  <KeyRound className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-sky-500" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Min 6 characters (e.g. Pass@123)"
-                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-10 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-10 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                   />
                   <button
@@ -706,16 +706,16 @@ export function CourseRegistrationWizard({
 
               {/* Dynamic Institutional Email Preview */}
               {fullName.trim().length >= 2 && (
-                <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-4 md:col-span-2 flex items-start gap-3.5 animate-fade-in shadow-sm">
-                  <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-cyan-500/20 text-cyan-600 dark:text-cyan-400">
+                <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 p-4 md:col-span-2 flex items-start gap-3.5 animate-fade-in shadow-sm">
+                  <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-600 dark:text-sky-400">
                     <Sparkles className="size-5" />
                   </div>
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-1">
-                      <span className="text-xs font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-300">
+                      <span className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-sky-300">
                         Official Student Portal Email (Auto-Generated)
                       </span>
-                      <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-semibold text-cyan-700 dark:text-cyan-300">
+                      <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:text-sky-300">
                         Hello TVET Institutional ID
                       </span>
                     </div>
@@ -736,7 +736,7 @@ export function CourseRegistrationWizard({
                   <select
                     value={selectedCourse}
                     onChange={(e) => setSelectedCourse(e.target.value)}
-                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
+                    className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
                   >
                     {courses.map((c) => (
                       <option key={c.id} value={c.title}>
@@ -768,16 +768,16 @@ export function CourseRegistrationWizard({
                       onClick={() => setSelectedShift(shift.id)}
                       className={`text-left p-4 rounded-2xl border transition-all ${
                         selected
-                          ? 'border-cyan-500 bg-cyan-500/10 ring-2 ring-cyan-500/30'
-                          : 'border-border/80 bg-muted/20 hover:border-cyan-500/40 hover:bg-muted/40'
+                          ? 'border-blue-600 bg-blue-500/10 ring-2 ring-blue-500/30'
+                          : 'border-border/80 bg-muted/20 hover:border-blue-500/40 hover:bg-muted/40'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-semibold text-sm text-foreground">{shift.title}</span>
-                        {selected && <CheckCircle2 className="size-4 text-cyan-500" />}
+                        {selected && <CheckCircle2 className="size-4 text-blue-600 dark:text-sky-400" />}
                       </div>
                       <p className="mt-1.5 text-xs text-muted-foreground">{shift.time}</p>
-                      <span className="mt-1 block text-[11px] font-medium text-cyan-600 dark:text-cyan-400">
+                      <span className="mt-1 block text-[11px] font-medium text-blue-600 dark:text-sky-400">
                         {shift.days}
                       </span>
                     </button>
@@ -797,7 +797,7 @@ export function CourseRegistrationWizard({
                     onClick={() => setPreferredContact(method)}
                     className={`rounded-xl px-4 py-2 text-xs font-semibold border transition ${
                       preferredContact === method
-                        ? 'border-cyan-500 bg-cyan-500/15 text-cyan-600 dark:text-cyan-400'
+                        ? 'border-blue-600 bg-blue-500/15 text-blue-600 dark:text-sky-400'
                         : 'border-border bg-background hover:bg-muted text-muted-foreground'
                     }`}
                   >
@@ -816,15 +816,15 @@ export function CourseRegistrationWizard({
               <h2 className="text-xl md:text-2xl font-bold">Content Sharing & Community Policy</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET) is dedicated to high-standard practical trade training. Please read and accept our
-                workbench safety and curriculum guidelines.
+                workshop safety and curriculum guidelines.
               </p>
             </div>
 
             <div className="rounded-2xl border bg-muted/20 p-5 md:p-6 space-y-5 text-sm leading-6 max-h-[360px] overflow-y-auto">
               <div>
                 <h3 className="font-bold text-foreground flex items-center gap-2">
-                  <ShieldCheck className="size-4 text-cyan-500" />
-                  1. Proprietary Course Content & Workbench Schematics
+                  <ShieldCheck className="size-4 text-blue-600 dark:text-sky-400" />
+                  1. Proprietary Course Content & Technical Schematics
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground pl-6">
                   All laboratory handouts, motherboard boardview files, micro-soldering schematics, and video
@@ -835,11 +835,11 @@ export function CourseRegistrationWizard({
 
               <div>
                 <h3 className="font-bold text-foreground flex items-center gap-2">
-                  <Sparkles className="size-4 text-cyan-500" />
+                  <Sparkles className="size-4 text-blue-600 dark:text-sky-400" />
                   2. Laboratory Safety & Workstation Protocols
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground pl-6">
-                  Trainees must adhere strictly to workbench ESD (Electrostatic Discharge) grounding, safe hot-air
+                  Trainees must adhere strictly to workshop ESD (Electrostatic Discharge) grounding, safe hot-air
                   rework temperatures, thermal mat care, and chemical ventilation procedures. Protective eyewear
                   must be worn during desoldering exercises.
                 </p>
@@ -847,7 +847,7 @@ export function CourseRegistrationWizard({
 
               <div>
                 <h3 className="font-bold text-foreground flex items-center gap-2">
-                  <GraduationCap className="size-4 text-cyan-500" />
+                  <GraduationCap className="size-4 text-blue-600 dark:text-sky-400" />
                   3. Community Respect & Peer Mentorship
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground pl-6">
@@ -859,7 +859,7 @@ export function CourseRegistrationWizard({
 
               <div>
                 <h3 className="font-bold text-foreground flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-cyan-500" />
+                  <CheckCircle2 className="size-4 text-blue-600 dark:text-sky-400" />
                   4. Technical Assessment & Certification Integrity
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground pl-6">
@@ -875,7 +875,7 @@ export function CourseRegistrationWizard({
                 type="checkbox"
                 checked={policyAccepted}
                 onChange={(e) => setPolicyAccepted(e.target.checked)}
-                className="mt-1 size-5 rounded accent-cyan-500 cursor-pointer shrink-0"
+                className="mt-1 size-5 rounded accent-blue-600 cursor-pointer shrink-0"
               />
               <span className="text-sm font-medium text-foreground">
                 I have read, understood, and agree to ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET)&apos;s Content Sharing & Community Policy.
@@ -890,7 +890,7 @@ export function CourseRegistrationWizard({
             <div>
               <h2 className="text-xl md:text-2xl font-bold">Educational Background</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Share your background so our workshop instructors can customize workbench mentoring to your
+                Share your background so our workshop instructors can customize hands-on mentoring to your
                 experience level.
               </p>
             </div>
@@ -903,7 +903,7 @@ export function CourseRegistrationWizard({
                   <select
                     value={highestEducation}
                     onChange={(e) => setHighestEducation(e.target.value)}
-                    className="h-12 w-full appearance-none rounded-xl border border-input bg-background/90 px-4 pr-10 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
+                    className="h-12 w-full appearance-none rounded-xl border border-input bg-background/90 px-4 pr-10 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
                   >
                     <option value="">Select your education level</option>
                     {EDUCATION_LEVELS.map((level) => (
@@ -923,7 +923,7 @@ export function CourseRegistrationWizard({
                   <select
                     value={experienceYears}
                     onChange={(e) => setExperienceYears(e.target.value)}
-                    className="h-12 w-full appearance-none rounded-xl border border-input bg-background/90 px-4 pr-10 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
+                    className="h-12 w-full appearance-none rounded-xl border border-input bg-background/90 px-4 pr-10 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
                   >
                     <option value="">Select your experience</option>
                     {EXPERIENCE_YEARS.map((exp) => (
@@ -961,15 +961,15 @@ export function CourseRegistrationWizard({
                   onClick={() => setPaymentPlan('full')}
                   className={`relative cursor-pointer rounded-2xl border p-6 transition-all duration-200 ${
                     paymentPlan === 'full'
-                      ? 'border-cyan-500 bg-cyan-500/5 ring-2 ring-cyan-500/30 shadow-md'
-                      : 'border-border/80 bg-card hover:border-cyan-500/40 hover:bg-muted/20'
+                      ? 'border-blue-600 bg-blue-500/5 ring-2 ring-blue-500/30 shadow-md'
+                      : 'border-border/80 bg-card hover:border-blue-500/40 hover:bg-muted/20'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-bold text-base text-foreground">
                       Pay once and unlock full access
                     </h3>
-                    <span className="rounded-full bg-cyan-500/15 px-2.5 py-0.5 text-xs font-bold text-cyan-600 dark:text-cyan-400">
+                    <span className="rounded-full bg-blue-500/15 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:text-sky-400">
                       10% Discount
                     </span>
                   </div>
@@ -978,7 +978,7 @@ export function CourseRegistrationWizard({
                     <span className="text-sm line-through text-muted-foreground">
                       {basePrice} Birr
                     </span>
-                    <span className="text-3xl font-extrabold text-cyan-600 dark:text-cyan-400">
+                    <span className="text-3xl font-extrabold text-blue-600 dark:text-sky-400">
                       {priceAfterPlan} Birr
                     </span>
                   </div>
@@ -1018,8 +1018,8 @@ export function CourseRegistrationWizard({
                   onClick={() => setPaymentPlan('split')}
                   className={`relative cursor-pointer rounded-2xl border p-6 transition-all duration-200 ${
                     paymentPlan === 'split'
-                      ? 'border-cyan-500 bg-cyan-500/5 ring-2 ring-cyan-500/30 shadow-md'
-                      : 'border-border/80 bg-card hover:border-cyan-500/40 hover:bg-muted/20'
+                      ? 'border-blue-600 bg-blue-500/5 ring-2 ring-blue-500/30 shadow-md'
+                      : 'border-border/80 bg-card hover:border-blue-500/40 hover:bg-muted/20'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -1077,7 +1077,7 @@ export function CourseRegistrationWizard({
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value as PaymentMethodKey)}
-                  className="h-12 w-full appearance-none rounded-xl border border-input bg-background/90 px-4 pr-10 text-sm font-medium outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 cursor-pointer"
+                  className="h-12 w-full appearance-none rounded-xl border border-input bg-background/90 px-4 pr-10 text-sm font-medium outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
                 >
                   <option value="cbe">Commercial Bank of Ethiopia (CBE)</option>
                   <option value="telebirr">Telebirr SuperApp</option>
@@ -1164,7 +1164,7 @@ export function CourseRegistrationWizard({
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                   placeholder="Enter coupon code if you have one"
-                  className="h-11 flex-1 rounded-xl border border-input bg-background/90 px-4 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 uppercase"
+                  className="h-11 flex-1 rounded-xl border border-input bg-background/90 px-4 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 uppercase"
                 />
                 <Button type="submit" variant="outline" className="rounded-xl px-5">
                   Apply
@@ -1189,14 +1189,14 @@ export function CourseRegistrationWizard({
             <div>
               <h2 className="text-xl md:text-2xl font-bold">Payment Confirmation</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Provide proof of payment to finalize your registration and secure your workbench.
+                Provide proof of payment to finalize your registration and secure your cohort seat.
               </p>
             </div>
 
             {/* Info / Notice Banner */}
-            <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/10 p-4 sm:p-5 text-sm">
+            <div className="rounded-2xl border border-blue-500/25 bg-blue-500/10 p-4 sm:p-5 text-sm">
               <div className="flex gap-3">
-                <AlertCircle className="size-5 text-cyan-600 dark:text-cyan-400 shrink-0 mt-0.5" />
+                <AlertCircle className="size-5 text-blue-600 dark:text-sky-400 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-foreground">Payment Verification:</h4>
                   <p className="mt-1 text-xs text-muted-foreground leading-5">
@@ -1215,7 +1215,7 @@ export function CourseRegistrationWizard({
                 value={transactionRef}
                 onChange={(e) => setTransactionRef(e.target.value)}
                 placeholder="e.g., FT2123456789 or Telebirr Trans ID"
-                className="h-11 rounded-xl border border-input bg-background/90 px-4 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                className="h-11 rounded-xl border border-input bg-background/90 px-4 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
             </label>
 
@@ -1246,11 +1246,11 @@ export function CourseRegistrationWizard({
                   }}
                   className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center cursor-pointer transition ${
                     receiptUploading
-                      ? 'opacity-60 border-cyan-500 bg-cyan-500/5'
-                      : 'border-border/80 hover:border-cyan-500 hover:bg-muted/20'
+                      ? 'opacity-60 border-blue-500 bg-blue-500/5'
+                      : 'border-border/80 hover:border-blue-500 hover:bg-muted/20'
                   }`}
                 >
-                  <div className="flex size-12 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
+                  <div className="flex size-12 items-center justify-center rounded-full bg-blue-500/10 text-blue-600 dark:text-sky-400">
                     <UploadCloud className="size-6" />
                   </div>
                   <p className="mt-3 text-sm font-semibold text-foreground">
@@ -1261,9 +1261,9 @@ export function CourseRegistrationWizard({
                   </p>
                 </div>
               ) : (
-                <div className="flex items-center justify-between rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+                <div className="flex items-center justify-between rounded-2xl border border-blue-500/30 bg-blue-500/5 p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-xl bg-cyan-500/20 text-cyan-600 dark:text-cyan-400">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-blue-500/20 text-blue-600 dark:text-sky-400">
                       <FileText className="size-5" />
                     </div>
                     <div>
@@ -1298,7 +1298,7 @@ export function CourseRegistrationWizard({
                 value={confirmationLink}
                 onChange={(e) => setConfirmationLink(e.target.value)}
                 placeholder="e.g., https://payment-provider.com/confirmation/abc123"
-                className="h-11 rounded-xl border border-input bg-background/90 px-4 text-sm outline-none transition-all focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                className="h-11 rounded-xl border border-input bg-background/90 px-4 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
             </label>
           </div>
@@ -1334,12 +1334,12 @@ export function CourseRegistrationWizard({
                   </span>
                 )}
                 {couponApplied && (
-                  <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">
+                  <span className="text-xs font-bold text-blue-600 dark:text-sky-400">
                     + Coupon
                   </span>
                 )}
               </div>
-              <span className="text-base font-extrabold text-cyan-600 dark:text-cyan-400">
+              <span className="text-base font-extrabold text-blue-600 dark:text-sky-400">
                 {finalPrice} Birr{' '}
                 <span className="text-xs font-normal text-muted-foreground">
                   {paymentPlan === 'full' ? '(10% off)' : '(Part 1)'}
@@ -1366,7 +1366,7 @@ export function CourseRegistrationWizard({
               <Button
                 type="button"
                 onClick={handleNextStep}
-                className="rounded-xl px-6 font-bold uppercase tracking-wider text-xs bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-[1.02]"
+                className="rounded-xl px-6 font-bold uppercase tracking-wider text-xs bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02]"
               >
                 Next Step <ArrowRight className="ml-1.5 size-4" />
               </Button>
@@ -1375,7 +1375,7 @@ export function CourseRegistrationWizard({
                 type="button"
                 onClick={handleSubmitRegistration}
                 disabled={submitting || receiptUploading}
-                className="rounded-xl px-6 font-bold uppercase tracking-wider text-xs bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/25 hover:scale-[1.02]"
+                className="rounded-xl px-6 font-bold uppercase tracking-wider text-xs bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02]"
               >
                 {submitting ? 'Submitting...' : 'Submit Registration'}
                 {!submitting && <CheckCircle2 className="ml-1.5 size-4" />}

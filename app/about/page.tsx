@@ -38,7 +38,7 @@ export default async function AboutPage() {
       <PageIntro
         eyebrow="About Hello TVET"
         title="Technical learning with a practical-first point of view."
-        description="We bridge the gap between abstract electrical theory and the reality of the workbench. ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET) prepares students to diagnose, troubleshoot, and restore the electronic devices and systems our society depends on every day."
+        description="We bridge the gap between abstract electrical theory and the reality of the workshop lab. ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET) prepares students to diagnose, troubleshoot, and restore the electronic devices and systems our society depends on every day."
       />
       <main>
         {/* ── OUR STORY & PURPOSE ── */}
@@ -70,19 +70,19 @@ export default async function AboutPage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-800 bg-slate-950 p-8 text-white shadow-2xl md:p-10">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-cyan-400/20 text-cyan-300">
+          <div className="rounded-3xl border border-blue-400/30 bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] p-8 text-white shadow-2xl md:p-10">
+            <span className="flex size-12 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30 shadow-md">
               <CircuitBoard className="size-6" />
             </span>
-            <blockquote className="mt-8 text-2xl font-semibold leading-relaxed tracking-tight text-white md:text-3xl">
+            <blockquote className="mt-8 text-2xl font-bold leading-relaxed tracking-tight text-white md:text-3xl">
               “The most valuable repair skill is not solder speed — it is the patience and logic to diagnose the root cause before touching a tool.”
             </blockquote>
-            <div className="mt-8 flex items-center justify-between border-t border-slate-800 pt-6">
+            <div className="mt-8 flex items-center justify-between border-t border-white/20 pt-6">
               <div>
-                <p className="font-semibold text-cyan-300">Core Training Principle</p>
-                <p className="text-xs text-slate-400">Hello TVET Technical Faculty</p>
+                <p className="font-bold text-white">Core Training Principle</p>
+                <p className="text-xs text-blue-100">Hello TVET Technical Faculty</p>
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Bahir Dar</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider text-blue-200">Bahir Dar</span>
             </div>
           </div>
         </section>
@@ -107,7 +107,7 @@ export default async function AboutPage() {
             </div>
             <div className="rounded-2xl border bg-card/60 p-5 text-center card-hover-lift">
               <p className="text-4xl font-extrabold tracking-tight text-primary md:text-5xl">1-on-1</p>
-              <p className="mt-2 text-sm font-semibold">Workbench Allocation</p>
+              <p className="mt-2 text-sm font-semibold">Station Allocation</p>
               <p className="text-xs text-muted-foreground">Personal station & equipment</p>
             </div>
           </div>
@@ -121,24 +121,24 @@ export default async function AboutPage() {
               <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">What guides our curriculum</h2>
             </div>
             <div className="grid gap-6 md:grid-cols-3">
-              <div className="card-hover-lift group rounded-3xl border bg-card p-8 shadow-sm hover:border-cyan-500/40">
-                <span className="flex size-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400 transition-transform duration-300 group-hover:scale-110">
+              <div className="card-hover-lift group rounded-3xl border bg-card p-8 shadow-sm hover:border-blue-500/40">
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-110">
                   <Target className="size-6" />
                 </span>
                 <h3 className="mt-6 text-xl font-bold transition-colors group-hover:text-primary">Our Mission</h3>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">{schoolConfig.mission}</p>
               </div>
 
-              <div className="card-hover-lift group rounded-3xl border bg-card p-8 shadow-sm hover:border-cyan-500/40">
-                <span className="flex size-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400 transition-transform duration-300 group-hover:scale-110">
+              <div className="card-hover-lift group rounded-3xl border bg-card p-8 shadow-sm hover:border-blue-500/40">
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-110">
                   <Eye className="size-6" />
                 </span>
                 <h3 className="mt-6 text-xl font-bold transition-colors group-hover:text-primary">Our Vision</h3>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">{schoolConfig.vision}</p>
               </div>
 
-              <div className="card-hover-lift group rounded-3xl border bg-card p-8 shadow-sm hover:border-cyan-500/40">
-                <span className="flex size-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400 transition-transform duration-300 group-hover:scale-110">
+              <div className="card-hover-lift group rounded-3xl border bg-card p-8 shadow-sm hover:border-blue-500/40">
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-110">
                   <Users className="size-6" />
                 </span>
                 <h3 className="mt-6 text-xl font-bold transition-colors group-hover:text-primary">Training Methodology</h3>
@@ -159,7 +159,7 @@ export default async function AboutPage() {
                 Experienced practitioners, dedicated to your growth
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-                Our faculty members are active repair specialists with decades of combined workbench experience solving real hardware failures.
+                Our faculty members are active repair specialists with decades of combined practical workshop experience solving real hardware failures.
               </p>
             </div>
 
@@ -167,9 +167,9 @@ export default async function AboutPage() {
               {instructors.map((instructor) => (
                 <div
                   key={instructor.name}
-                  className="card-hover-lift group overflow-hidden rounded-3xl border bg-card shadow-sm hover:border-cyan-500/40"
+                  className="card-hover-lift group overflow-hidden rounded-3xl border bg-card shadow-sm hover:border-blue-500/40"
                 >
-                  <div className="aspect-[4/3] overflow-hidden bg-slate-900">
+                  <div className="aspect-[4/3] overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <img
                       src={instructor.image}
                       alt={instructor.name}
@@ -177,7 +177,7 @@ export default async function AboutPage() {
                     />
                   </div>
                   <div className="p-7">
-                    <span className="inline-block rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold text-cyan-600 dark:text-cyan-400">
+                    <span className="inline-block rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-600 dark:text-sky-400">
                       {instructor.experience}
                     </span>
                     <h3 className="mt-4 text-xl font-bold transition-colors group-hover:text-primary">{instructor.name}</h3>
@@ -207,22 +207,22 @@ export default async function AboutPage() {
         {/* ── CAREER PATHWAYS ── */}
         <section className="px-5 py-20 lg:px-8">
           <div className="container mx-auto max-w-7xl">
-            <div className="relative overflow-hidden rounded-3xl border border-cyan-500/20 bg-slate-950 p-8 text-white shadow-2xl md:p-14 circuit-grid-bg">
-              <div className="absolute -right-20 -bottom-20 size-72 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
+            <div className="relative overflow-hidden rounded-3xl border border-blue-400/30 bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] p-8 text-white shadow-2xl md:p-14 circuit-grid-bg">
+              <div className="absolute -right-20 -bottom-20 size-72 rounded-full bg-white/10 blur-3xl pointer-events-none" />
               <div className="relative grid gap-10 lg:grid-cols-2 lg:items-center">
                 <div>
-                  <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-bold text-cyan-300">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
                     <GraduationCap className="size-4" /> Career Opportunities
                   </span>
-                  <h2 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl text-white">
+                  <h2 className="mt-4 text-3xl font-extrabold tracking-tight md:text-4xl text-white">
                     Where Hello TVET training leads our graduates.
                   </h2>
-                  <p className="mt-5 text-sm leading-7 text-slate-300">
+                  <p className="mt-5 text-sm leading-7 text-blue-100">
                     Technical repair is one of the fastest-growing trade sectors in East Africa. By mastering circuit diagnostics, our alumni enter high-demand roles or launch profitable businesses.
                   </p>
                   <div className="mt-8">
                     <Link href="/register">
-                      <Button className="rounded-xl bg-cyan-400 px-6 font-bold text-slate-950 transition-all duration-300 hover:bg-cyan-300 hover:shadow-lg hover:shadow-cyan-400/25 hover:scale-[1.02]">
+                      <Button className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]">
                         Enroll in upcoming cohort <ArrowRight data-icon="inline-end" />
                       </Button>
                     </Link>
@@ -250,10 +250,10 @@ export default async function AboutPage() {
                   ].map((path) => (
                     <div
                       key={path.title}
-                      className="card-hover-lift rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-inner hover:border-cyan-500/40"
+                      className="card-hover-lift rounded-2xl border border-white/20 bg-white/10 p-5 shadow-inner backdrop-blur-md hover:bg-white/15 hover:border-white/40"
                     >
                       <h3 className="font-bold text-white text-base">{path.title}</h3>
-                      <p className="mt-2 text-xs leading-5 text-slate-400">{path.desc}</p>
+                      <p className="mt-2 text-xs leading-5 text-blue-100">{path.desc}</p>
                     </div>
                   ))}
                 </div>

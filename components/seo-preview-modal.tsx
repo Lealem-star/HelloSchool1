@@ -97,11 +97,11 @@ export function CourseSeoPreviewModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="relative flex max-h-[90vh] w-full max-w-4xl flex-col rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+      <div className="relative flex max-h-[90vh] w-full max-w-4xl flex-col rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-card">
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4.5 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
+            <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400">
               <Share2 className="size-5" />
             </div>
             <div>
@@ -109,7 +109,7 @@ export function CourseSeoPreviewModal({
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
                   SEO & Social Sharing Preview
                 </h3>
-                <span className="rounded-full bg-cyan-100 px-2 py-0.5 text-[11px] font-semibold text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300">
+                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-800 dark:bg-blue-900/40 dark:text-sky-300">
                   {course.category}
                 </span>
               </div>
@@ -145,7 +145,7 @@ export function CourseSeoPreviewModal({
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex items-center gap-2 border-b-2 px-4 py-3 text-xs font-semibold transition ${
                   active
-                    ? 'border-cyan-500 text-cyan-600 dark:text-cyan-400'
+                    ? 'border-blue-600 text-blue-600 dark:border-sky-400 dark:text-sky-400'
                     : 'border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                 }`}
               >
@@ -163,7 +163,7 @@ export function CourseSeoPreviewModal({
             <div className="space-y-6">
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-7 items-center justify-center rounded-full bg-cyan-600 text-xs font-black text-white">
+                  <div className="flex size-7 items-center justify-center rounded-full bg-blue-600 text-xs font-black text-white">
                     H
                   </div>
                   <div className="leading-tight">
@@ -208,9 +208,9 @@ export function CourseSeoPreviewModal({
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-cyan-100 bg-cyan-50/50 p-4 text-xs text-slate-700 dark:border-cyan-900/50 dark:bg-cyan-950/20 dark:text-cyan-200">
-                <p className="font-semibold text-cyan-900 dark:text-cyan-100 mb-1 flex items-center gap-1.5">
-                  <Sparkles className="size-4 text-cyan-600 dark:text-cyan-400" /> Google Search
+              <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4 text-xs text-slate-700 dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-200">
+                <p className="font-semibold text-blue-900 dark:text-blue-100 mb-1 flex items-center gap-1.5">
+                  <Sparkles className="size-4 text-blue-600 dark:text-sky-400" /> Google Search
                   Optimization Highlights
                 </p>
                 <p className="text-[11px] leading-relaxed">
@@ -227,7 +227,7 @@ export function CourseSeoPreviewModal({
           {activeTab === 'og' && (
             <div className="space-y-6">
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900 max-w-2xl mx-auto">
-                <div className="relative aspect-[1200/630] w-full bg-slate-950 overflow-hidden">
+                <div className="relative aspect-[1200/630] w-full bg-[#0b1d47] overflow-hidden">
                   <img
                     src={ogImageUrl}
                     alt={course.title}
@@ -254,7 +254,7 @@ export function CourseSeoPreviewModal({
                     Dynamic OpenGraph Image Generator Active
                   </p>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                    Rendered live via <code className="font-mono text-cyan-600 dark:text-cyan-400">{ogImageUrl}</code> (1200 × 630 px PNG)
+                    Rendered live via <code className="font-mono text-blue-600 dark:text-sky-400">{ogImageUrl}</code> (1200 × 630 px PNG)
                   </p>
                 </div>
                 <a
@@ -273,7 +273,7 @@ export function CourseSeoPreviewModal({
           {activeTab === 'twitter' && (
             <div className="space-y-6">
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-md dark:border-slate-800 dark:bg-slate-900 max-w-xl mx-auto">
-                <div className="relative aspect-[1200/630] w-full bg-slate-950 overflow-hidden">
+                <div className="relative aspect-[1200/630] w-full bg-[#0b1d47] overflow-hidden">
                   <img
                     src={ogImageUrl}
                     alt={course.title}
@@ -284,7 +284,7 @@ export function CourseSeoPreviewModal({
                   <div className="flex items-center gap-1 text-[11px] text-slate-400 font-medium">
                     <span>helloschool.edu.et</span>
                     <span>•</span>
-                    <span className="text-cyan-500">@helloschool_et</span>
+                    <span className="text-sky-500">@helloschool_et</span>
                   </div>
                   <h4 className="mt-1 text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
                     {course.title} | Hello TVET
@@ -301,13 +301,13 @@ export function CourseSeoPreviewModal({
                 </p>
                 <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-600 dark:text-slate-400">
                   <div className="rounded-lg bg-white p-2 border dark:bg-slate-800 dark:border-slate-700">
-                    <span className="text-cyan-500">twitter:card</span> → summary_large_image
+                    <span className="text-sky-500">twitter:card</span> → summary_large_image
                   </div>
                   <div className="rounded-lg bg-white p-2 border dark:bg-slate-800 dark:border-slate-700">
-                    <span className="text-cyan-500">twitter:site</span> → @helloschool_et
+                    <span className="text-sky-500">twitter:site</span> → @helloschool_et
                   </div>
                   <div className="rounded-lg bg-white p-2 border dark:bg-slate-800 dark:border-slate-700 col-span-2">
-                    <span className="text-cyan-500">twitter:image</span> → /courses/{course.slug}/twitter-image
+                    <span className="text-sky-500">twitter:image</span> → /courses/{course.slug}/twitter-image
                   </div>
                 </div>
               </div>
@@ -354,7 +354,7 @@ export function CourseSeoPreviewModal({
                 </div>
               </div>
 
-              <div className="relative rounded-2xl border border-slate-800 bg-slate-950 p-4 text-[11px] font-mono text-slate-200 overflow-x-auto max-h-96">
+              <div className="relative rounded-2xl border border-blue-900/40 bg-[#081533] p-4 text-[11px] font-mono text-slate-200 overflow-x-auto max-h-96">
                 <pre>{schemaJson}</pre>
               </div>
             </div>
@@ -364,7 +364,7 @@ export function CourseSeoPreviewModal({
         {/* Footer */}
         <div className="flex items-center justify-between border-t px-6 py-4 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-3xl">
           <span className="text-[11px] text-slate-500 dark:text-slate-400">
-            OpenGraph images are rendered via <code className="font-mono text-cyan-600 dark:text-cyan-400">next/og</code> ImageResponse
+            OpenGraph images are rendered via <code className="font-mono text-blue-600 dark:text-sky-400">next/og</code> ImageResponse
           </span>
           <Button onClick={onClose} size="sm" className="rounded-xl px-5">
             Done

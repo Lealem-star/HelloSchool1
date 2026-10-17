@@ -49,9 +49,9 @@ const SECTORS = [
     title: 'Universities & Technical Colleges',
     badge: 'Lab Technicians',
     description:
-      'Upskill laboratory technicians, electronics workshop instructors, and university campus engineering staff to maintain department benches and test instruments.',
+      'Upskill laboratory technicians, electronics workshop instructors, and university campus engineering staff to maintain department equipment and test instruments.',
     skills: ['Oscilloscope calibration', 'PCB prototyping & soldering', 'Lab equipment servicing'],
-    accent: 'from-cyan-500/20 to-blue-500/10 border-cyan-500/30 text-cyan-400',
+    accent: 'from-blue-500/20 to-sky-500/10 border-blue-500/30 text-sky-400',
   },
   {
     icon: Server,
@@ -133,27 +133,27 @@ export function CompanyTrainingCTA() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-slate-950 py-20 text-white lg:py-28 border-t border-slate-800">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] py-20 text-white lg:py-28 border-t border-blue-400/30">
         {/* Glow Gradients */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(6,182,212,0.18),transparent_70%),radial-gradient(circle_at_10%_90%,rgba(16,185,129,0.12),transparent_40%),radial-gradient(circle_at_90%_80%,rgba(99,102,241,0.12),transparent_40%)]" />
-        <div className="tech-dot-bg absolute inset-0 opacity-20 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(255,255,255,0.18),transparent_70%),radial-gradient(circle_at_10%_90%,rgba(56,189,248,0.2),transparent_40%),radial-gradient(circle_at_90%_80%,rgba(255,255,255,0.12),transparent_40%)]" />
+        <div className="tech-dot-bg absolute inset-0 opacity-15 pointer-events-none" />
 
         <div className="container relative mx-auto max-w-7xl px-5 lg:px-8">
           {/* Header Banner */}
           <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1.5 text-xs font-semibold text-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-1.5 text-xs font-bold text-white shadow-lg backdrop-blur-md">
               <Building2 className="size-3.5" />
               <span>Institutional & Enterprise Technical Workforce</span>
             </div>
 
             <h2 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl lg:leading-tight">
               Customized Technical Training for{' '}
-              <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-emerald-300 bg-clip-text text-transparent">
+              <span className="text-white drop-shadow-sm">
                 Institutional Employees
               </span>
             </h2>
 
-            <p className="mt-5 text-base sm:text-lg leading-relaxed text-slate-300">
+            <p className="mt-5 text-base sm:text-lg leading-relaxed text-blue-50">
               Does your institution maintain its own specialized hardware? We build tailored, hands-on repair curriculums designed specifically for technicians in <strong>hospitals, factories, universities, telecoms, and financial institutions</strong>.
             </p>
 
@@ -161,7 +161,7 @@ export function CompanyTrainingCTA() {
               <Button
                 size="lg"
                 onClick={() => setModalOpen(true)}
-                className="group rounded-xl bg-gradient-to-r from-cyan-400 to-teal-400 px-7 font-bold text-slate-950 shadow-xl shadow-cyan-400/20 transition-all duration-300 hover:from-cyan-300 hover:to-teal-300 hover:scale-[1.02] hover:shadow-cyan-400/30"
+                className="group rounded-xl bg-white px-7 font-bold text-[#155DFC] shadow-xl transition-all duration-300 hover:bg-blue-50 hover:scale-[1.02] hover:shadow-2xl"
               >
                 <Building2 className="size-4 mr-2" />
                 Request Institutional Training
@@ -169,9 +169,9 @@ export function CompanyTrainingCTA() {
               </Button>
               <a
                 href={`tel:+251${schoolConfig.phone.replace(/^0/, '').replace(/\s+/g, '')}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/80 px-6 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:border-cyan-400/50 hover:bg-slate-800 hover:text-white"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/40 bg-white/10 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:border-white hover:bg-white/20"
               >
-                <PhoneCall className="size-4 text-cyan-400" />
+                <PhoneCall className="size-4 text-white" />
                 <span>Call Institutional Desk: {schoolConfig.phone}</span>
               </a>
             </div>
@@ -184,34 +184,34 @@ export function CompanyTrainingCTA() {
               return (
                 <div
                   key={sector.title}
-                  className="group relative flex flex-col justify-between rounded-2xl border border-slate-800/90 bg-gradient-to-b from-slate-900/90 to-slate-950 p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:shadow-cyan-950/40"
+                  className="group relative flex flex-col justify-between rounded-2xl border border-white/20 bg-white/10 p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/50 hover:bg-white/15 hover:shadow-2xl"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <div className="flex size-11 items-center justify-center rounded-xl bg-slate-800 border border-slate-700 text-cyan-400 group-hover:border-cyan-400/40 group-hover:bg-cyan-400/10 transition-colors">
+                      <div className="flex size-11 items-center justify-center rounded-xl bg-white/20 border border-white/30 text-white transition-colors">
                         <Icon className="size-5" />
                       </div>
-                      <span className="rounded-md border border-slate-700 bg-slate-800/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-300">
+                      <span className="rounded-md border border-white/30 bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                         {sector.badge}
                       </span>
                     </div>
 
-                    <h3 className="mt-5 text-lg font-bold text-white group-hover:text-cyan-300 transition-colors">
+                    <h3 className="mt-5 text-lg font-bold text-white transition-colors">
                       {sector.title}
                     </h3>
-                    <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-slate-400">
+                    <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-blue-100">
                       {sector.description}
                     </p>
                   </div>
 
-                  <div className="mt-6 border-t border-slate-800/80 pt-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                  <div className="mt-6 border-t border-white/20 pt-4">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-blue-200 mb-2">
                       Core Modules Include:
                     </p>
-                    <ul className="space-y-1.5 text-xs text-slate-300">
+                    <ul className="space-y-1.5 text-xs text-white">
                       {sector.skills.map((skill) => (
                         <li key={skill} className="flex items-center gap-2">
-                          <CheckCircle2 className="size-3 text-cyan-400 shrink-0" />
+                          <CheckCircle2 className="size-3 text-emerald-300 shrink-0" />
                           <span>{skill}</span>
                         </li>
                       ))}
@@ -223,45 +223,45 @@ export function CompanyTrainingCTA() {
           </div>
 
           {/* Institutional Value Highlights Strip */}
-          <div className="mt-12 rounded-3xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 backdrop-blur-md">
+          <div className="mt-12 rounded-3xl border border-white/20 bg-white/10 p-6 sm:p-8 backdrop-blur-md">
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-center">
               <div className="flex items-center gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-400 border border-cyan-400/20">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30">
                   <Wrench className="size-6" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-white">Your Exact Hardware</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Custom labs built around your institutional machinery.</p>
+                  <p className="text-xs text-blue-100 mt-0.5">Custom labs built around your institutional machinery.</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-teal-400/10 text-teal-400 border border-teal-400/20">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30">
                   <MapPin className="size-6" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-white">Flexible Location</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">On-site at your facility or in our Bahir Dar benches.</p>
+                  <p className="text-xs text-blue-100 mt-0.5">On-site at your facility or in our Bahir Dar training labs.</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-400/10 text-indigo-400 border border-indigo-400/20">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30">
                   <Clock className="size-6" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-white">Tailored Scheduling</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Rotational shifts, weekend cohorts or intensive bootcamps.</p>
+                  <p className="text-xs text-blue-100 mt-0.5">Rotational shifts, weekend cohorts or intensive bootcamps.</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-amber-400/10 text-amber-400 border border-amber-400/20">
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30">
                   <ShieldCheck className="size-6" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-white">Certified Competency</h4>
-                  <p className="text-xs text-slate-400 mt-0.5">Accredited certification and technical skill evaluations.</p>
+                  <p className="text-xs text-blue-100 mt-0.5">Accredited certification and technical skill evaluations.</p>
                 </div>
               </div>
             </div>
@@ -272,28 +272,28 @@ export function CompanyTrainingCTA() {
       {/* ── MODAL: COMPANY INQUIRY (DEDICATED, NOT MERGED WITH NORMAL CONTACT US) ── */}
       {modalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 sm:p-6 backdrop-blur-md animate-fade-in"
+          className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 sm:p-6 backdrop-blur-md animate-fade-in"
           onClick={() => !loading && setModalOpen(false)}
         >
           <div
-            className="relative w-full max-w-2xl my-8 rounded-3xl border border-slate-700 bg-slate-900 text-white shadow-2xl overflow-hidden"
+            className="relative w-full max-w-2xl my-8 rounded-3xl border border-slate-200 bg-white text-slate-900 shadow-2xl overflow-hidden dark:border-slate-800 dark:bg-card dark:text-white"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-6 py-5">
+            <div className="flex items-center justify-between bg-gradient-to-r from-[#1048ca] via-[#155DFC] to-[#0c3694] px-6 py-5 text-white">
               <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300 border border-cyan-400/30">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-white/15 text-white border border-white/20">
                   <Building2 className="size-5" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-white">Customized Company Training Inquiry</h3>
-                  <p className="text-xs text-slate-400">Dedicated institutional intake · Hello TVET Corporate Programs</p>
+                  <p className="text-xs text-blue-100">Dedicated institutional intake · Hello TVET Corporate Programs</p>
                 </div>
               </div>
               <button
                 disabled={loading}
                 onClick={() => setModalOpen(false)}
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-800 hover:text-white"
+                className="rounded-lg p-2 text-white/80 transition hover:bg-white/20 hover:text-white"
               >
                 <X className="size-5" />
               </button>
@@ -303,23 +303,23 @@ export function CompanyTrainingCTA() {
             <div className="p-6 sm:p-8 max-h-[80vh] overflow-y-auto">
               {submitted ? (
                 <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-8 text-center animate-scale-in">
-                  <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-emerald-500 text-slate-950">
+                  <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30">
                     <CheckCircle2 className="size-8" />
                   </span>
-                  <h4 className="mt-5 text-2xl font-bold text-white">Institutional Inquiry Received!</h4>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-300 max-w-md mx-auto">
+                  <h4 className="mt-5 text-2xl font-bold text-slate-900 dark:text-white">Institutional Inquiry Received!</h4>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300 max-w-md mx-auto">
                     Thank you, <strong>{form.contactPerson}</strong>. Your customized training request for <strong>{form.companyName}</strong> has been logged in our corporate admin desk. Our institutional training director will reach out to you within 24 hours.
                   </p>
                   <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
                     <Button
                       onClick={handleReset}
-                      className="bg-cyan-400 text-slate-950 font-bold hover:bg-cyan-300"
+                      className="bg-[#155DFC] text-white font-bold hover:bg-[#0D4ECC] shadow-md shadow-blue-500/25"
                     >
                       Done
                     </Button>
                     <a
                       href={`tel:+251${schoolConfig.phone.replace(/^0/, '').replace(/\s+/g, '')}`}
-                      className="inline-flex items-center gap-2 text-xs text-slate-300 hover:text-cyan-300"
+                      className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-[#155DFC]"
                     >
                       <PhoneCall className="size-3.5" /> Urgent inquiry? Call {schoolConfig.phone}
                     </a>
@@ -328,13 +328,13 @@ export function CompanyTrainingCTA() {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {error && (
-                    <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-3.5 text-sm text-red-300">
+                    <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-3.5 text-sm text-red-600 dark:text-red-300">
                       {error}
                     </div>
                   )}
 
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                    <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       Organization / Institution Name *
                       <input
                         required
@@ -343,11 +343,11 @@ export function CompanyTrainingCTA() {
                         onChange={handleChange}
                         placeholder="e.g. Felege Hiwot Hospital, BDU, Dangote"
                         disabled={loading}
-                        className="h-11 rounded-xl border border-slate-700 bg-slate-950 px-3.5 text-sm font-normal text-white placeholder-slate-500 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3.5 text-sm font-normal text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                       />
                     </label>
 
-                    <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                    <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       Institution Sector *
                       <select
                         required
@@ -355,7 +355,7 @@ export function CompanyTrainingCTA() {
                         value={form.institutionType}
                         onChange={handleChange}
                         disabled={loading}
-                        className="h-11 rounded-xl border border-slate-700 bg-slate-950 px-3 text-sm font-normal text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 cursor-pointer"
+                        className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm font-normal text-slate-900 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                       >
                         <option value="Hospitals & Healthcare">Hospitals & Healthcare</option>
                         <option value="Industrial & Manufacturing">Industrial & Manufacturing</option>
@@ -369,7 +369,7 @@ export function CompanyTrainingCTA() {
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                    <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       Contact Person Full Name *
                       <input
                         required
@@ -378,11 +378,11 @@ export function CompanyTrainingCTA() {
                         onChange={handleChange}
                         placeholder="e.g. Dr. Abebe / Eng. Martha"
                         disabled={loading}
-                        className="h-11 rounded-xl border border-slate-700 bg-slate-950 px-3.5 text-sm font-normal text-white placeholder-slate-500 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3.5 text-sm font-normal text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                       />
                     </label>
 
-                    <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                    <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       Job Title / Department
                       <input
                         name="jobTitle"
@@ -390,13 +390,13 @@ export function CompanyTrainingCTA() {
                         onChange={handleChange}
                         placeholder="e.g. Maintenance Head / HR Director"
                         disabled={loading}
-                        className="h-11 rounded-xl border border-slate-700 bg-slate-950 px-3.5 text-sm font-normal text-white placeholder-slate-500 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3.5 text-sm font-normal text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                       />
                     </label>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                    <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       Official Work Email *
                       <input
                         required
@@ -406,11 +406,11 @@ export function CompanyTrainingCTA() {
                         onChange={handleChange}
                         placeholder="contact@institution.gov.et"
                         disabled={loading}
-                        className="h-11 rounded-xl border border-slate-700 bg-slate-950 px-3.5 text-sm font-normal text-white placeholder-slate-500 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3.5 text-sm font-normal text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                       />
                     </label>
 
-                    <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                    <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       Phone Number *
                       <input
                         required
@@ -419,20 +419,20 @@ export function CompanyTrainingCTA() {
                         onChange={handleChange}
                         placeholder="+251 9..."
                         disabled={loading}
-                        className="h-11 rounded-xl border border-slate-700 bg-slate-950 px-3.5 text-sm font-normal text-white placeholder-slate-500 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                        className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3.5 text-sm font-normal text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                       />
                     </label>
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                    <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       Trainees / Employees Count
                       <select
                         name="employeeCount"
                         value={form.employeeCount}
                         onChange={handleChange}
                         disabled={loading}
-                        className="h-11 rounded-xl border border-slate-700 bg-slate-950 px-3 text-sm font-normal text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 cursor-pointer"
+                        className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm font-normal text-slate-900 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                       >
                         <option value="1 - 5 staff">1 - 5 staff (Focused Team)</option>
                         <option value="6 - 15 staff">6 - 15 staff (Full Department Cohort)</option>
@@ -441,14 +441,14 @@ export function CompanyTrainingCTA() {
                       </select>
                     </label>
 
-                    <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                    <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                       Training Delivery Location
                       <select
                         name="location"
                         value={form.location}
                         onChange={handleChange}
                         disabled={loading}
-                        className="h-11 rounded-xl border border-slate-700 bg-slate-950 px-3 text-sm font-normal text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 cursor-pointer"
+                        className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3 text-sm font-normal text-slate-900 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 cursor-pointer dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                       >
                         <option value="At HelloSchool Advanced Labs (Bahir Dar)">At HelloSchool Advanced Labs (Bahir Dar)</option>
                         <option value="On-site at our Institution Facility">On-site at our Institution Facility</option>
@@ -457,7 +457,7 @@ export function CompanyTrainingCTA() {
                     </label>
                   </div>
 
-                  <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                  <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                     Specific Hardware / Equipment Focus
                     <input
                       name="trainingFocus"
@@ -465,11 +465,11 @@ export function CompanyTrainingCTA() {
                       onChange={handleChange}
                       placeholder="e.g. Patient monitors, Siemens PLC boards, Dell enterprise servers..."
                       disabled={loading}
-                      className="h-11 rounded-xl border border-slate-700 bg-slate-950 px-3.5 text-sm font-normal text-white placeholder-slate-500 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3.5 text-sm font-normal text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                     />
                   </label>
 
-                  <label className="flex flex-col gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-300">
+                  <label className="flex flex-col gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                     Additional Requirements or Maintenance Challenges
                     <textarea
                       name="message"
@@ -478,12 +478,12 @@ export function CompanyTrainingCTA() {
                       onChange={handleChange}
                       placeholder="Describe the devices your staff maintains, the technical obstacles you face, or timeline preferences..."
                       disabled={loading}
-                      className="rounded-xl border border-slate-700 bg-slate-950 p-3.5 text-sm font-normal text-white placeholder-slate-500 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+                      className="rounded-xl border border-slate-300 bg-slate-50 p-3.5 text-sm font-normal text-slate-900 placeholder-slate-400 outline-none transition focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                     />
                   </label>
 
-                  <div className="pt-2 flex items-center justify-between border-t border-slate-800">
-                    <p className="text-[11px] text-slate-400">
+                  <div className="pt-2 flex items-center justify-between border-t border-slate-200 dark:border-slate-800">
+                    <p className="text-[11px] text-slate-500">
                       * This inquiry route routes directly to the corporate training coordinator.
                     </p>
                     <div className="flex gap-2">
@@ -492,14 +492,14 @@ export function CompanyTrainingCTA() {
                         variant="outline"
                         onClick={() => setModalOpen(false)}
                         disabled={loading}
-                        className="border-slate-700 bg-transparent text-slate-300 hover:bg-slate-800 hover:text-white"
+                        className="border-slate-300 bg-transparent text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                       >
                         Cancel
                       </Button>
                       <Button
                         type="submit"
                         disabled={loading}
-                        className="bg-gradient-to-r from-cyan-400 to-teal-400 text-slate-950 font-bold hover:from-cyan-300 hover:to-teal-300"
+                        className="bg-[#155DFC] text-white font-bold hover:bg-[#0D4ECC] shadow-lg shadow-blue-500/25"
                       >
                         {loading ? (
                           <>

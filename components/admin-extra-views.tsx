@@ -15,6 +15,7 @@ import {
   ImageIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useConfirm } from '@/components/ui/dialog-modal'
 
 export type AdminInstructor = {
   id: string
@@ -93,9 +94,9 @@ function Modal({
 }
 
 const inputCls =
-  'h-11 rounded-lg border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-cyan-500'
+  'h-11 rounded-lg border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-blue-500'
 const textareaCls =
-  'rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-cyan-500'
+  'rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500'
 
 function toSpecialtiesArray(val: unknown): string[] {
   if (Array.isArray(val)) return val.map(String)
@@ -146,7 +147,7 @@ export function InstructorsView({
           <h2 className="text-2xl font-bold tracking-tight text-foreground">Instructors & Mentors</h2>
           <p className="text-sm text-muted-foreground">Manage training faculty displayed on About page</p>
         </div>
-        <Button onClick={onAdd} className="bg-cyan-500 font-semibold text-slate-950 hover:bg-cyan-400">
+        <Button onClick={onAdd} className="bg-blue-600 font-bold text-white hover:bg-blue-700 shadow-md shadow-blue-500/25">
           <Plus className="mr-1.5 size-4" /> Add Instructor
         </Button>
       </div>
@@ -157,13 +158,13 @@ export function InstructorsView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search instructors by name, title, or bio..."
-          className="h-10 w-full max-w-sm rounded-xl border bg-card pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-cyan-500"
+          className="h-10 w-full max-w-sm rounded-xl border bg-card pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {loading ? (
         <div className="flex h-48 items-center justify-center">
-          <Loader2 className="size-6 animate-spin text-cyan-500" />
+          <Loader2 className="size-6 animate-spin text-blue-600" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed p-12 text-center text-muted-foreground">
@@ -174,7 +175,7 @@ export function InstructorsView({
           {filtered.map((inst) => (
             <div
               key={inst.id}
-              className="flex flex-col justify-between rounded-2xl border bg-card p-5 shadow-sm transition hover:border-cyan-500/40"
+              className="flex flex-col justify-between rounded-2xl border bg-card p-5 shadow-sm transition hover:border-blue-500/40"
             >
               <div>
                 <div className="flex items-start gap-4">
@@ -185,7 +186,7 @@ export function InstructorsView({
                     onError={(e) => ((e.target as any).src = '/images/helloschool.jpg')}
                   />
                   <div className="min-w-0 flex-1">
-                    <span className="inline-block rounded-md bg-cyan-400/10 px-2 py-0.5 text-[11px] font-bold text-cyan-600 dark:text-cyan-400">
+                    <span className="inline-block rounded-md bg-blue-500/10 px-2 py-0.5 text-[11px] font-bold text-blue-600 dark:text-sky-400">
                       {inst.experience || 'Specialist'}
                     </span>
                     <h3 className="mt-1 truncate font-bold text-foreground">{inst.name}</h3>
@@ -272,10 +273,18 @@ export function InstructorModal({
   const [published, setPublished] = useState(instructor ? instructor.published : true)
   const [sortOrder, setSortOrder] = useState(instructor ? instructor.sortOrder : 0)
   const [saving, setSaving] = useState(false)
+  const { alert } = useConfirm()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name.trim() || !role.trim()) return alert('Name and role are required')
+    if (!name.trim() || !role.trim()) {
+      await alert({
+        title: 'Validation Error',
+        message: 'Name and role are required fields.',
+        variant: 'warning',
+      })
+      return
+    }
     setSaving(true)
     try {
       const parsedSpecialties = specialties
@@ -296,7 +305,11 @@ export function InstructorModal({
       })
       onClose()
     } catch (err: any) {
-      alert(err.message || 'Failed to save instructor')
+      await alert({
+        title: 'Save Failed',
+        message: err.message || 'Failed to save instructor',
+        variant: 'danger',
+      })
     } finally {
       setSaving(false)
     }
@@ -358,7 +371,7 @@ export function InstructorModal({
             rows={4}
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            placeholder="Background, certifications, workbench mastery..."
+            placeholder="Background, certifications, technical mastery..."
             className={textareaCls}
           />
         </label>
@@ -368,7 +381,7 @@ export function InstructorModal({
             type="checkbox"
             checked={published}
             onChange={(e) => setPublished(e.target.checked)}
-            className="size-4 rounded accent-cyan-500"
+            className="size-4 rounded accent-blue-600"
           />
           Published (visible on website)
         </label>
@@ -377,7 +390,7 @@ export function InstructorModal({
           <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
             Cancel
           </Button>
-          <Button type="submit" disabled={saving} className="bg-cyan-500 text-slate-950 font-semibold hover:bg-cyan-400">
+          <Button type="submit" disabled={saving} className="bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-500/25">
             {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
             {saving ? 'Saving...' : instructor ? 'Update Instructor' : 'Create Instructor'}
           </Button>
@@ -420,9 +433,9 @@ export function FacilitiesView({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-foreground">Workshop Facilities</h2>
-          <p className="text-sm text-muted-foreground">Manage workbench stations & equipment shown on Training page</p>
+          <p className="text-sm text-muted-foreground">Manage lab facilities & equipment shown on Training page</p>
         </div>
-        <Button onClick={onAdd} className="bg-cyan-500 font-semibold text-slate-950 hover:bg-cyan-400">
+        <Button onClick={onAdd} className="bg-blue-600 font-bold text-white hover:bg-blue-700 shadow-md shadow-blue-500/25">
           <Plus className="mr-1.5 size-4" /> Add Facility
         </Button>
       </div>
@@ -433,13 +446,13 @@ export function FacilitiesView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search workshop facilities..."
-          className="h-10 w-full max-w-sm rounded-xl border bg-card pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-cyan-500"
+          className="h-10 w-full max-w-sm rounded-xl border bg-card pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {loading ? (
         <div className="flex h-48 items-center justify-center">
-          <Loader2 className="size-6 animate-spin text-cyan-500" />
+          <Loader2 className="size-6 animate-spin text-blue-600" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed p-12 text-center text-muted-foreground">
@@ -450,10 +463,10 @@ export function FacilitiesView({
           {filtered.map((fac) => (
             <div
               key={fac.id}
-              className="flex flex-col justify-between rounded-2xl border bg-card p-6 shadow-sm transition hover:border-cyan-500/40"
+              className="flex flex-col justify-between rounded-2xl border bg-card p-6 shadow-sm transition hover:border-blue-500/40"
             >
               <div>
-                <div className="flex size-11 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400">
+                <div className="flex size-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400">
                   <Wrench className="size-5" />
                 </div>
                 <h3 className="mt-4 font-bold text-foreground">{fac.title}</h3>
@@ -512,10 +525,18 @@ export function FacilityModal({
   const [sortOrder, setSortOrder] = useState(facility ? facility.sortOrder : 0)
   const [published, setPublished] = useState(facility ? facility.published : true)
   const [saving, setSaving] = useState(false)
+  const { alert } = useConfirm()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!title.trim()) return alert('Title is required')
+    if (!title.trim()) {
+      await alert({
+        title: 'Validation Error',
+        message: 'Facility title is required.',
+        variant: 'warning',
+      })
+      return
+    }
     setSaving(true)
     try {
       await onSave({
@@ -528,7 +549,11 @@ export function FacilityModal({
       })
       onClose()
     } catch (err: any) {
-      alert(err.message || 'Failed to save facility')
+      await alert({
+        title: 'Save Failed',
+        message: err.message || 'Failed to save facility',
+        variant: 'danger',
+      })
     } finally {
       setSaving(false)
     }
@@ -573,7 +598,7 @@ export function FacilityModal({
             type="checkbox"
             checked={published}
             onChange={(e) => setPublished(e.target.checked)}
-            className="size-4 rounded accent-cyan-500"
+            className="size-4 rounded accent-blue-600"
           />
           Published (visible on website)
         </label>
@@ -582,7 +607,7 @@ export function FacilityModal({
           <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
             Cancel
           </Button>
-          <Button type="submit" disabled={saving} className="bg-cyan-500 text-slate-950 font-semibold hover:bg-cyan-400">
+          <Button type="submit" disabled={saving} className="bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-500/25">
             {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
             {saving ? 'Saving...' : facility ? 'Update Facility' : 'Create Facility'}
           </Button>
@@ -629,7 +654,7 @@ export function ProjectsView({
           <h2 className="text-2xl font-bold tracking-tight text-foreground">Student Projects & Case Studies</h2>
           <p className="text-sm text-muted-foreground">Manage real-world board repair cases displayed on Training page</p>
         </div>
-        <Button onClick={onAdd} className="bg-cyan-500 font-semibold text-slate-950 hover:bg-cyan-400">
+        <Button onClick={onAdd} className="bg-blue-600 font-bold text-white hover:bg-blue-700 shadow-md shadow-blue-500/25">
           <Plus className="mr-1.5 size-4" /> Add Project Case
         </Button>
       </div>
@@ -640,13 +665,13 @@ export function ProjectsView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search projects by device, fault, or technician..."
-          className="h-10 w-full max-w-sm rounded-xl border bg-card pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-cyan-500"
+          className="h-10 w-full max-w-sm rounded-xl border bg-card pl-9 pr-4 text-sm outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {loading ? (
         <div className="flex h-48 items-center justify-center">
-          <Loader2 className="size-6 animate-spin text-cyan-500" />
+          <Loader2 className="size-6 animate-spin text-blue-600" />
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed p-12 text-center text-muted-foreground">
@@ -657,18 +682,18 @@ export function ProjectsView({
           {filtered.map((proj) => (
             <div
               key={proj.id}
-              className="flex flex-col justify-between rounded-2xl border bg-card p-6 shadow-sm transition hover:border-cyan-500/40"
+              className="flex flex-col justify-between rounded-2xl border bg-card p-6 shadow-sm transition hover:border-blue-500/40"
             >
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="rounded-full bg-cyan-400/10 px-2.5 py-0.5 text-[11px] font-bold text-cyan-600 dark:text-cyan-400">
+                  <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[11px] font-bold text-blue-600 dark:text-sky-400">
                     {proj.badge || 'Case Study'}
                   </span>
                   <span className="text-xs text-muted-foreground">{proj.category}</span>
                 </div>
 
                 <h3 className="mt-3 font-bold text-foreground">{proj.title}</h3>
-                <p className="mt-1 text-xs font-medium text-cyan-600 dark:text-cyan-400">Device: {proj.device}</p>
+                <p className="mt-1 text-xs font-medium text-blue-600 dark:text-sky-400">Device: {proj.device}</p>
 
                 <div className="mt-4 space-y-2 text-xs">
                   <div className="rounded-lg bg-muted/60 p-2.5">
@@ -732,10 +757,18 @@ export function ProjectModal({
   const [sortOrder, setSortOrder] = useState(project ? project.sortOrder : 0)
   const [published, setPublished] = useState(project ? project.published : true)
   const [saving, setSaving] = useState(false)
+  const { alert } = useConfirm()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!title.trim()) return alert('Title is required')
+    if (!title.trim()) {
+      await alert({
+        title: 'Validation Error',
+        message: 'Project title is required.',
+        variant: 'warning',
+      })
+      return
+    }
     setSaving(true)
     try {
       await onSave({
@@ -754,7 +787,11 @@ export function ProjectModal({
       })
       onClose()
     } catch (err: any) {
-      alert(err.message || 'Failed to save student project')
+      await alert({
+        title: 'Save Failed',
+        message: err.message || 'Failed to save student project',
+        variant: 'danger',
+      })
     } finally {
       setSaving(false)
     }
@@ -815,7 +852,7 @@ export function ProjectModal({
         </label>
 
         <label className="flex flex-col gap-1 text-xs font-semibold text-foreground">
-          Workbench Solution
+          Practical Lab Solution
           <textarea rows={2} value={solution} onChange={(e) => setSolution(e.target.value)} className={textareaCls} />
         </label>
 
@@ -829,7 +866,7 @@ export function ProjectModal({
             type="checkbox"
             checked={published}
             onChange={(e) => setPublished(e.target.checked)}
-            className="size-4 rounded accent-cyan-500"
+            className="size-4 rounded accent-blue-600"
           />
           Published (visible on website)
         </label>
@@ -838,7 +875,7 @@ export function ProjectModal({
           <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
             Cancel
           </Button>
-          <Button type="submit" disabled={saving} className="bg-cyan-500 text-slate-950 font-semibold hover:bg-cyan-400">
+          <Button type="submit" disabled={saving} className="bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-500/25">
             {saving ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
             {saving ? 'Saving...' : project ? 'Update Project' : 'Create Project'}
           </Button>

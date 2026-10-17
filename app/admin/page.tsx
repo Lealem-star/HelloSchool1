@@ -50,6 +50,8 @@ import {
   Building2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useConfirm } from '@/components/ui/dialog-modal'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { CourseSeoPreviewModal } from '@/components/seo-preview-modal'
 import {
   InstructorsView,
@@ -74,6 +76,12 @@ import {
   CompanyOverview,
   AdminTrustedPartner,
 } from '@/components/admin-company-views'
+import {
+  AdminBatchView,
+  BatchItem,
+  BatchOverview,
+  CandidateStudent,
+} from '@/components/admin-batch-view'
 
 /* ──────────────────────────────────────────────────────────────
    Shared types
@@ -232,6 +240,7 @@ const textareaCls =
    Main page
    ────────────────────────────────────────────────────────────── */
 export default function AdminPage() {
+  const { confirm, alert } = useConfirm()
   const [user, setUser] = useState<User | null>(null)
   const [loggingIn, setLoggingIn] = useState(false)
   const [email, setEmail] = useState('')
@@ -239,6 +248,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('')
   const [tab, setTab] = useState<
     | 'registrations'
+    | 'batches'
     | 'inquiries'
     | 'company-inquiries'
     | 'trusted-partners'
@@ -270,6 +280,20 @@ export default function AdminPage() {
 
   // Trusted Partners state
   const [trustedPartners, setTrustedPartners] = useState<AdminTrustedPartner[]>([])
+
+  // Batches (ዙሮች / Cohort Intakes) state
+  const [batches, setBatches] = useState<BatchItem[]>([])
+  const [batchOverview, setBatchOverview] = useState<BatchOverview>({
+    totalBatches: 0,
+    openBatches: 0,
+    activeBatches: 0,
+    completedBatches: 0,
+    upcomingBatches: 0,
+    totalEnrolledTrainees: 0,
+  })
+  const [batchCourses, setBatchCourses] = useState<string[]>([])
+  const [batchCandidates, setBatchCandidates] = useState<any[]>([])
+  const [batchesLoading, setBatchesLoading] = useState(false)
 
   // Registrations state
   const [registrations, setRegistrations] = useState<AdminRegistration[]>([])
@@ -344,10 +368,12 @@ export default function AdminPage() {
     if (!user) return
     loadCategories()
     loadRegistrations()
+    loadBatches()
     loadInquiries()
     loadCompanyInquiries()
     loadTrustedPartners()
     if (tab === 'registrations') loadRegistrations()
+    if (tab === 'batches') loadBatches()
     if (tab === 'inquiries') loadInquiries()
     if (tab === 'company-inquiries') loadCompanyInquiries()
     if (tab === 'trusted-partners') loadTrustedPartners()
@@ -365,6 +391,31 @@ export default function AdminPage() {
   }, [user, tab, statusFilter, regStatusFilter, companyStatusFilter])
 
   /* ─── Loaders ─── */
+  async function loadBatches() {
+    setBatchesLoading(true)
+    try {
+      const res = await fetch('/api/admin/batches')
+      const d = await res.json()
+      if (res.ok) {
+        setBatches(d.batches || [])
+        setBatchOverview(
+          d.overview || {
+            totalBatches: 0,
+            openBatches: 0,
+            activeBatches: 0,
+            completedBatches: 0,
+            upcomingBatches: 0,
+            totalEnrolledTrainees: 0,
+          }
+        )
+        setBatchCourses(d.courses || [])
+        setBatchCandidates(d.candidateStudents || [])
+      }
+    } finally {
+      setBatchesLoading(false)
+    }
+  }
+
   async function loadRegistrations() {
     setLoading(true)
     try {
@@ -516,6 +567,120 @@ export default function AdminPage() {
     })
   }
 
+  /* ─── Batch (ዙር / Cohort Intake) operations ─── */
+  async function createBatch(formData: Partial<BatchItem>): Promise<boolean> {
+    try {
+      const res = await fetch('/api/admin/batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      const d = await res.json()
+      if (!res.ok) throw new Error(d.error || 'Failed to create batch')
+      loadBatches()
+      return true
+    } catch (e: any) {
+      await alert({
+        title: 'Batch Creation Failed',
+        message: e.message || 'Failed to create batch',
+        variant: 'danger',
+      })
+      return false
+    }
+  }
+
+  async function updateBatch(formData: Partial<BatchItem> & { id: string }): Promise<boolean> {
+    try {
+      const res = await fetch('/api/admin/batches', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      const d = await res.json()
+      if (!res.ok) throw new Error(d.error || 'Failed to update batch')
+      loadBatches()
+      return true
+    } catch (e: any) {
+      await alert({
+        title: 'Batch Update Failed',
+        message: e.message || 'Failed to update batch',
+        variant: 'danger',
+      })
+      return false
+    }
+  }
+
+  async function deleteBatch(id: string): Promise<boolean> {
+    try {
+      const res = await fetch(`/api/admin/batches?id=${id}`, { method: 'DELETE' })
+      const d = await res.json()
+      if (!res.ok) throw new Error(d.error || 'Failed to delete batch')
+      loadBatches()
+      return true
+    } catch (e: any) {
+      await alert({
+        title: 'Delete Failed',
+        message: e.message || 'Failed to delete batch',
+        variant: 'danger',
+      })
+      return false
+    }
+  }
+
+  async function assignStudentToBatch(data: {
+    batchId: string
+    registrationId?: string
+    studentName?: string
+    phone?: string
+    email?: string
+    city?: string
+    telegramUsername?: string
+    password?: string
+    courseTitle: string
+    shift: string
+    status?: string
+  }): Promise<boolean> {
+    try {
+      const res = await fetch('/api/admin/batches/assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      const d = await res.json()
+      if (!res.ok) throw new Error(d.error || 'Failed to assign student to batch')
+      loadBatches()
+      loadRegistrations()
+      return true
+    } catch (e: any) {
+      await alert({
+        title: 'Assignment Failed',
+        message: e.message || 'Failed to assign student to batch',
+        variant: 'danger',
+      })
+      return false
+    }
+  }
+
+  async function removeStudentFromBatch(registrationId: string): Promise<boolean> {
+    try {
+      const res = await fetch(`/api/admin/batches/assign?registrationId=${registrationId}`, {
+        method: 'DELETE',
+      })
+      const d = await res.json()
+      if (!res.ok) throw new Error(d.error || 'Failed to remove from batch')
+      loadBatches()
+      loadRegistrations()
+      return true
+    } catch (e: any) {
+      await alert({
+        title: 'Removal Failed',
+        message: e.message || 'Failed to remove student from batch',
+        variant: 'danger',
+      })
+      return false
+    }
+  }
+
   /* ─── Registration operations ─── */
   async function updateRegistrationStatus(id: string, status: string) {
     setSavingId(id)
@@ -532,7 +697,11 @@ export default function AdminPage() {
       setRegistrations((p) => p.map((r) => (r.id === id ? { ...r, status } : r)))
       loadRegistrations()
     } catch (e: any) {
-      alert(e.message)
+      await alert({
+        title: 'Status Update Failed',
+        message: e.message || 'Failed to update registration status',
+        variant: 'danger',
+      })
     } finally {
       setSavingId(null)
     }
@@ -556,14 +725,24 @@ export default function AdminPage() {
       )
       loadRegistrations()
     } catch (e: any) {
-      alert(e.message)
+      await alert({
+        title: 'Bulk Update Failed',
+        message: e.message || 'Failed to update registrations',
+        variant: 'danger',
+      })
     } finally {
       setLoading(false)
     }
   }
 
   async function deleteRegistration(id: string) {
-    if (!confirm('Are you sure you want to permanently delete this registration record?')) return
+    const ok = await confirm({
+      title: 'Delete Registration',
+      message: 'Are you sure you want to permanently delete this registration record?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       const res = await fetch(`/api/admin/registrations?id=${id}`, { method: 'DELETE' })
@@ -574,7 +753,11 @@ export default function AdminPage() {
       setRegistrations((p) => p.filter((r) => r.id !== id))
       loadRegistrations()
     } catch (e: any) {
-      alert(e.message)
+      await alert({
+        title: 'Delete Failed',
+        message: e.message || 'Failed to delete registration',
+        variant: 'danger',
+      })
     } finally {
       setSavingId(null)
     }
@@ -582,7 +765,13 @@ export default function AdminPage() {
 
   async function bulkDeleteRegistrations(ids: string[]) {
     if (ids.length === 0) return
-    if (!confirm(`Are you sure you want to delete ${ids.length} selected registration(s)?`)) return
+    const ok = await confirm({
+      title: 'Bulk Delete Registrations',
+      message: `Are you sure you want to permanently delete ${ids.length} selected registration(s)?`,
+      confirmText: 'Delete All',
+      variant: 'danger',
+    })
+    if (!ok) return
     setLoading(true)
     try {
       const res = await fetch(`/api/admin/registrations?ids=${ids.join(',')}`, {
@@ -595,7 +784,11 @@ export default function AdminPage() {
       setRegistrations((p) => p.filter((r) => !ids.includes(r.id)))
       loadRegistrations()
     } catch (e: any) {
-      alert(e.message)
+      await alert({
+        title: 'Bulk Delete Failed',
+        message: e.message || 'Failed to delete registrations',
+        variant: 'danger',
+      })
     } finally {
       setLoading(false)
     }
@@ -615,7 +808,11 @@ export default function AdminPage() {
       }
       setRegistrations((p) => p.map((r) => (r.id === id ? { ...r, adminNotes } : r)))
     } catch (e: any) {
-      alert(e.message)
+      await alert({
+        title: 'Error Saving Notes',
+        message: e.message || 'Failed to save staff notes',
+        variant: 'danger',
+      })
     } finally {
       setSavingId(null)
     }
@@ -634,7 +831,11 @@ export default function AdminPage() {
       setInquiries((p) => p.map((i) => (i.id === id ? { ...i, status } : i)))
       loadInquiries()
     } catch (e: any) {
-      alert(e.message)
+      await alert({
+        title: 'Status Update Failed',
+        message: e.message || 'Failed to update inquiry status',
+        variant: 'danger',
+      })
     } finally {
       setSavingId(null)
     }
@@ -655,14 +856,24 @@ export default function AdminPage() {
       )
       loadInquiries()
     } catch (e: any) {
-      alert(e.message)
+      await alert({
+        title: 'Bulk Update Failed',
+        message: e.message || 'Failed to update inquiries',
+        variant: 'danger',
+      })
     } finally {
       setLoading(false)
     }
   }
 
   async function deleteInquiry(id: string) {
-    if (!confirm('Are you sure you want to delete this student inquiry?')) return
+    const ok = await confirm({
+      title: 'Delete Inquiry',
+      message: 'Are you sure you want to delete this student inquiry?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       const res = await fetch(`/api/admin/inquiries?id=${id}`, { method: 'DELETE' })
@@ -670,7 +881,11 @@ export default function AdminPage() {
       setInquiries((p) => p.filter((i) => i.id !== id))
       loadInquiries()
     } catch (e: any) {
-      alert(e.message)
+      await alert({
+        title: 'Delete Failed',
+        message: e.message || 'Failed to delete inquiry',
+        variant: 'danger',
+      })
     } finally {
       setSavingId(null)
     }
@@ -678,7 +893,13 @@ export default function AdminPage() {
 
   async function bulkDeleteInquiries(ids: string[]) {
     if (ids.length === 0) return
-    if (!confirm(`Are you sure you want to delete ${ids.length} inquiries?`)) return
+    const ok = await confirm({
+      title: 'Bulk Delete Inquiries',
+      message: `Are you sure you want to delete ${ids.length} inquiries?`,
+      confirmText: 'Delete All',
+      variant: 'danger',
+    })
+    if (!ok) return
     setLoading(true)
     try {
       const res = await fetch(`/api/admin/inquiries?ids=${ids.join(',')}`, {
@@ -688,7 +909,11 @@ export default function AdminPage() {
       setInquiries((p) => p.filter((i) => !ids.includes(i.id)))
       loadInquiries()
     } catch (e: any) {
-      alert(e.message)
+      await alert({
+        title: 'Bulk Delete Failed',
+        message: e.message || 'Failed to delete inquiries',
+        variant: 'danger',
+      })
     } finally {
       setLoading(false)
     }
@@ -735,7 +960,11 @@ export default function AdminPage() {
       })
       if (!res.ok) {
         const d = await res.json()
-        alert(d.error || 'Save failed')
+        await alert({
+          title: 'Save Failed',
+          message: d.error || 'Failed to save course',
+          variant: 'danger',
+        })
         return
       }
       setCourseOpen(false)
@@ -746,7 +975,13 @@ export default function AdminPage() {
     }
   }
   async function deleteCourse(id: string) {
-    if (!confirm('Delete this course?')) return
+    const ok = await confirm({
+      title: 'Delete Course',
+      message: 'Are you sure you want to delete this course?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       await fetch(`/api/admin/courses?id=${id}`, { method: 'DELETE' })
@@ -784,7 +1019,11 @@ export default function AdminPage() {
       })
       if (!res.ok) {
         const d = await res.json()
-        alert(d.error || 'Save failed')
+        await alert({
+          title: 'Save Failed',
+          message: d.error || 'Failed to save gallery item',
+          variant: 'danger',
+        })
         return
       }
       setGalleryOpen(false)
@@ -795,7 +1034,13 @@ export default function AdminPage() {
     }
   }
   async function deleteGallery(id: string) {
-    if (!confirm('Delete this gallery item?')) return
+    const ok = await confirm({
+      title: 'Delete Gallery Item',
+      message: 'Are you sure you want to delete this gallery item?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       await fetch(`/api/admin/gallery?id=${id}`, { method: 'DELETE' })
@@ -841,7 +1086,11 @@ export default function AdminPage() {
       })
       if (!res.ok) {
         const d = await res.json()
-        alert(d.error || 'Save failed')
+        await alert({
+          title: 'Save Failed',
+          message: d.error || 'Failed to save library resource',
+          variant: 'danger',
+        })
         return
       }
       setLibraryOpen(false)
@@ -852,7 +1101,13 @@ export default function AdminPage() {
     }
   }
   async function deleteLibrary(id: string) {
-    if (!confirm('Delete this library resource?')) return
+    const ok = await confirm({
+      title: 'Delete Library Resource',
+      message: 'Are you sure you want to delete this library resource?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       await fetch(`/api/admin/library?id=${id}`, { method: 'DELETE' })
@@ -913,18 +1168,23 @@ export default function AdminPage() {
   async function deleteCategory(id: string) {
     const cat = categories.find((c) => c.id === id)
     const label = cat ? `"${cat.name}"` : 'this category'
-    if (
-      !confirm(
-        `Are you sure you want to delete ${label}? Courses or digital library items using it will retain their text label, but it will be removed from navigation filters.`
-      )
-    )
-      return
+    const ok = await confirm({
+      title: 'Delete Category',
+      message: `Are you sure you want to delete ${label}? Courses or digital library items using it will retain their text label, but it will be removed from navigation filters.`,
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       const res = await fetch(`/api/admin/categories?id=${id}`, { method: 'DELETE' })
       const d = await res.json()
       if (!res.ok) {
-        alert(d.error || 'Delete failed')
+        await alert({
+          title: 'Delete Failed',
+          message: d.error || 'Delete failed',
+          variant: 'danger',
+        })
         return
       }
       loadCategories()
@@ -947,7 +1207,13 @@ export default function AdminPage() {
     loadInstructors()
   }
   async function deleteInstructor(id: string) {
-    if (!confirm('Are you sure you want to delete this instructor?')) return
+    const ok = await confirm({
+      title: 'Delete Instructor',
+      message: 'Are you sure you want to delete this instructor?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       const res = await fetch(`/api/admin/instructors?id=${id}`, { method: 'DELETE' })
@@ -971,7 +1237,13 @@ export default function AdminPage() {
     loadFacilities()
   }
   async function deleteFacility(id: string) {
-    if (!confirm('Are you sure you want to delete this facility?')) return
+    const ok = await confirm({
+      title: 'Delete Workshop Facility',
+      message: 'Are you sure you want to delete this facility?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       const res = await fetch(`/api/admin/facilities?id=${id}`, { method: 'DELETE' })
@@ -995,7 +1267,13 @@ export default function AdminPage() {
     loadProjects()
   }
   async function deleteProject(id: string) {
-    if (!confirm('Are you sure you want to delete this student project?')) return
+    const ok = await confirm({
+      title: 'Delete Student Project',
+      message: 'Are you sure you want to delete this student project?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       const res = await fetch(`/api/admin/projects?id=${id}`, { method: 'DELETE' })
@@ -1069,7 +1347,13 @@ export default function AdminPage() {
   }
 
   async function deleteCompanyInquiry(id: string) {
-    if (!confirm('Are you sure you want to delete this company inquiry?')) return
+    const ok = await confirm({
+      title: 'Delete Company Inquiry',
+      message: 'Are you sure you want to delete this company inquiry?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       const res = await fetch(`/api/admin/company-inquiries?id=${id}`, {
@@ -1112,7 +1396,13 @@ export default function AdminPage() {
   }
 
   async function deletePartner(id: string) {
-    if (!confirm('Are you sure you want to delete this partner?')) return
+    const ok = await confirm({
+      title: 'Delete Trusted Partner',
+      message: 'Are you sure you want to delete this partner?',
+      confirmText: 'Delete',
+      variant: 'danger',
+    })
+    if (!ok) return
     setSavingId(id)
     try {
       const res = await fetch(`/api/admin/partners?id=${id}`, { method: 'DELETE' })
@@ -1126,6 +1416,7 @@ export default function AdminPage() {
   /* ─── Shared refresh per tab ─── */
   function refreshCurrent() {
     if (tab === 'registrations') loadRegistrations()
+    if (tab === 'batches') loadBatches()
     if (tab === 'inquiries') loadInquiries()
     if (tab === 'company-inquiries') loadCompanyInquiries()
     if (tab === 'trusted-partners') loadTrustedPartners()
@@ -1147,25 +1438,28 @@ export default function AdminPage() {
      ────────────────────────────────────────────────────────── */
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center px-5">
+      <div className="relative min-h-screen bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] flex flex-col items-center justify-center px-5">
+        <div className="absolute top-4 right-4 z-10">
+          <ThemeToggle size="sm" className="border-white/20 bg-white/10 text-white hover:bg-white/20" />
+        </div>
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center gap-3">
           <img
             src="/images/helloschool.jpg"
             alt="Hello TVET"
-            className="h-16 w-auto rounded-xl object-contain bg-white/95 p-1 shadow-md"
+            className="h-16 w-auto rounded-2xl object-contain bg-white p-1.5 shadow-xl"
           />
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Admin Portal</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Hello TVET · Admin Portal</p>
         </div>
 
-        <div className="w-full max-w-sm rounded-3xl border border-slate-800 bg-slate-900 p-8 shadow-2xl">
+        <div className="w-full max-w-sm rounded-3xl border border-white/30 bg-white p-8 shadow-2xl text-slate-900">
           <div className="flex flex-col items-center text-center">
-            <span className="flex size-14 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-400">
+            <span className="flex size-14 items-center justify-center rounded-2xl bg-blue-50 text-[#155DFC] shadow-xs">
               <ShieldCheck className="size-7" />
             </span>
-            <h1 className="mt-4 text-xl font-bold text-white">Staff Login</h1>
-            <p className="mt-1 text-sm text-slate-400">
-              Sign in to manage inquiries and content.
+            <h1 className="mt-4 text-xl font-extrabold text-slate-900">Staff Login</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Sign in to manage admissions, batches, and curriculum.
             </p>
           </div>
           <form onSubmit={handleLogin} className="mt-7 flex flex-col gap-4">
@@ -1174,7 +1468,7 @@ export default function AdminPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-11 rounded-lg border border-slate-700 bg-slate-800 px-3 text-sm text-white outline-none placeholder:text-slate-500 focus:ring-2 focus:ring-cyan-400"
+                className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20"
                 placeholder="admin@emschool.edu.et"
                 required
               />
@@ -1184,18 +1478,18 @@ export default function AdminPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-11 rounded-lg border border-slate-700 bg-slate-800 px-3 text-sm text-white outline-none placeholder:text-slate-500 focus:ring-2 focus:ring-cyan-400"
+                className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20"
                 placeholder="••••••••"
                 required
               />
             </Field>
             {loginError && (
-              <p className="rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">{loginError}</p>
+              <p className="rounded-xl bg-red-500/10 px-3 py-2 text-sm text-red-600 font-medium">{loginError}</p>
             )}
             <Button
               type="submit"
               disabled={loggingIn}
-              className="w-full rounded-lg bg-cyan-400 text-slate-950 hover:bg-cyan-300 font-semibold"
+              className="w-full rounded-xl bg-[#155DFC] text-white hover:bg-blue-700 font-bold shadow-md shadow-blue-500/25 transition-all duration-200"
             >
               {loggingIn ? (
                 <><Loader2 className="mr-2 size-4 animate-spin" />Signing in...</>
@@ -1222,6 +1516,13 @@ export default function AdminPage() {
       icon: FileText,
       count: registrations.length,
       badge: regOverview.pending > 0 ? regOverview.pending : null,
+    },
+    {
+      id: 'batches' as const,
+      label: 'Batches (ዙሮች)',
+      icon: Layers,
+      count: batches.length,
+      badge: batchOverview.openBatches > 0 ? `${batchOverview.openBatches} Open` : null,
     },
     { id: 'inquiries' as const, label: 'Student Inquiries', icon: Users, count: inquiries.length, badge: overview.new > 0 ? overview.new : null },
     {
@@ -1251,13 +1552,13 @@ export default function AdminPage() {
   const currentSection = navItems.find((n) => n.id === tab)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-slate-950">
+    <div className="flex h-screen overflow-hidden bg-slate-100/90 dark:bg-card/90 backdrop-blur-xs">
 
       {/* ── SIDEBAR ── */}
-      <aside className="flex w-64 shrink-0 flex-col overflow-y-auto border-r border-slate-800 bg-slate-900">
+      <aside className="flex w-64 shrink-0 flex-col overflow-y-auto border-r border-blue-950/40 bg-[#0b1d47] text-white">
 
         {/* Logo area */}
-        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-slate-800 px-5">
+        <div className="flex h-16 shrink-0 items-center gap-3 border-b border-blue-900/40 px-5">
           <img
             src="/images/helloschool.jpg"
             alt="Hello TVET"
@@ -1265,13 +1566,13 @@ export default function AdminPage() {
           />
           <div className="flex flex-col leading-none">
             <span className="text-sm font-bold text-white">Hello TVET</span>
-            <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-slate-400">Admin</span>
+            <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-blue-200">Admin</span>
           </div>
         </div>
 
         {/* Nav section */}
         <nav className="flex-1 px-3 py-5">
-          <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+          <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-blue-300/70">
             Content
           </p>
           <ul className="flex flex-col gap-0.5">
@@ -1283,18 +1584,18 @@ export default function AdminPage() {
                     onClick={() => setTab(item.id)}
                     className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                       active
-                        ? 'bg-cyan-500/15 text-cyan-400'
-                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                        ? 'bg-[#155DFC] text-white font-bold shadow-md shadow-blue-500/25'
+                        : 'text-blue-100/80 hover:bg-white/10 hover:text-white'
                     }`}
                   >
-                    <item.icon className={`size-4 shrink-0 ${active ? 'text-cyan-400' : 'text-slate-500 group-hover:text-white'}`} />
+                    <item.icon className={`size-4 shrink-0 ${active ? 'text-white' : 'text-blue-200 group-hover:text-white'}`} />
                     <span className="flex-1 text-left">{item.label}</span>
                     {item.badge != null ? (
-                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-cyan-400 px-1 text-[10px] font-bold text-slate-950">
+                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#155DFC]">
                         {item.badge}
                       </span>
                     ) : item.count > 0 ? (
-                      <span className={`text-xs font-medium ${active ? 'text-cyan-400/70' : 'text-slate-600'}`}>
+                      <span className={`text-xs font-semibold ${active ? 'text-white/90' : 'text-blue-200/90'}`}>
                         {item.count}
                       </span>
                     ) : null}
@@ -1305,23 +1606,23 @@ export default function AdminPage() {
           </ul>
 
           {/* Quick stats divider */}
-          <div className="mt-6 border-t border-slate-800 pt-5">
-            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+          <div className="mt-6 border-t border-blue-900/40 pt-5">
+            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-blue-300/70">
               Overview
             </p>
             <div className="flex flex-col gap-2 px-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Student Inquiries</span>
+                <span className="text-blue-200/70">Student Inquiries</span>
                 <span className="font-semibold text-white">{overview.total}</span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Company Inquiries</span>
-                <span className="font-semibold text-cyan-400">{companyOverview.total}</span>
+                <span className="text-blue-200/70">Company Inquiries</span>
+                <span className="font-semibold text-sky-300">{companyOverview.total}</span>
               </div>
               {companyOverview.new > 0 && (
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400">New Company Inquiries</span>
-                  <span className="font-semibold text-amber-400">{companyOverview.new}</span>
+                  <span className="text-blue-200/70">New Company Inquiries</span>
+                  <span className="font-semibold text-amber-300">{companyOverview.new}</span>
                 </div>
               )}
             </div>
@@ -1329,35 +1630,36 @@ export default function AdminPage() {
         </nav>
 
         {/* Bottom user strip */}
-        <div className="shrink-0 border-t border-slate-800 p-3">
-          <div className="flex items-center gap-3 rounded-xl bg-slate-800/60 px-3 py-2.5">
+        <div className="shrink-0 border-t border-blue-900/40 p-3">
+          <div className="flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5">
             {user.avatarUrl ? (
               <img
                 src={user.avatarUrl}
                 alt=""
-                className="size-8 shrink-0 rounded-full object-cover border border-cyan-400/40"
+                className="size-8 shrink-0 rounded-full object-cover border border-white/20"
               />
             ) : (
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-cyan-400/20 text-xs font-bold text-cyan-400">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-[#155DFC]">
                 {(user.name || user.email).charAt(0).toUpperCase()}
               </span>
             )}
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-white">{user.name || 'Admin'}</p>
-              <p className="truncate text-[10px] text-slate-400">{user.email}</p>
+              <p className="truncate text-[10px] text-blue-200">{user.email}</p>
             </div>
           </div>
-          <div className="mt-2 flex gap-1.5">
+          <div className="mt-2 flex items-center gap-1.5">
             <a
               href="/"
               target="_blank"
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-slate-400 transition hover:bg-slate-800 hover:text-white"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-blue-200 transition hover:bg-white/10 hover:text-white"
             >
               <ArrowLeft className="size-3" /> View site
             </a>
+            <ThemeToggle size="sm" className="border-blue-900/50 bg-white/10 text-white hover:bg-white/20 hover:border-white/30" />
             <button
               onClick={handleLogout}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-slate-400 transition hover:bg-slate-800 hover:text-red-400"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-blue-200 transition hover:bg-white/10 hover:text-red-300"
             >
               <LogOut className="size-3" /> Logout
             </button>
@@ -1369,7 +1671,7 @@ export default function AdminPage() {
       <div className="flex flex-1 flex-col overflow-hidden">
 
         {/* Top bar */}
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 dark:border-slate-800 dark:bg-slate-900">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-6 dark:border-slate-800/80 dark:bg-slate-900/90">
           <div className="flex items-center gap-2">
             {currentSection && <currentSection.icon className="size-4 text-slate-400" />}
             <h1 className="text-base font-semibold text-slate-800 dark:text-white">
@@ -1377,12 +1679,13 @@ export default function AdminPage() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle size="sm" />
             <Button
               variant="outline"
               size="sm"
               onClick={refreshCurrent}
               disabled={loading}
-              className="rounded-lg border-slate-200 text-slate-600 hover:text-slate-900"
+              className="rounded-lg border-slate-200 text-slate-600 hover:text-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:text-white"
             >
               <RefreshCw className={`mr-1.5 size-3.5 ${loading ? 'animate-spin' : ''}`} />
               Refresh
@@ -1398,6 +1701,7 @@ export default function AdminPage() {
             <RegistrationsView
               items={registrations}
               overview={regOverview}
+              batches={batches}
               loading={loading}
               search={search}
               setSearch={setSearch}
@@ -1409,6 +1713,27 @@ export default function AdminPage() {
               onDelete={deleteRegistration}
               onBulkDelete={bulkDeleteRegistrations}
               onSaveNotes={saveRegistrationNotes}
+              onAssignToBatch={assignStudentToBatch}
+              onRemoveFromBatch={removeStudentFromBatch}
+              onNavigateToBatches={() => setTab('batches')}
+            />
+          )}
+
+          {/* ─── TAB: BATCHES (ዙር) ─── */}
+          {tab === 'batches' && (
+            <AdminBatchView
+              batches={batches}
+              overview={batchOverview}
+              courses={batchCourses}
+              coursesList={courses}
+              candidateStudents={batchCandidates}
+              loading={batchesLoading}
+              refresh={loadBatches}
+              onCreateBatch={createBatch}
+              onUpdateBatch={updateBatch}
+              onDeleteBatch={deleteBatch}
+              onAssignToBatch={assignStudentToBatch}
+              onRemoveFromBatch={removeStudentFromBatch}
             />
           )}
 
@@ -1952,7 +2277,7 @@ function ProfileView({
   const cardCls = 'rounded-2xl border bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900'
   const fieldCls = 'flex flex-col gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-300'
   const inputCls =
-    'h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white'
+    'h-11 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white'
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -1965,10 +2290,10 @@ function ProfileView({
                 <img
                   src={user.avatarUrl}
                   alt={user.name || user.email}
-                  className="size-16 rounded-2xl object-cover border-2 border-cyan-400 shadow-md"
+                  className="size-16 rounded-2xl object-cover border-2 border-blue-500 shadow-md"
                 />
               ) : (
-                <span className="flex size-16 items-center justify-center rounded-2xl bg-cyan-400/15 text-2xl font-bold text-cyan-500 border border-cyan-400/30">
+                <span className="flex size-16 items-center justify-center rounded-2xl bg-blue-500/15 text-2xl font-bold text-blue-600 border border-blue-400/30">
                   {(user.name || user.email).charAt(0).toUpperCase()}
                 </span>
               )}
@@ -1981,7 +2306,7 @@ function ProfileView({
                 <h2 className="text-xl font-bold text-slate-800 dark:text-white">
                   {user.name || 'Site Administrator'}
                 </h2>
-                <span className="rounded-full bg-cyan-400/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-cyan-500 border border-cyan-400/20">
+                <span className="rounded-full bg-blue-500/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 border border-blue-400/20">
                   {user.role}
                 </span>
               </div>
@@ -1990,7 +2315,7 @@ function ProfileView({
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-950 sm:text-right">
+          <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs text-slate-500 dark:border-slate-800 dark:bg-card sm:text-right">
             <p className="font-semibold text-slate-700 dark:text-slate-300">Session Status</p>
             <p className="mt-0.5 text-emerald-600 dark:text-emerald-400 font-medium">● Active & Protected</p>
             <p className="mt-1 text-[10px] text-slate-400">Sliding 8-hr TTL token</p>
@@ -2002,7 +2327,7 @@ function ProfileView({
       <div className={cardCls}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Camera className="size-4 text-cyan-500" />
+            <Camera className="size-4 text-blue-600 dark:text-sky-400" />
             <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400">
               Profile Photo & Avatar
             </h3>
@@ -2051,11 +2376,11 @@ function ProfileView({
             onClick={() => fileInputRef.current?.click()}
             className={`group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-7 text-center transition ${
               dragOver
-                ? 'border-cyan-400 bg-cyan-500/10'
-                : 'border-slate-200 bg-slate-50/60 hover:border-cyan-400/60 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-cyan-400/40'
+                ? 'border-blue-500 bg-blue-500/10'
+                : 'border-slate-200 bg-slate-50/60 hover:border-blue-500/60 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-blue-400/40'
             }`}
           >
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-600 transition group-hover:scale-105 dark:text-cyan-400">
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 transition group-hover:scale-105 dark:text-sky-400">
               {uploading || avatarSaving ? (
                 <Loader2 className="size-6 animate-spin" />
               ) : (
@@ -2090,14 +2415,14 @@ function ProfileView({
                   disabled={avatarSaving || uploading}
                   className={`group relative size-12 overflow-hidden rounded-xl border-2 transition hover:scale-105 ${
                     isSelected
-                      ? 'border-cyan-400 ring-2 ring-cyan-400/30'
+                      ? 'border-blue-500 ring-2 ring-blue-500/30'
                       : 'border-slate-200 dark:border-slate-700 opacity-80 hover:opacity-100'
                   }`}
                   title={preset.label}
                 >
                   <img src={preset.url} alt={preset.label} className="size-full object-cover" />
                   {isSelected && (
-                    <span className="absolute inset-0 flex items-center justify-center bg-cyan-900/40 text-white">
+                    <span className="absolute inset-0 flex items-center justify-center bg-blue-900/40 text-white">
                       <Check className="size-4" />
                     </span>
                   )}
@@ -2249,7 +2574,7 @@ function ProfileView({
       {/* ── Security & Role Permissions Summary ── */}
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900/50">
         <div className="flex items-center gap-2">
-          <Shield className="size-4 text-cyan-500" />
+          <Shield className="size-4 text-blue-600 dark:text-sky-400" />
           <h3 className="text-sm font-bold text-slate-800 dark:text-white">Security & Permissions</h3>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 text-xs text-slate-600 dark:text-slate-400">
@@ -2344,6 +2669,7 @@ function InquiryDetailModal({
   onDelete: (id: string) => void
   saving: boolean
 }) {
+  const { confirm } = useConfirm()
   if (!open || !inquiry) return null
 
   const cleanPhone = cleanPhoneForChat(inquiry.phone)
@@ -2525,8 +2851,14 @@ function InquiryDetailModal({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              if (confirm('Delete this inquiry permanently?')) {
+            onClick={async () => {
+              const ok = await confirm({
+                title: 'Delete Inquiry',
+                message: 'Are you sure you want to delete this inquiry permanently?',
+                confirmText: 'Delete',
+                variant: 'danger',
+              })
+              if (ok) {
                 onDelete(inquiry.id)
                 onClose()
               }
@@ -3244,7 +3576,7 @@ function ListView<T extends { id: string }>(props: {
                         {onPreview && (
                           <button
                             onClick={() => onPreview(row)}
-                            className="inline-flex items-center rounded-lg border border-cyan-500/30 p-2 text-cyan-600 transition hover:bg-cyan-500/10 dark:text-cyan-400"
+                            className="inline-flex items-center rounded-lg border border-blue-500/30 p-2 text-blue-600 transition hover:bg-blue-500/10 dark:text-sky-400"
                             title="SEO & Social Sharing Preview"
                           >
                             <Share2 className="size-4" />
@@ -3803,7 +4135,7 @@ function CourseEditor({
                 Course Curriculum & Practical Lab Milestones
               </h4>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Define the multi-module progression, lecture topics, and hands-on workbench milestones.
+                Define the multi-module progression, lecture topics, and hands-on practical lab milestones.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -3840,7 +4172,7 @@ function CourseEditor({
               {form.syllabus.map((mod, modIdx) => (
                 <div
                   key={modIdx}
-                  className="rounded-2xl border border-slate-200 bg-white p-4.5 shadow-sm dark:border-slate-800 dark:bg-slate-950/60 space-y-3.5"
+                  className="rounded-2xl border border-slate-200 bg-white p-4.5 shadow-sm dark:border-slate-800 dark:bg-card space-y-3.5"
                 >
                   {/* Module Header Bar */}
                   <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 dark:border-slate-800/60">
@@ -3969,7 +4301,7 @@ function CourseEditor({
                   {/* Practical Lab Milestone */}
                   <div className="rounded-xl border border-amber-300/60 bg-amber-50/50 p-3.5 dark:border-amber-900/50 dark:bg-amber-950/20">
                     <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 mb-1.5">
-                      <Wrench className="size-3.5" /> Practical Lab Milestone (Workbench Exam)
+                      <Wrench className="size-3.5" /> Practical Lab Milestone (Hands-On Exam)
                     </div>
                     <input
                       className="h-9 w-full rounded-lg border border-amber-300/80 bg-white px-3 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-amber-500 dark:border-amber-900 dark:bg-slate-900 dark:text-slate-100"
@@ -3978,7 +4310,7 @@ function CourseEditor({
                       placeholder="e.g. Isolate short to ground using voltage injection, locate thermal hotspot, and restore clean boot."
                     />
                     <p className="mt-1 text-[11px] text-amber-800/70 dark:text-amber-400/70">
-                      The hands-on benchmark test that trainees must independently accomplish on their workbench.
+                      The hands-on benchmark test that trainees must independently accomplish in the practical lab.
                     </p>
                   </div>
                 </div>
@@ -3992,7 +4324,7 @@ function CourseEditor({
             type="button"
             variant="outline"
             onClick={() => setPreviewOpen(true)}
-            className="gap-2 border-cyan-500/30 text-xs text-cyan-600 hover:bg-cyan-50 dark:text-cyan-400 dark:hover:bg-cyan-950/30"
+            className="gap-2 border-blue-500/30 text-xs text-blue-600 hover:bg-blue-50 dark:text-sky-400 dark:hover:bg-blue-950/30"
           >
             <Share2 className="size-3.5" />
             SEO & Social Preview
@@ -4401,11 +4733,11 @@ function CategoriesView({
             </span>
           </div>
         </div>
-        <div className="rounded-2xl border border-cyan-100 bg-cyan-50/60 p-5 shadow-sm dark:border-cyan-900/40 dark:bg-cyan-950/30">
-          <p className="text-xs font-semibold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">Course Categories</p>
+        <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-5 shadow-sm dark:border-blue-900/40 dark:bg-blue-950/30">
+          <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-sky-400">Course Categories</p>
           <div className="mt-2 flex items-baseline justify-between">
-            <p className="text-3xl font-bold text-cyan-700 dark:text-cyan-300">{courseCount}</p>
-            <span className="rounded-md bg-cyan-100 px-2 py-0.5 text-xs font-medium text-cyan-700 dark:bg-cyan-900/60 dark:text-cyan-300">
+            <p className="text-3xl font-bold text-blue-700 dark:text-sky-300">{courseCount}</p>
+            <span className="rounded-md bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/60 dark:text-sky-300">
               Courses catalog
             </span>
           </div>
@@ -4457,7 +4789,7 @@ function CategoriesView({
               onClick={() => setTypeFilter('course')}
               className={`rounded-md px-3 py-1.5 font-medium transition ${
                 typeFilter === 'course'
-                  ? 'bg-card text-cyan-600 shadow-sm dark:text-cyan-400'
+                  ? 'bg-card text-blue-600 shadow-sm dark:text-sky-400 font-bold'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -4478,7 +4810,7 @@ function CategoriesView({
           {/* Add Category Button */}
           <Button
             onClick={() => onAdd()}
-            className="rounded-lg bg-cyan-500 font-semibold text-slate-950 hover:bg-cyan-400"
+            className="rounded-lg bg-blue-600 font-bold text-white hover:bg-blue-700 shadow-md shadow-blue-500/25"
           >
             <Plus className="mr-1.5 size-4" /> Add Category
           </Button>
@@ -4553,8 +4885,8 @@ function CategoriesView({
                       {/* Section */}
                       <td className="px-6 py-4">
                         {cat.type === 'course' ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-xs font-semibold text-cyan-800 dark:border-cyan-800/60 dark:bg-cyan-950/40 dark:text-cyan-300">
-                            <BookOpen className="size-3 text-cyan-600 dark:text-cyan-400" />
+                          <span className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800 dark:border-blue-800/60 dark:bg-blue-950/40 dark:text-sky-300">
+                            <BookOpen className="size-3 text-blue-600 dark:text-sky-400" />
                             Course Catalog
                           </span>
                         ) : (
@@ -4714,12 +5046,12 @@ function CategoryEditor({
               onClick={() => setType('course')}
               className={`flex flex-col items-start gap-1.5 rounded-xl border p-3.5 text-left transition ${
                 type === 'course'
-                  ? 'border-cyan-500 bg-cyan-50/50 ring-2 ring-cyan-500/20 dark:border-cyan-400 dark:bg-cyan-950/30'
+                  ? 'border-blue-500 bg-blue-50/50 ring-2 ring-blue-500/20 dark:border-blue-400 dark:bg-blue-950/30'
                   : 'border-border bg-card hover:bg-muted/40'
               }`}
             >
               <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-                <BookOpen className="size-4 text-cyan-500" />
+                <BookOpen className="size-4 text-blue-600 dark:text-sky-400" />
                 <span>Course Catalog</span>
               </div>
               <p className="text-[11px] text-muted-foreground leading-snug">
@@ -4767,7 +5099,7 @@ function CategoryEditor({
           <Button
             type="submit"
             disabled={saving}
-            className="bg-cyan-500 font-semibold text-slate-950 hover:bg-cyan-400"
+            className="bg-blue-600 font-bold text-white hover:bg-blue-700 shadow-md shadow-blue-500/25"
           >
             {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Category'}

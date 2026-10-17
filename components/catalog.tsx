@@ -54,14 +54,14 @@ export function CoursesCatalog({
       />
       <main className="container mx-auto max-w-7xl px-5 py-14 lg:px-8">
         {/* Promotional Banner & COC Certification */}
-        <div className="mb-8 rounded-3xl border border-cyan-500/25 bg-gradient-to-r from-cyan-500/10 via-emerald-500/10 to-transparent p-6 md:p-8">
+        <div className="mb-8 rounded-3xl border border-blue-500/25 bg-gradient-to-r from-blue-500/10 via-sky-500/10 to-transparent p-6 md:p-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
                   🎉 ልዩ ማበረታቻ፦ 2+1 በነፃ!
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-cyan-500/15 px-3 py-1 text-xs font-semibold text-cyan-600 dark:text-cyan-400">
+                <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 px-3 py-1 text-xs font-semibold text-blue-600 dark:text-sky-400">
                   ሙሉ ዕውቅና ያለው (Fully Accredited)
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-3 py-1 text-xs font-semibold text-purple-600 dark:text-purple-400">
@@ -72,11 +72,11 @@ export function CoursesCatalog({
                 በነፃ፦ ከሁለት በላይ ት/ት ለሚመዘገብ አንድ በነፃ!
               </h2>
               <p className="mt-1 text-xs md:text-sm text-muted-foreground">
-                Register for more than two courses and get one course completely free. All training tracks include dedicated workbench time, COC exam alignment (Basic Electrical Electronics & Industrial Machines), and access to our technical digital library.
+                Register for more than two courses and get one course completely free. All training tracks include hands-on practical lab training, COC exam alignment (Basic Electrical Electronics & Industrial Machines), and access to our technical digital library.
               </p>
             </div>
             <Link href="/register" className="shrink-0">
-              <Button className="rounded-xl px-5 font-bold uppercase tracking-wider text-xs bg-cyan-500 hover:bg-cyan-400 text-slate-950">
+              <Button className="rounded-xl px-5 font-bold uppercase tracking-wider text-xs bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/25">
                 Register for Cohort <ArrowRight className="ml-1.5 size-4" />
               </Button>
             </Link>
@@ -93,8 +93,8 @@ export function CoursesCatalog({
                 key={item}
                 onClick={() => setCategory(item)}
                 className={`rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all duration-200 ${category === item
-                    ? 'border-cyan-500 bg-primary text-primary-foreground shadow-sm shadow-cyan-500/20 scale-[1.02]'
-                    : 'bg-background text-muted-foreground hover:border-cyan-500/40 hover:text-foreground'
+                    ? 'border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-500/25 scale-[1.02]'
+                    : 'bg-background text-muted-foreground hover:border-blue-500/40 hover:text-foreground'
                   }`}
               >
                 {item}
@@ -110,7 +110,7 @@ export function CoursesCatalog({
                 className="group flex flex-col overflow-hidden rounded-3xl border bg-card card-hover-lift"
               >
                 <div className="grid sm:grid-cols-[200px_1fr]">
-                  <div className="relative overflow-hidden bg-slate-900 min-h-48">
+                  <div className="relative overflow-hidden bg-slate-100 dark:bg-slate-800 min-h-48">
                     {course.image ? (
                       <img
                         src={course.image}
@@ -122,7 +122,7 @@ export function CoursesCatalog({
                         <CourseIcon name={course.icon as any} />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0b1d47]/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   </div>
                   <div className="p-6 flex flex-col justify-between">
                     <div>
@@ -130,7 +130,7 @@ export function CoursesCatalog({
                         <CourseIcon name={course.icon as any} />
                         <div className="flex items-center gap-1.5">
                           {course.syllabus && course.syllabus.length > 0 && (
-                            <span className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-600 dark:text-cyan-400">
+                            <span className="rounded-md border border-blue-500/30 bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-sky-400">
                               {course.syllabus.length} Modules
                             </span>
                           )}
@@ -151,7 +151,7 @@ export function CoursesCatalog({
                         {course.duration}
                       </span>
                       <Link href={`/courses/${course.slug}`}>
-                        <Button variant="outline" size="sm" className="rounded-xl group-hover:border-cyan-500/50">
+                        <Button variant="outline" size="sm" className="rounded-xl group-hover:border-blue-500/50">
                           Details <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-1" />
                         </Button>
                       </Link>
@@ -190,7 +190,7 @@ function ResourceModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/70 p-4 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-md animate-fade-in"
       onClick={onClose}
     >
       <div
@@ -199,7 +199,7 @@ function ResourceModal({
       >
         <div className="flex items-start justify-between gap-4 border-b pb-5 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400">
               {resource.format.includes('Video') ? (
                 <Video className="size-6" />
               ) : resource.format.includes('Reference') ? (
@@ -210,7 +210,7 @@ function ResourceModal({
             </span>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400">
                   {resource.category}
                 </span>
                 <span
@@ -269,7 +269,7 @@ function ResourceModal({
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
-                <span>Practical workbench safety and fault isolation steps</span>
+                <span>Practical workshop safety and fault isolation steps</span>
               </li>
             </ul>
           </div>
@@ -347,7 +347,7 @@ export function LibraryCatalog({
     <SiteShell>
       <PageIntro
         eyebrow="Digital Technical Library"
-        title="Keep learning beyond the workbench."
+        title="Keep learning beyond the workshop."
         description="Access verified repair manuals, multimeter diagnostic cheat sheets, power rail schematics, and micro-soldering references crafted by Hello TVET faculty."
       />
 
@@ -367,8 +367,8 @@ export function LibraryCatalog({
             <p className="mt-1 text-2xl font-bold text-foreground">PDFs & Videos</p>
           </div>
           <div className="p-3 rounded-2xl bg-muted/30 card-hover-lift">
-            <p className="text-xs text-cyan-600 dark:text-cyan-400 uppercase tracking-wider font-semibold">Access</p>
-            <p className="mt-1 text-2xl font-bold text-cyan-600 dark:text-cyan-400">Free / Enrolled</p>
+            <p className="text-xs text-blue-600 dark:text-sky-400 uppercase tracking-wider font-semibold">Access</p>
+            <p className="mt-1 text-2xl font-bold text-blue-600 dark:text-sky-400">Free / Enrolled</p>
           </div>
         </div>
 
@@ -408,8 +408,8 @@ export function LibraryCatalog({
             <button
               onClick={() => setCategory('All resources')}
               className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${category === 'All resources'
-                  ? 'border-cyan-500 bg-primary text-primary-foreground shadow-sm shadow-cyan-500/20 scale-[1.02]'
-                  : 'bg-background text-muted-foreground hover:border-cyan-500/40 hover:text-foreground'
+                  ? 'border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-500/25 scale-[1.02]'
+                  : 'bg-background text-muted-foreground hover:border-blue-500/40 hover:text-foreground'
                 }`}
             >
               All topics
@@ -419,8 +419,8 @@ export function LibraryCatalog({
                 key={item}
                 onClick={() => setCategory(item)}
                 className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${category === item
-                    ? 'border-cyan-500 bg-primary text-primary-foreground shadow-sm shadow-cyan-500/20 scale-[1.02]'
-                    : 'bg-background text-muted-foreground hover:border-cyan-500/40 hover:text-foreground'
+                    ? 'border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-500/25 scale-[1.02]'
+                    : 'bg-background text-muted-foreground hover:border-blue-500/40 hover:text-foreground'
                   }`}
               >
                 {item}
@@ -554,20 +554,20 @@ export function LibraryCatalog({
       </main>
 
       {/* ── REQUEST A SCHEMATIC OR GUIDE BANNER ── */}
-      <section className="border-y bg-slate-950 px-5 py-16 text-white lg:px-8">
+      <section className="border-y bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] px-5 py-16 text-white lg:px-8">
         <div className="container mx-auto max-w-4xl text-center">
-          <span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-cyan-400/20 text-cyan-300">
+          <span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30 shadow-md">
             <BookOpen className="size-6" />
           </span>
-          <h2 className="mt-5 text-3xl font-bold tracking-tight text-white md:text-4xl">
+          <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-white md:text-4xl">
             Need a specific circuit schematic or board layout?
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-300">
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-blue-100">
             Our workshop maintains an extensive repository of laptop board views, smartphone pinout diagrams, and SMPS power schematics. If you are troubleshooting a tricky board, request it directly from our instructor desk.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/contact">
-              <Button className="rounded-lg bg-cyan-400 px-6 font-semibold text-slate-950 hover:bg-cyan-300">
+              <Button className="rounded-xl bg-white px-6 font-bold text-[#155DFC] hover:bg-blue-50 shadow-xl transition-all duration-300 hover:scale-[1.02]">
                 Request a schematic or manual <ArrowRight data-icon="inline-end" />
               </Button>
             </Link>

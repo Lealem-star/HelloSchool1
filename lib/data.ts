@@ -11,8 +11,8 @@ export const schoolConfig = {
   alternatePhone: '09 82 48 43 28',
   email: 'info@hellotvet.edu.et',
   whatsappPhone: '251947747070',
-  telegram: 'https://t.me/helloschool_et',
-  telegramHandle: '@helloschool_et',
+  telegram: 'https://t.me/Hellotechn',
+  telegramHandle: '@HHaileHaile',
   facebook: 'https://web.facebook.com/people/Hello-Technology-of-Institute-%E1%88%84%E1%88%8E-%E1%8B%A8%E1%88%99%E1%8B%AB-%E1%88%9B%E1%88%B0%E1%88%8D%E1%8C%A0%E1%8A%9B-%E1%89%B0%E1%89%8B%E1%88%9D/100063821901962/?locale=af_ZA',
   address: 'ባ/ዳር ፓፒረስ ሆቴል ፊት ለፊት ሲግናል ሞል ህንፃ 4ኛ ፎቅ ቢሮ ቁ.409, Bahir Dar, Ethiopia',
   englishAddress: 'Signal Mall Building, 4th Floor, Office No. 409 (In front of Papyrus Hotel), Bahir Dar, Ethiopia',
@@ -26,8 +26,16 @@ export const schoolConfig = {
   ],
   description:
     'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET - Hello Technical and Vocational Training) — Leading accredited technical trade and vocational training institute in Bahir Dar providing hands-on workshops in electronics, computing, electrical installations, digital media, coding, and industrial equipment maintenance.',
-  mission: 'To equip Ethiopian youth and professionals with accredited, job-ready technical trade skills, practical diagnostic problem-solving abilities, and workbench mastery.',
+  mission: 'To equip Ethiopian youth and professionals with accredited, job-ready technical trade skills, practical diagnostic problem-solving abilities, and hands-on lab excellence.',
   vision: 'To be the most trusted center for accredited technical vocational education and hardware trade competence in East Africa.',
+  brandColor: '#155DFC',
+  brandColorName: 'Electric Royal Blue',
+  theme: {
+    primary: '#155DFC',
+    primaryHover: '#0D4ECC',
+    white: '#FFFFFF',
+    themeName: 'Blue & White',
+  },
 }
 
 export const trainingHighlights = [
@@ -62,7 +70,7 @@ export const trainingHighlights = [
 export const faqs = [
   {
     q: 'Do I need previous electronics background to enroll?',
-    a: 'No prior experience is necessary. Our foundation modules start with core electrical concepts, meter measurements, and workbench safety before advancing to diagnosis and soldering.',
+    a: 'No prior experience is necessary. Our foundation modules start with core electrical concepts, meter measurements, and workshop safety before advancing to diagnosis and soldering.',
   },
   {
     q: 'ሙሉ ዕውቅና እና የCOC ስልጠና ይሰጣል? (Are courses accredited & COC aligned?)',
@@ -74,7 +82,7 @@ export const faqs = [
   },
   {
     q: 'Are tools and practice boards provided during the workshop?',
-    a: 'Yes! Every enrolled student is assigned a dedicated workbench station with professional soldering gear, diagnostic meters, microscopes, and practice motherboards.',
+    a: 'Yes! Every enrolled student is assigned a dedicated practical training station with professional soldering gear, diagnostic meters, microscopes, and practice motherboards.',
   },
   {
     q: 'Can this program help me start my own repair shop in Ethiopia?',

@@ -99,7 +99,7 @@ export function ScrollProgressBar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] h-[3px] bg-transparent pointer-events-none">
       <div
-        className="h-full bg-gradient-to-r from-cyan-400 via-sky-400 to-amber-400 shadow-[0_0_12px_rgba(34,211,238,0.8)] transition-all duration-150 ease-out"
+        className="h-full bg-gradient-to-r from-blue-600 via-sky-400 to-blue-500 shadow-[0_0_12px_rgba(37,99,235,0.8)] transition-all duration-150 ease-out"
         style={{ width: `${progress}%` }}
       />
     </div>
@@ -123,7 +123,7 @@ export function BackToTopButton() {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Back to top"
-      className="fixed bottom-6 right-6 z-40 flex size-11 items-center justify-center rounded-2xl border border-cyan-400/40 bg-slate-900/90 text-cyan-400 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400 hover:bg-slate-900 hover:text-cyan-300 hover:shadow-cyan-500/20 animate-fade-in"
+      className="fixed bottom-6 right-6 z-40 flex size-11 items-center justify-center rounded-2xl border border-white/20 bg-[#155DFC] text-white shadow-xl shadow-blue-500/30 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-[#0D4ECC] hover:shadow-blue-500/40 animate-fade-in"
     >
       <ArrowUp className="size-5" />
     </button>
@@ -133,6 +133,7 @@ export function BackToTopButton() {
 export function Header() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [hasAvailableBatches, setHasAvailableBatches] = useState<boolean>(true)
   const pathname = usePathname()
   const { language, t } = useLanguage()
 
@@ -145,28 +146,71 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    let mounted = true
+    async function fetchBatchAvailability() {
+      try {
+        const res = await fetch('/api/batches/status', { cache: 'no-store' })
+        if (res.ok) {
+          const data = await res.json()
+          if (mounted && typeof data.hasOpenBatch === 'boolean') {
+            setHasAvailableBatches(data.hasOpenBatch)
+          }
+        }
+      } catch {
+        // Fallback to true if network error
+      }
+    }
+    fetchBatchAvailability()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
   return (
     <header className="sticky top-0 z-50">
       {/* ── Top Announcement Ticker ── */}
-      <div className="border-b border-cyan-500/15 bg-slate-950 px-4 py-2 text-center text-xs text-slate-300">
-        <div className="container mx-auto flex flex-wrap items-center justify-center gap-2 max-w-7xl">
-          <span className="relative flex size-2 shrink-0">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-cyan-400 opacity-75"></span>
-            <span className="relative inline-flex size-2 rounded-full bg-cyan-400"></span>
-          </span>
-          <span className="font-semibold text-white">{t('tickerIntake')}</span>
-          <span className="text-slate-400">{t('tickerMessage')}</span>
-          <Link href="/register" className="ml-1.5 font-bold text-cyan-300 transition-colors hover:text-cyan-200 hover:underline">
-            {t('tickerAction')}
-          </Link>
+      {hasAvailableBatches ? (
+        <div className="border-b border-blue-400/30 bg-[#155DFC] px-4 py-2 text-center text-xs text-white shadow-sm">
+          <div className="container mx-auto flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-7xl">
+            <span className="relative flex size-2 shrink-0">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-white opacity-75"></span>
+              <span className="relative inline-flex size-2 rounded-full bg-white"></span>
+            </span>
+            <span className="font-bold text-white">{t('tickerIntake')}</span>
+            <span className="text-blue-100 font-medium">{t('tickerMessage')}</span>
+            <Link
+              href="/register"
+              className="ml-1 font-extrabold text-white underline underline-offset-2 transition-colors hover:text-blue-100 inline-flex items-center gap-0.5"
+            >
+              {t('tickerAction')}
+            </Link>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="border-b border-blue-400/30 bg-[#155DFC] px-4 py-2 text-center text-xs text-white shadow-sm">
+          <div className="container mx-auto flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-7xl">
+            <span className="relative flex size-2 shrink-0">
+              <span className="relative inline-flex size-2 rounded-full bg-amber-300"></span>
+            </span>
+            <span className="font-bold text-white">{t('tickerIntake')}</span>
+            <span className="text-blue-100 font-medium">
+              {language === 'am'
+                ? 'የባህር ዳር ተግባራዊ ስልጠና ክፍለ-ጊዜዎች · ቀጣይ ዙር በቅርቡ ይከፈታል'
+                : 'Bahir Dar Practical Vocational Training · Next Batch Opening Soon'}
+            </span>
+            <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-white/20 border border-white/30 px-2.5 py-0.5 text-[11px] font-bold text-white">
+              {t('tickerOpeningSoon')}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* ── Main Glassmorphism Navbar ── */}
       <div
         className={`border-b transition-all duration-300 ${
           scrolled
-            ? 'border-border/80 bg-background/90 shadow-md shadow-black/5 backdrop-blur-lg dark:shadow-cyan-950/20'
+            ? 'border-border/80 bg-background/90 shadow-md shadow-black/5 backdrop-blur-lg dark:shadow-blue-950/20'
             : 'border-border/50 bg-background/80 backdrop-blur-md'
         }`}
       >
@@ -183,7 +227,7 @@ export function Header() {
                   href={item.href}
                   className={`relative text-sm font-medium transition-colors py-1 ${
                     active
-                      ? 'text-foreground font-semibold after:absolute after:-bottom-1.5 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-cyan-500 after:shadow-[0_0_8px_rgba(6,182,212,0.8)]'
+                      ? 'text-foreground font-semibold after:absolute after:-bottom-1.5 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-blue-600 dark:after:bg-sky-400 after:shadow-[0_0_8px_rgba(37,99,235,0.8)]'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -201,16 +245,16 @@ export function Header() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-xl border-border/80 px-3.5 py-2 text-xs font-semibold hover:border-cyan-400 hover:text-cyan-400 gap-1.5 transition"
+                className="rounded-xl border-border/80 px-3.5 py-2 text-xs font-semibold hover:border-blue-500 hover:text-blue-600 dark:hover:text-sky-400 gap-1.5 transition"
               >
-                <User className="size-3.5 text-cyan-500" />
+                <User className="size-3.5 text-blue-600 dark:text-sky-400" />
                 {language === 'am' ? 'መግቢያ' : 'Log In'}
               </Button>
             </Link>
             <Link href="/register">
               <Button
                 size="sm"
-                className="rounded-xl px-4 py-2 font-semibold transition duration-300 hover:shadow-md hover:shadow-cyan-500/20 hover:scale-[1.02]"
+                className="rounded-xl px-4 py-2 font-semibold bg-blue-600 text-white transition duration-300 hover:bg-blue-700 hover:shadow-md hover:shadow-blue-500/25 hover:scale-[1.02]"
               >
                 {t('registerNow')} <ArrowRight data-icon="inline-end" />
               </Button>
@@ -246,7 +290,7 @@ export function Header() {
                     onClick={() => setOpen(false)}
                     className={`rounded-xl px-3.5 py-3 text-sm font-medium transition ${
                       active
-                        ? 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold'
+                        ? 'bg-blue-500/10 text-blue-600 dark:text-sky-400 font-bold'
                         : 'text-foreground hover:bg-muted'
                     }`}
                   >
@@ -256,13 +300,13 @@ export function Header() {
               })}
               <div className="mt-4 pt-3 border-t flex flex-col gap-2">
                 <Link href="/student/login" onClick={() => setOpen(false)}>
-                  <Button variant="outline" className="w-full rounded-xl justify-center gap-2 border-cyan-500/30 text-cyan-600 dark:text-cyan-400">
+                  <Button variant="outline" className="w-full rounded-xl justify-center gap-2 border-blue-500/30 text-blue-600 dark:text-sky-400">
                     <User className="size-4" />
                     {language === 'am' ? 'መግቢያ (Log In)' : 'Log In'}
                   </Button>
                 </Link>
                 <Link href="/register" onClick={() => setOpen(false)}>
-                  <Button className="w-full rounded-xl justify-center">
+                  <Button className="w-full rounded-xl justify-center bg-blue-600 text-white hover:bg-blue-700">
                     {t('registerNow')} <ArrowRight data-icon="inline-end" />
                   </Button>
                 </Link>
@@ -279,23 +323,23 @@ export function Footer() {
   const { language } = useLanguage()
 
   return (
-    <footer className="border-t bg-slate-950 text-slate-300">
+    <footer className="border-t border-blue-900/40 bg-[#0b1d47] text-slate-200">
       <div className="container mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-4 lg:px-8">
         <div className="md:col-span-2">
           <div className="mb-5 flex items-center gap-3">
             <img
               src="/images/helloschool.jpg"
               alt="ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET)"
-              className="h-11 sm:h-12 w-auto rounded-lg object-contain bg-white/95 p-1 shadow-sm"
+              className="h-11 sm:h-12 w-auto rounded-lg object-contain bg-white p-1 shadow-sm"
             />
             <div className="flex flex-col">
               <span className="font-bold text-white text-base leading-tight">ሄሎ የቴክኒክና ሙያ ማሰልጠኛ</span>
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-blue-200">
                 {language === 'am' ? 'ሄሎ ቴክኒክና ሙያ ማሰልጠኛ · ባሕር ዳር' : 'Hello TVET · Technical and Vocational Training'}
               </span>
             </div>
           </div>
-          <p className="max-w-md text-sm leading-7 text-slate-400">
+          <p className="max-w-md text-sm leading-7 text-blue-100">
             {language === 'am'
               ? 'በኢትዮጵያ ለቀጣዩ ትውልድ የኤሌክትሮኒክስ፣ የስማርትፎን እና የኮምፒውተር ጥገና ባለሙያዎች የተዘጋጀ ተግባራዊ የቴክኒክ ስልጠና።'
               : 'Practical technical education for the next generation of electronics, smartphone, and computer repair professionals in Ethiopia.'}
@@ -306,7 +350,7 @@ export function Footer() {
               target="_blank"
               rel="noreferrer"
               aria-label="Telegram"
-              className="rounded-lg border border-slate-800 px-3 py-2 text-xs font-semibold hover:border-cyan-400 hover:text-cyan-400"
+              className="rounded-lg border border-blue-800/80 bg-blue-950/40 px-3 py-2 text-xs font-semibold text-white hover:border-[#155DFC] hover:bg-[#155DFC] transition-all"
             >
               Telegram
             </a>
@@ -315,7 +359,7 @@ export function Footer() {
               target="_blank"
               rel="noreferrer"
               aria-label="WhatsApp"
-              className="rounded-lg border border-slate-800 px-3 py-2 text-xs font-semibold hover:border-cyan-400 hover:text-cyan-400"
+              className="rounded-lg border border-blue-800/80 bg-blue-950/40 px-3 py-2 text-xs font-semibold text-white hover:border-[#155DFC] hover:bg-[#155DFC] transition-all"
             >
               WhatsApp
             </a>
@@ -324,63 +368,63 @@ export function Footer() {
               target="_blank"
               rel="noreferrer"
               aria-label="Facebook"
-              className="rounded-lg border border-slate-800 px-3 py-2 text-xs font-semibold hover:border-cyan-400 hover:text-cyan-400"
+              className="rounded-lg border border-blue-800/80 bg-blue-950/40 px-3 py-2 text-xs font-semibold text-white hover:border-[#155DFC] hover:bg-[#155DFC] transition-all"
             >
               Facebook
             </a>
             <a
               href="#"
               aria-label="LinkedIn"
-              className="rounded-lg border border-slate-800 px-3 py-2 text-xs font-semibold hover:border-cyan-400 hover:text-cyan-400"
+              className="rounded-lg border border-blue-800/80 bg-blue-950/40 px-3 py-2 text-xs font-semibold text-white hover:border-[#155DFC] hover:bg-[#155DFC] transition-all"
             >
               LinkedIn
             </a>
           </div>
         </div>
         <div>
-          <h3 className="mb-4 text-sm font-semibold text-white">
+          <h3 className="mb-4 text-sm font-bold text-white uppercase tracking-wider">
             {language === 'am' ? 'አስስ' : 'Explore'}
           </h3>
-          <div className="flex flex-col gap-3 text-sm text-slate-400">
-            <Link href="/courses" className="hover:text-cyan-400">
+          <div className="flex flex-col gap-3 text-sm text-blue-100">
+            <Link href="/courses" className="hover:text-white transition-colors">
               {language === 'am' ? 'ስልጠናዎቻችን' : 'Our Courses'}
             </Link>
-            <Link href="/training" className="hover:text-cyan-400">
+            <Link href="/training" className="hover:text-white transition-colors">
               {language === 'am' ? 'ተግባራዊ ስልጠና' : 'Practical Training'}
             </Link>
-            <Link href="/library" className="hover:text-cyan-400">
+            <Link href="/library" className="hover:text-white transition-colors">
               {language === 'am' ? 'ዲጂታል ቤተ-መጽሐፍት' : 'Digital Library'}
             </Link>
-            <Link href="/about" className="hover:text-cyan-400">
+            <Link href="/about" className="hover:text-white transition-colors">
               {language === 'am' ? 'ስለ እኛ' : 'About Us'}
             </Link>
           </div>
         </div>
         <div>
-          <h3 className="mb-4 text-sm font-semibold text-white">
+          <h3 className="mb-4 text-sm font-bold text-white uppercase tracking-wider">
             {language === 'am' ? 'አድራሻና ግንኙነት' : 'Contact & Location'}
           </h3>
-          <div className="flex flex-col gap-3 text-sm text-slate-400">
-            <span className="flex gap-2"><Phone className="size-4 shrink-0 text-cyan-400" />{schoolConfig.phone} / {schoolConfig.alternatePhone}</span>
-            <span className="flex gap-2"><Mail className="size-4 shrink-0 text-cyan-400" />{schoolConfig.email}</span>
-            <span className="flex gap-2"><MapPin className="size-4 shrink-0 text-cyan-400" />{schoolConfig.address}</span>
+          <div className="flex flex-col gap-3 text-sm text-blue-100">
+            <span className="flex gap-2"><Phone className="size-4 shrink-0 text-sky-300" />{schoolConfig.phone} / {schoolConfig.alternatePhone}</span>
+            <span className="flex gap-2"><Mail className="size-4 shrink-0 text-sky-300" />{schoolConfig.email}</span>
+            <span className="flex gap-2"><MapPin className="size-4 shrink-0 text-sky-300" />{schoolConfig.address}</span>
           </div>
         </div>
       </div>
-      <div className="border-t border-slate-800/80 bg-slate-950/70">
-        <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-5 text-xs text-slate-400 sm:flex-row lg:px-8">
+      <div className="border-t border-blue-900/60 bg-[#081533]">
+        <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-5 text-xs text-blue-200 sm:flex-row lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-center sm:text-left">
             <span>
               © {new Date().getFullYear()} ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET). {language === 'am' ? 'መብቱ በህግ የተጠበቀ ነው።' : 'All rights reserved.'}
             </span>
-            <span className="hidden sm:inline text-slate-600">·</span>
+            <span className="hidden sm:inline text-blue-400">·</span>
             <span>
               {language === 'am' ? 'ባሕር ዳር፣ ኢትዮጵያ' : 'Bahir Dar, Ethiopia'}
             </span>
           </div>
 
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-400 font-medium">
+            <span className="text-blue-200 font-medium">
               {language === 'am' ? 'ያበለጸገው፡' : 'Built by'}
             </span>
             <a
@@ -443,7 +487,7 @@ export function StatStrip() {
       <div className="container mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
           <div className="group flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-6 text-center shadow-sm card-hover-lift">
-            <span className="flex size-12 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-600 dark:text-cyan-400 transition-transform duration-300 group-hover:scale-110">
+            <span className="flex size-12 items-center justify-center rounded-xl bg-blue-500/15 text-blue-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-110">
               <Sparkles className="size-6" />
             </span>
             <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">1,200+</p>
@@ -454,7 +498,7 @@ export function StatStrip() {
               <Wrench className="size-6" />
             </span>
             <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">98%</p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">Practical Bench Time</p>
+            <p className="mt-1 text-xs font-semibold text-muted-foreground">Practical Lab Training</p>
           </div>
           <div className="group flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-6 text-center shadow-sm card-hover-lift">
             <span className="flex size-12 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-600 dark:text-emerald-400 transition-transform duration-300 group-hover:scale-110">
@@ -590,7 +634,7 @@ export function InquiryForm({
           <input
             name="name"
             disabled={loading}
-            className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-60"
+            className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
             placeholder="Your full name"
           />
         </label>
@@ -599,7 +643,7 @@ export function InquiryForm({
           <input
             name="phone"
             disabled={loading}
-            className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-60"
+            className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
             placeholder="+251 ..."
           />
         </label>
@@ -611,7 +655,7 @@ export function InquiryForm({
             name="email"
             type="email"
             disabled={loading}
-            className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-60"
+            className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
             placeholder="you@example.com"
           />
         </label>
@@ -622,7 +666,7 @@ export function InquiryForm({
             value={selectedCourse}
             onChange={(e) => setSelectedCourse(e.target.value)}
             disabled={loading}
-            className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-60 cursor-pointer"
+            className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60 cursor-pointer"
           >
             <option value="">Select a course</option>
             {courseOptions.map((opt: string) => (
@@ -639,7 +683,7 @@ export function InquiryForm({
           name="message"
           rows={4}
           disabled={loading}
-          className="rounded-xl border border-input bg-background/90 p-3.5 text-sm outline-none transition-all duration-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-60"
+          className="rounded-xl border border-input bg-background/90 p-3.5 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
           placeholder="Tell us what you would like to learn..."
         />
       </label>
@@ -648,7 +692,7 @@ export function InquiryForm({
           name="consent"
           type="checkbox"
           disabled={loading}
-          className="mt-0.5 size-4 rounded accent-cyan-500 cursor-pointer"
+          className="mt-0.5 size-4 rounded accent-blue-600 cursor-pointer"
         />
         I consent to the school using this information to respond to my inquiry.
       </label>
@@ -660,7 +704,7 @@ export function InquiryForm({
       <Button
         type="submit"
         disabled={loading}
-        className="w-full sm:w-fit rounded-xl px-6 transition duration-300 hover:shadow-lg hover:shadow-cyan-500/20 hover:scale-[1.02]"
+        className="w-full sm:w-fit rounded-xl px-6 bg-blue-600 text-white hover:bg-blue-700 transition duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02]"
       >
         {loading ? 'Sending...' : 'Send inquiry'}
         {!loading && <Send data-icon="inline-end" />}
@@ -671,7 +715,7 @@ export function InquiryForm({
 
 export function CourseIcon({ name }: { name: keyof typeof iconMap }) {
   return (
-    <span className="flex size-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-600 dark:text-cyan-400 transition-transform duration-300 group-hover:scale-105">
+    <span className="flex size-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-105">
       <Icon name={name} />
     </span>
   )
@@ -714,12 +758,12 @@ export function SearchField({
 }) {
   return (
     <div className="relative group">
-      <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-cyan-500" />
+      <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-blue-600 dark:group-focus-within:text-sky-400" />
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-4 text-sm outline-none transition-all duration-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+        className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-4 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
       />
     </div>
   )
@@ -728,31 +772,31 @@ export function SearchField({
 export function CTASection() {
   return (
     <section className="px-5 py-20 lg:px-8">
-      <div className="container relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-cyan-500/20 bg-slate-950 px-8 py-12 text-white shadow-2xl md:px-14 md:py-16">
-        <div className="absolute -right-20 -top-20 size-72 rounded-full bg-cyan-500/15 blur-3xl pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 size-72 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+      <div className="container relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-blue-400/30 bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] px-8 py-12 text-white shadow-2xl md:px-14 md:py-16">
+        <div className="absolute -right-20 -top-20 size-72 rounded-full bg-white/15 blur-3xl pointer-events-none" />
+        <div className="absolute -left-20 -bottom-20 size-72 rounded-full bg-sky-300/20 blur-3xl pointer-events-none" />
         <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
           <div>
-            <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">
+            <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
               <CircuitBoard className="size-3.5" /> Your Next Career Step
             </span>
-            <h2 className="mt-2 max-w-xl text-3xl font-bold tracking-tight text-white md:text-4xl">
+            <h2 className="mt-2 max-w-xl text-3xl font-extrabold tracking-tight text-white md:text-4xl">
               Ready to build practical repair skills?
             </h2>
-            <p className="mt-4 max-w-lg leading-7 text-slate-300">
-              Explore our courses or send an inquiry. We will help you find the right technical workbench path for your goals.
+            <p className="mt-4 max-w-lg leading-7 text-blue-100">
+              Explore our courses or send an inquiry. We will help you find the right technical training path for your goals.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link href="/courses">
-              <Button className="rounded-xl bg-cyan-400 px-6 font-bold text-slate-950 transition-all duration-300 hover:bg-cyan-300 hover:shadow-lg hover:shadow-cyan-400/25 hover:scale-[1.02]">
+              <Button className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]">
                 Explore courses <ArrowRight data-icon="inline-end" />
               </Button>
             </Link>
             <Link href="/contact">
               <Button
                 variant="outline"
-                className="rounded-xl border-slate-700 bg-transparent px-6 font-semibold text-white transition-all duration-300 hover:border-slate-400 hover:bg-white/10 hover:text-white"
+                className="rounded-xl border-white/50 bg-white/10 px-6 font-semibold text-white transition-all duration-300 hover:border-white hover:bg-white/20 hover:text-white"
               >
                 Contact us
               </Button>
@@ -778,17 +822,17 @@ export function GalleryCard({
   return (
     <article
       className={cn(
-        'group overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-xl hover:shadow-cyan-950/10',
+        'group overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/40 hover:shadow-xl hover:shadow-blue-950/10',
         className
       )}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-slate-900">
+      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 dark:bg-slate-800">
         <img
           src={image}
           alt={title}
           className="size-full object-cover transition duration-700 ease-out group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0b1d47]/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
       <div className="p-5">
         <h3 className="font-semibold text-foreground transition-colors group-hover:text-primary">
@@ -806,7 +850,7 @@ export { ChevronRight, ChevronDown, Clock3, Play, Phone, Mail, MapPin }
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-cyan-400 selection:text-slate-950">
+    <div className="flex min-h-screen flex-col bg-transparent text-foreground selection:bg-blue-600 selection:text-white">
       <ScrollProgressBar />
       <Header />
       <div className="flex-1 animate-fade-in">{children}</div>
