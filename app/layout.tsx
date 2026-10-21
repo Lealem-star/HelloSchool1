@@ -5,21 +5,24 @@ import './globals.css'
 import { getOrganizationSchema, JsonLd } from '@/lib/schema'
 import { AppProviders } from '@/components/providers'
 import { GeometricBackground } from '@/components/geometric-background'
+import { ChatBot } from '@/components/chat-bot'
+import { CookieBanner } from '@/components/cookie-banner'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://helloschool.edu.et'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ | Hello TVET',
-    template: '%s | Hello TVET',
+    default: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል | Hello Technology Training Center',
+    template: '%s | Hello Technology Training Center',
   },
   description:
-    'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET - Hello Technical and Vocational Training) — Hands-on accredited technical training in smartphone repair, computer maintenance, electrical installation, TV repair, coding, video editing, and industrial equipment in Bahir Dar, Ethiopia.',
+    'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center) — Hands-on accredited technical training in smartphone repair, computer maintenance, electrical installation, TV repair, coding, video editing, and industrial equipment in Bahir Dar, Ethiopia.',
   keywords: [
+    'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል',
+    'Hello Technology Training Center',
     'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ',
     'Hello TVET',
-    'Hello Technical and Vocational Training',
     'electronics repair school Ethiopia',
     'mobile phone repair training Bahir Dar',
     'computer maintenance course',
@@ -27,9 +30,9 @@ export const metadata: Metadata = {
     'electronics troubleshooting',
     'Bahir Dar technical vocational training',
   ],
-  authors: [{ name: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET)', url: SITE_URL }],
-  creator: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET)',
-  publisher: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET)',
+  authors: [{ name: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center)', url: SITE_URL }],
+  creator: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center)',
+  publisher: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center)',
   alternates: {
     canonical: '/',
   },
@@ -37,16 +40,16 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'am_ET',
     url: '/',
-    title: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ | Hello TVET',
+    title: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል | Hello Technology Training Center',
     description:
-      'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET - Hello Technical and Vocational Training) — Hands-on accredited technical training in smartphone repair, computer maintenance, and electronics diagnostics in Bahir Dar, Ethiopia.',
-    siteName: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET)',
+      'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center) — Hands-on accredited technical training in smartphone repair, computer maintenance, and electronics diagnostics in Bahir Dar, Ethiopia.',
+    siteName: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center)',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ | Hello TVET',
+    title: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል | Hello Technology Training Center',
     description:
-      'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET - Hello Technical and Vocational Training) — Hands-on accredited technical training in smartphone repair, computer maintenance, and electronics diagnostics in Bahir Dar, Ethiopia.',
+      'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center) — Hands-on accredited technical training in smartphone repair, computer maintenance, and electronics diagnostics in Bahir Dar, Ethiopia.',
     creator: '@helloschool_et',
     site: '@helloschool_et',
   },
@@ -113,6 +116,8 @@ export default function RootLayout({
           <div className="relative z-10 flex min-h-screen flex-col">
             {children}
           </div>
+          <ChatBot />
+          <CookieBanner />
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </AppProviders>
       </body>

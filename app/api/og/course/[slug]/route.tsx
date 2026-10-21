@@ -67,13 +67,13 @@ export async function GET(
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span
                 style={{
-                  fontSize: '24px',
+                  fontSize: '20px',
                   fontWeight: 900,
                   letterSpacing: '0.05em',
                   color: '#ffffff',
                 }}
               >
-                HELLO TVET
+                HELLO TECHNOLOGY
               </span>
               <span
                 style={{
@@ -83,7 +83,7 @@ export async function GET(
                   color: '#dbeafe',
                 }}
               >
-                TECHNICAL & VOCATIONAL TRAINING · BAHIR DAR
+                TRAINING CENTER · BAHIR DAR
               </span>
             </div>
           </div>

@@ -40,10 +40,10 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { LanguageToggle } from '@/components/language-toggle'
 import { useLanguage } from '@/components/language-provider'
 
-const iconMap = { Smartphone, Laptop, Zap, Monitor, GraduationCap, Wrench, Cpu, Briefcase, CircuitBoard }
+const iconMap = { Smartphone, Laptop, Zap, Monitor, GraduationCap, Wrench, Cpu, Briefcase, CircuitBoard, Sparkles, ShieldCheck, BookOpen }
 
-export function Icon({ name, className }: { name: keyof typeof iconMap; className?: string }) {
-  const Component = iconMap[name] || CircuitBoard
+export function Icon({ name, className }: { name: keyof typeof iconMap | string; className?: string }) {
+  const Component = (iconMap as any)[name] || CircuitBoard
   return <Component className={className} aria-hidden="true" />
 }
 
@@ -51,20 +51,20 @@ export function Logo() {
   const { language } = useLanguage()
 
   return (
-    <Link href="/" className="flex items-center gap-3" aria-label="ሄሎ የቴክኒክና ሙያ ማሰልጠኛ">
+    <Link href="/" className="flex items-center gap-3" aria-label="ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል">
       <img
         src="/images/helloschool.jpg"
-        alt="ሄሎ የቴክኒክና ሙያ ማሰልጠኛ"
+        alt="ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል"
         className="h-11 sm:h-12 w-auto object-contain drop-shadow-sm transition-transform duration-300 hover:scale-105"
       />
       <div className="flex flex-col">
         <span className="font-bold text-foreground text-sm sm:text-base leading-tight tracking-tight">
-          ሄሎ የቴክኒክና ሙያ ማሰልጠኛ
+          ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል
         </span>
         <span className="text-[11px] text-muted-foreground font-medium hidden sm:inline-block">
           {language === 'am'
-            ? 'ሄሎ ቴክኒክና ሙያ ማሰልጠኛ · ባሕር ዳር'
-            : 'Hello TVET · Technical & Vocational Training'}
+            ? 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል · ባሕር ዳር'
+            : 'Hello Technology Training Center'}
         </span>
       </div>
     </Link>
@@ -324,18 +324,18 @@ export function Footer() {
 
   return (
     <footer className="border-t border-blue-900/40 bg-[#0b1d47] text-slate-200">
-      <div className="container mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-4 lg:px-8">
-        <div className="md:col-span-2">
+      <div className="container mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-5 lg:px-8">
+        <div className="sm:col-span-2">
           <div className="mb-5 flex items-center gap-3">
             <img
               src="/images/helloschool.jpg"
-              alt="ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET)"
+              alt="ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center)"
               className="h-11 sm:h-12 w-auto rounded-lg object-contain bg-white p-1 shadow-sm"
             />
             <div className="flex flex-col">
-              <span className="font-bold text-white text-base leading-tight">ሄሎ የቴክኒክና ሙያ ማሰልጠኛ</span>
+              <span className="font-bold text-white text-base leading-tight">ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል</span>
               <span className="text-xs text-blue-200">
-                {language === 'am' ? 'ሄሎ ቴክኒክና ሙያ ማሰልጠኛ · ባሕር ዳር' : 'Hello TVET · Technical and Vocational Training'}
+                {language === 'am' ? 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል · ባሕር ዳር' : 'Hello Technology Training Center'}
               </span>
             </div>
           </div>
@@ -395,8 +395,30 @@ export function Footer() {
             <Link href="/library" className="hover:text-white transition-colors">
               {language === 'am' ? 'ዲጂታል ቤተ-መጽሐፍት' : 'Digital Library'}
             </Link>
+            <Link href="/student/login" className="hover:text-white transition-colors font-medium">
+              {language === 'am' ? 'የተማሪ ፖርታል (Student Portal)' : 'Student Portal'}
+            </Link>
+            <Link href="/verify/certificate" className="hover:text-white transition-colors font-medium text-sky-300">
+              {language === 'am' ? 'ሰርተፊኬት ማረጋገጫ (Verify Certificate)' : 'Verify Certificate'}
+            </Link>
             <Link href="/about" className="hover:text-white transition-colors">
               {language === 'am' ? 'ስለ እኛ' : 'About Us'}
+            </Link>
+          </div>
+        </div>
+        <div>
+          <h3 className="mb-4 text-sm font-bold text-white uppercase tracking-wider">
+            {language === 'am' ? 'ፖሊሲዎችና ደንቦች' : 'Policies & Rules'}
+          </h3>
+          <div className="flex flex-col gap-3 text-sm text-blue-100">
+            <Link href="/privacy" className="hover:text-white transition-colors">
+              {language === 'am' ? 'የግል መረጃ ጥበቃ (Privacy)' : 'Privacy Policy'}
+            </Link>
+            <Link href="/terms" className="hover:text-white transition-colors">
+              {language === 'am' ? 'የስልጠና ደንቦች (Terms)' : 'Terms of Training'}
+            </Link>
+            <Link href="/refund-policy" className="hover:text-white transition-colors">
+              {language === 'am' ? 'ተመላሽና ዝውውር (Refunds)' : 'Refund & Postponement'}
             </Link>
           </div>
         </div>
@@ -412,15 +434,29 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-blue-900/60 bg-[#081533]">
-        <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-5 text-xs text-blue-200 sm:flex-row lg:px-8">
+        <div className="container mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-5 text-xs text-blue-200 lg:flex-row lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-center sm:text-left">
             <span>
-              © {new Date().getFullYear()} ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET). {language === 'am' ? 'መብቱ በህግ የተጠበቀ ነው።' : 'All rights reserved.'}
+              © {new Date().getFullYear()} ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center). {language === 'am' ? 'መብቱ በህግ የተጠበቀ ነው።' : 'All rights reserved.'}
             </span>
             <span className="hidden sm:inline text-blue-400">·</span>
             <span>
               {language === 'am' ? 'ባሕር ዳር፣ ኢትዮጵያ' : 'Bahir Dar, Ethiopia'}
             </span>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 text-blue-300">
+            <Link href="/privacy" className="hover:text-white underline-offset-4 hover:underline transition-colors">
+              {language === 'am' ? 'የግል መረጃ ጥበቃ' : 'Privacy'}
+            </Link>
+            <span className="text-blue-500">·</span>
+            <Link href="/terms" className="hover:text-white underline-offset-4 hover:underline transition-colors">
+              {language === 'am' ? 'የስልጠና ደንቦች' : 'Terms'}
+            </Link>
+            <span className="text-blue-500">·</span>
+            <Link href="/refund-policy" className="hover:text-white underline-offset-4 hover:underline transition-colors">
+              {language === 'am' ? 'የክፍያ ተመላሽና ዝውውር' : 'Refunds'}
+            </Link>
           </div>
 
           <div className="flex items-center gap-2 text-xs">
@@ -482,6 +518,9 @@ export function SectionHeading({ eyebrow, title, description, align = 'left' }: 
 }
 
 export function StatStrip() {
+  const { language } = useLanguage()
+  const isAm = language === 'am'
+
   return (
     <div className="border-y border-border bg-muted/20 py-8 backdrop-blur-sm">
       <div className="container mx-auto max-w-7xl px-5 lg:px-8">
@@ -491,28 +530,38 @@ export function StatStrip() {
               <Sparkles className="size-6" />
             </span>
             <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">1,200+</p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">Technicians Mentored</p>
+            <p className="mt-1 text-xs font-semibold text-muted-foreground">
+              {isAm ? 'የሰለጠኑ ቴክኒሻኖች' : 'Technicians Mentored'}
+            </p>
           </div>
           <div className="group flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-6 text-center shadow-sm card-hover-lift">
             <span className="flex size-12 items-center justify-center rounded-xl bg-amber-400/15 text-amber-600 dark:text-amber-400 transition-transform duration-300 group-hover:scale-110">
               <Wrench className="size-6" />
             </span>
             <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">98%</p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">Practical Lab Training</p>
+            <p className="mt-1 text-xs font-semibold text-muted-foreground">
+              {isAm ? 'የተግባር ላብራቶሪ ስልጠና' : 'Practical Lab Training'}
+            </p>
           </div>
           <div className="group flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-6 text-center shadow-sm card-hover-lift">
             <span className="flex size-12 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-600 dark:text-emerald-400 transition-transform duration-300 group-hover:scale-110">
               <ShieldCheck className="size-6" />
             </span>
-            <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">4 Dedicated</p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">Hardware Repair Labs</p>
+            <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+              {isAm ? '4 ራሳቸውን የቻሉ' : '4 Dedicated'}
+            </p>
+            <p className="mt-1 text-xs font-semibold text-muted-foreground">
+              {isAm ? 'የሃርድዌር ጥገና ላብራቶሪዎች' : 'Hardware Repair Labs'}
+            </p>
           </div>
           <div className="group flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-6 text-center shadow-sm card-hover-lift">
             <span className="flex size-12 items-center justify-center rounded-xl bg-sky-400/15 text-sky-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-110">
               <BookOpen className="size-6" />
             </span>
             <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">100%</p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">Real Diagnostic Tools</p>
+            <p className="mt-1 text-xs font-semibold text-muted-foreground">
+              {isAm ? 'እውነተኛ የመመርመሪያ እቃዎች' : 'Real Diagnostic Tools'}
+            </p>
           </div>
         </div>
       </div>
@@ -527,6 +576,8 @@ export function InquiryForm({
   courseName?: string
   coursesList?: string[]
 }) {
+  const { language } = useLanguage()
+  const isAm = language === 'am'
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -574,7 +625,11 @@ export function InquiryForm({
     const consent = data.get('consent') as string | null
 
     if (!name?.trim() || !phone?.trim() || !consent) {
-      setError('Please complete your name, phone number, and consent before sending.')
+      setError(
+        isAm
+          ? 'እባክዎ ሙሉ ስምዎን፣ ስልክ ቁጥርዎን እና የስምምነት ማረጋገጫውን ይሙሉ/ይምረጡ።'
+          : 'Please complete your name, phone number, and consent before sending.'
+      )
       setLoading(false)
       return
     }
@@ -604,7 +659,12 @@ export function InquiryForm({
       form.reset()
       setSelectedCourse(courseName || '')
     } catch (e: any) {
-      setError(e.message || 'Something went wrong. Please try again or call us directly.')
+      setError(
+        e.message ||
+          (isAm
+            ? 'ስህተት ተከስቷል። እባክዎ እንደገና ይሞክሩ ወይም በቀጥታ በስልክ ይደውሉልን።'
+            : 'Something went wrong. Please try again or call us directly.')
+      )
     } finally {
       setLoading(false)
     }
@@ -612,16 +672,20 @@ export function InquiryForm({
 
   if (submitted)
     return (
-      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
+      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center animate-fade-in">
         <span className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Check />
         </span>
-        <h3 className="mt-4 text-xl font-bold">Inquiry sent successfully!</h3>
+        <h3 className="mt-4 text-xl font-bold">
+          {isAm ? 'ጥያቄዎ በተሳካ ሁኔታ ተልኳል!' : 'Inquiry sent successfully!'}
+        </h3>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Thank you! Your inquiry has been saved. The school will contact you shortly using the details you provided.
+          {isAm
+            ? 'እናመሰግናለን! መረጃዎ ተመዝግቧል። የማዕከሉ የቅበላ ክፍል በሰጡን አድራሻ በቅርቡ ያነጋግርዎታል።'
+            : 'Thank you! Your inquiry has been saved. The school will contact you shortly using the details you provided.'}
         </p>
-        <Button variant="outline" className="mt-5" onClick={() => setSubmitted(false)}>
-          Send another inquiry
+        <Button variant="outline" className="mt-5 rounded-xl" onClick={() => setSubmitted(false)}>
+          {isAm ? 'ሌላ ጥያቄ ይላኩ' : 'Send another inquiry'}
         </Button>
       </div>
     )
@@ -630,27 +694,27 @@ export function InquiryForm({
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="flex flex-col gap-2 text-sm font-medium">
-          Full name *
+          {isAm ? 'ሙሉ ስም *' : 'Full name *'}
           <input
             name="name"
             disabled={loading}
             className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
-            placeholder="Your full name"
+            placeholder={isAm ? 'የእርስዎን ሙሉ ስም ያስገቡ' : 'Your full name'}
           />
         </label>
         <label className="flex flex-col gap-2 text-sm font-medium">
-          Phone number *
+          {isAm ? 'ስልክ ቁጥር *' : 'Phone number *'}
           <input
             name="phone"
             disabled={loading}
             className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
-            placeholder="+251 ..."
+            placeholder="+251 9..."
           />
         </label>
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="flex flex-col gap-2 text-sm font-medium">
-          Email
+          {isAm ? 'ኢሜይል (አማራጭ)' : 'Email'}
           <input
             name="email"
             type="email"
@@ -660,7 +724,7 @@ export function InquiryForm({
           />
         </label>
         <label className="flex flex-col gap-2 text-sm font-medium">
-          Preferred course
+          {isAm ? 'የሚመርጡት ስልጠና' : 'Preferred course'}
           <select
             name="course"
             value={selectedCourse}
@@ -668,7 +732,7 @@ export function InquiryForm({
             disabled={loading}
             className="h-11 rounded-xl border border-input bg-background/90 px-3.5 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60 cursor-pointer"
           >
-            <option value="">Select a course</option>
+            <option value="">{isAm ? 'ስልጠና ይምረጡ' : 'Select a course'}</option>
             {courseOptions.map((opt: string) => (
               <option key={opt} value={opt}>
                 {opt}
@@ -678,23 +742,25 @@ export function InquiryForm({
         </label>
       </div>
       <label className="flex flex-col gap-2 text-sm font-medium">
-        Message
+        {isAm ? 'መልዕክት' : 'Message'}
         <textarea
           name="message"
           rows={4}
           disabled={loading}
           className="rounded-xl border border-input bg-background/90 p-3.5 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60"
-          placeholder="Tell us what you would like to learn..."
+          placeholder={isAm ? 'ምን መማር እንደሚፈልጉ ወይም ጥያቄዎን ይንገሩን...' : 'Tell us what you would like to learn...'}
         />
       </label>
-      <label className="flex items-start gap-3 text-sm text-muted-foreground">
+      <label className="flex items-start gap-3 text-sm text-muted-foreground cursor-pointer">
         <input
           name="consent"
           type="checkbox"
           disabled={loading}
           className="mt-0.5 size-4 rounded accent-blue-600 cursor-pointer"
         />
-        I consent to the school using this information to respond to my inquiry.
+        {isAm
+          ? 'ማዕከሉ ለጥያቄዬ ምላሽ ለመስጠት በዚህ መረጃዬ እንዲጠቀም እስማማለሁ።'
+          : 'I consent to the school using this information to respond to my inquiry.'}
       </label>
       {error && (
         <p className="text-sm font-medium text-destructive" role="alert">
@@ -706,22 +772,32 @@ export function InquiryForm({
         disabled={loading}
         className="w-full sm:w-fit rounded-xl px-6 bg-blue-600 text-white hover:bg-blue-700 transition duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02]"
       >
-        {loading ? 'Sending...' : 'Send inquiry'}
+        {loading
+          ? (isAm ? 'በመላክ ላይ...' : 'Sending...')
+          : (isAm ? 'ጥያቄ ይላኩ' : 'Send inquiry')}
         {!loading && <Send data-icon="inline-end" />}
       </Button>
     </form>
   )
 }
 
-export function CourseIcon({ name }: { name: keyof typeof iconMap }) {
+export function CourseIcon({ name, className }: { name: keyof typeof iconMap | string; className?: string }) {
   return (
-    <span className="flex size-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-105">
+    <span
+      className={cn(
+        'flex size-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-105',
+        className
+      )}
+    >
       <Icon name={name} />
     </span>
   )
 }
 
 export function WhatsAppButton() {
+  const { language } = useLanguage()
+  const isAm = language === 'am'
+
   return (
     <a
       href={`https://wa.me/${schoolConfig.whatsappPhone}`}
@@ -729,12 +805,15 @@ export function WhatsAppButton() {
       rel="noreferrer"
       className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm font-semibold text-emerald-600 dark:text-emerald-400 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-500/20 hover:shadow-md"
     >
-      <MessageCircle className="size-4" /> Ask on WhatsApp
+      <MessageCircle className="size-4" /> {isAm ? 'በWhatsApp ይጠይቁ' : 'Ask on WhatsApp'}
     </a>
   )
 }
 
 export function TelegramButton() {
+  const { language } = useLanguage()
+  const isAm = language === 'am'
+
   return (
     <a
       href={schoolConfig.telegram}
@@ -742,7 +821,7 @@ export function TelegramButton() {
       rel="noreferrer"
       className="inline-flex items-center gap-2 rounded-xl border border-sky-500/30 bg-sky-500/10 px-4 py-2.5 text-sm font-semibold text-sky-600 dark:text-sky-400 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-500/20 hover:shadow-md"
     >
-      <Send className="size-4" /> Chat on Telegram
+      <Send className="size-4" /> {isAm ? 'በTelegram ያግኙን' : 'Chat on Telegram'}
     </a>
   )
 }
@@ -750,19 +829,23 @@ export function TelegramButton() {
 export function SearchField({
   value,
   onChange,
-  placeholder = 'Search...',
+  placeholder,
 }: {
   value: string
   onChange: (value: string) => void
   placeholder?: string
 }) {
+  const { language } = useLanguage()
+  const isAm = language === 'am'
+  const defaultPlaceholder = isAm ? 'ይፈልጉ...' : 'Search...'
+
   return (
     <div className="relative group">
       <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-blue-600 dark:group-focus-within:text-sky-400" />
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder || defaultPlaceholder}
         className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-4 text-sm outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
       />
     </div>
@@ -770,27 +853,33 @@ export function SearchField({
 }
 
 export function CTASection() {
+  const { language } = useLanguage()
+  const isAm = language === 'am'
+
   return (
     <section className="px-5 py-20 lg:px-8">
-      <div className="container relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-blue-400/30 bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] px-8 py-12 text-white shadow-2xl md:px-14 md:py-16">
+      <div className="container relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-blue-400/30 bg-[#0d2a75] bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] px-8 py-12 text-white shadow-2xl md:px-14 md:py-16">
         <div className="absolute -right-20 -top-20 size-72 rounded-full bg-white/15 blur-3xl pointer-events-none" />
         <div className="absolute -left-20 -bottom-20 size-72 rounded-full bg-sky-300/20 blur-3xl pointer-events-none" />
         <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
           <div>
             <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
-              <CircuitBoard className="size-3.5" /> Your Next Career Step
+              <CircuitBoard className="size-3.5" />
+              {isAm ? 'ቀጣዩ የሙያ እርምጃዎ' : 'Your Next Career Step'}
             </span>
             <h2 className="mt-2 max-w-xl text-3xl font-extrabold tracking-tight text-white md:text-4xl">
-              Ready to build practical repair skills?
+              {isAm ? 'ተግባራዊ የጥገና ክህሎትን ለማዳበር ዝግጁ ኖት?' : 'Ready to build practical repair skills?'}
             </h2>
             <p className="mt-4 max-w-lg leading-7 text-blue-100">
-              Explore our courses or send an inquiry. We will help you find the right technical training path for your goals.
+              {isAm
+                ? 'ስልጠናዎቻችንን ያስሱ ወይም ጥያቄዎን ይላኩልን። ለእርስዎ ግብ የሚስማማውን የቴክኒክ ስልጠና መንገድ እንዲመርጡ እናግዝዎታለን።'
+                : 'Explore our courses or send an inquiry. We will help you find the right technical training path for your goals.'}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link href="/courses">
               <Button className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]">
-                Explore courses <ArrowRight data-icon="inline-end" />
+                {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore courses'} <ArrowRight data-icon="inline-end" />
               </Button>
             </Link>
             <Link href="/contact">
@@ -798,7 +887,7 @@ export function CTASection() {
                 variant="outline"
                 className="rounded-xl border-white/50 bg-white/10 px-6 font-semibold text-white transition-all duration-300 hover:border-white hover:bg-white/20 hover:text-white"
               >
-                Contact us
+                {isAm ? 'ያግኙን' : 'Contact us'}
               </Button>
             </Link>
           </div>

@@ -3,13 +3,13 @@
 // synchronized to the real database and managed dynamically via Prisma / Admin portal.
 
 export const schoolConfig = {
-  name: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ',
-  englishName: 'Hello TVET',
-  brandSubtitle: 'Hello Technical and Vocational Training',
+  name: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል',
+  englishName: 'Hello Technology Training Center',
+  brandSubtitle: 'Hello Technology Training Center',
   tagline: 'Build Practical Skills. Repair with Confidence.',
   phone: '09 47 74 70 70',
   alternatePhone: '09 82 48 43 28',
-  email: 'info@hellotvet.edu.et',
+  email: 'info@hellotechnology.edu.et',
   whatsappPhone: '251947747070',
   telegram: 'https://t.me/Hellotechn',
   telegramHandle: '@HHaileHaile',
@@ -25,7 +25,7 @@ export const schoolConfig = {
     'Industrial Electrical Machines & Drives Servicing Level',
   ],
   description:
-    'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET - Hello Technical and Vocational Training) — Leading accredited technical trade and vocational training institute in Bahir Dar providing hands-on workshops in electronics, computing, electrical installations, digital media, coding, and industrial equipment maintenance.',
+    'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center) — Leading accredited technical trade and vocational training institute in Bahir Dar providing hands-on workshops in electronics, computing, electrical installations, digital media, coding, and industrial equipment maintenance.',
   mission: 'To equip Ethiopian youth and professionals with accredited, job-ready technical trade skills, practical diagnostic problem-solving abilities, and hands-on lab excellence.',
   vision: 'To be the most trusted center for accredited technical vocational education and hardware trade competence in East Africa.',
   brandColor: '#155DFC',
@@ -39,30 +39,41 @@ export const schoolConfig = {
 }
 
 export const trainingHighlights = [
-
   {
-    title: 'የተግባርና የላብራቶሪ ስልጠና (Hands-On Lab Training)',
+    title: 'የግል የተሟላ የላብራቶሪ ወንበር (Dedicated 1:1 Workstation)',
     description:
-      'Work with real electronic components, circuit boards, and industrial equipment in our fully-equipped workshops.',
-    icon: 'GraduationCap',
+      'Zero station sharing. Every student is assigned their own dedicated workbench equipped with SMD hot-air rework, digital multimeter, stereo microscope, and live motherboards.',
+    icon: 'Wrench',
   },
   {
-    title: 'የCOC እና ሙሉ ዕውቅና ያለው (COC & Full Accreditation)',
+    title: 'የኮምፖነንት ደረጃ እና ማይክሮ-ሶልደሪንግ (Micro-Soldering & Schematics)',
     description:
-      'Fully accredited for all educational levels. Specialized preparation for Basic Electrical Electronics & Industrial Electrical Machines COC exams.',
+      'Master multi-layer PCB schematics, boardview signal tracing, short-circuit injection, IC chip reballing, and jumper wire micro-routing beyond basic part swaps.',
+    icon: 'Cpu',
+  },
+  {
+    title: 'መንግስታዊ እውቅና እና የCOC ብቃት (Accredited TVET & COC Exam)',
+    description:
+      'Fully accredited across all educational levels with intensive practical mock drills tailored to national Basic Electronics & Industrial Electrical COC exams.',
     icon: 'ShieldCheck',
   },
   {
-    title: 'ልዩ ማበረታቻ፦ 2+1 በነፃ (Special Promotion: 2+1 Free)',
+    title: 'በእውነተኛ እቃዎች ላይ የሚደረግ ልምምድ (Real Consumer & Industrial Gear)',
     description:
-      'በነፃ፦ ከሁለት በላይ ት/ት ለሚመዘገብ አንድ ተጨማሪ ትምህርት በነፃ ይሰጣል። Register for more than two courses, get one completely free!',
-    icon: 'Sparkles',
+      'Troubleshoot actual non-working smartphones, laptops, refrigeration cooling units, and industrial motor control panels from week one.',
+    icon: 'Laptop',
   },
   {
-    title: 'የኤሌክትሮኒክስ መጻህፍትና ዲጂታል ላይብረሪ (Technical Books Library)',
+    title: 'የዕድሜ ልክ ዲጂታል ላይብረሪ (Lifetime Schematics & Digital Studio)',
     description:
-      'የኤሌክትሮኒክስ መጻህፍት አሉ። Comprehensive technical schematics, boardview files, and electronics reference handbooks available for all students.',
+      '24/7 access to our digital learning studio featuring 4K video lessons, high-resolution motherboard schematics, boardview software, and repair manuals.',
     icon: 'BookOpen',
+  },
+  {
+    title: 'የጥገና ሱቅ መክፈቻና የስራ ፈጠራ (Shop Launch & Sourcing Mentorship)',
+    description:
+      'Direct guidance on wholesale spare parts supply channels in Addis Ababa & Bahir Dar, choosing shop tooling, customer pricing, and launching a profitable repair business.',
+    icon: 'Briefcase',
   },
 ]
 

@@ -29,8 +29,12 @@ import {
   KeyRound,
   Eye,
   EyeOff,
+  HelpCircle,
+  Info,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useLanguage } from '@/components/language-provider'
+import { schoolConfig } from '@/lib/data'
 
 export type RegistrationCourseOption = {
   id: string
@@ -63,7 +67,7 @@ const PAYMENT_METHODS: Record<
     id: 'cbe',
     name: 'Commercial Bank of Ethiopia (CBE)',
     shortName: 'CBE',
-    accountName: 'Hello TVET (Hailu B.)',
+    accountName: 'Hello Technology (Hailu B.)',
     accountNumber: '1000535826033',
     badgeColor: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
   },
@@ -71,7 +75,7 @@ const PAYMENT_METHODS: Record<
     id: 'telebirr',
     name: 'Telebirr SuperApp',
     shortName: 'Telebirr',
-    accountName: 'Hello TVET (ሄሎ የቴክኒክና ሙያ)',
+    accountName: 'Hello Technology (ሄሎ ቴክኖሎጂ ማሰልጠኛ)',
     accountNumber: '0947747070',
     badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
     note: 'Telebirr: 09 47 74 70 70 / 09 82 48 43 28',
@@ -80,7 +84,7 @@ const PAYMENT_METHODS: Record<
     id: 'boa',
     name: 'Bank of Abyssinia (BOA)',
     shortName: 'Abyssinia',
-    accountName: 'Hello TVET (ሄሎ የቴክኒክና ሙያ)',
+    accountName: 'Hello Technology (ሄሎ ቴክኖሎጂ ማሰልጠኛ)',
     accountNumber: '8492019384',
     badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
   },
@@ -90,43 +94,54 @@ const SHIFT_OPTIONS = [
   {
     id: 'morning',
     title: 'Morning Shift',
+    titleAm: 'የጠዋት ፈረቃ',
     time: '8:30 AM – 12:00 PM',
+    timeAm: 'ከጠዋቱ 2:30 – 6:00',
     days: 'Monday – Friday',
+    daysAm: 'ከሰኞ – አርብ',
   },
   {
     id: 'afternoon',
     title: 'Afternoon Shift',
+    titleAm: 'የከሰዓት ፈረቃ',
     time: '1:30 PM – 5:00 PM',
+    timeAm: 'ከሰዓት 7:30 – 11:00',
     days: 'Monday – Friday',
+    daysAm: 'ከሰኞ – አርብ',
   },
   {
     id: 'saturday',
     title: 'Saturday Intensive',
+    titleAm: 'የቅዳሜ ሙሉ ቀን',
     time: '9:00 AM – 4:30 PM',
+    timeAm: 'ከጠዋቱ 3:00 – 10:30',
     days: 'Every Saturday',
+    daysAm: 'በየሳምንቱ ቅዳሜ',
   },
 ]
 
 const EDUCATION_LEVELS = [
-  'High School',
-  'Diploma',
-  "Bachelor's Degree",
-  "Master's Degree",
-  'PhD',
+  { id: 'High School', labelEn: 'High School (10th / 12th Grade)', labelAm: '10ኛ ወይም 12ኛ ክፍል ያጠናቀቀ' },
+  { id: 'Diploma', labelEn: 'TVET Diploma / Level 1-4', labelAm: 'የቴክኒክና ሙያ ዲፕሎማ / COC ደረጃ' },
+  { id: "Bachelor's Degree", labelEn: "Bachelor's Degree (University)", labelAm: 'የመጀመሪያ ዲግሪ' },
+  { id: "Master's Degree", labelEn: "Master's Degree / Above", labelAm: 'ማስተርስ ወይም ከዚያ በላይ' },
 ]
 
 const EXPERIENCE_YEARS = [
-  'None',
-  '0-1 years',
-  '1-3 years',
-  '3-5 years',
-  '5+ years',
+  { id: 'None', labelEn: 'None (Complete Beginner)', labelAm: 'ምንም የለኝም (ጀማሪ)' },
+  { id: '0-1 years', labelEn: 'Under 1 Year Practical Exposure', labelAm: 'ከ 1 ዓመት በታች' },
+  { id: '1-3 years', labelEn: '1 - 3 Years In-Shop/Bench Experience', labelAm: 'ከ 1 – 3 ዓመታት' },
+  { id: '3-5 years', labelEn: '3 - 5 Years Field Technician', labelAm: 'ከ 3 – 5 ዓመታት' },
+  { id: '5+ years', labelEn: '5+ Years Experienced Senior Technician', labelAm: 'ከ 5 ዓመት በላይ' },
 ]
 
 export function CourseRegistrationWizard({
   courses,
   initialCourseId,
 }: CourseRegistrationWizardProps) {
+  const { language } = useLanguage()
+  const isAm = language === 'am'
+
   // Step tracker (1 to 5)
   const [currentStep, setCurrentStep] = useState<number>(1)
 
@@ -152,8 +167,8 @@ export function CourseRegistrationWizard({
       .split(/\s+/)
       .filter(Boolean)
     const first = parts[0] || 'student'
-    const father = parts[1] || (parts.length > 2 ? parts[parts.length - 1] : 'tvet')
-    return `${first}.${father}@hellotvet.edu.et`
+    const father = parts[1] || (parts.length > 2 ? parts[parts.length - 1] : 'tech')
+    return `${first}.${father}@hellotechnology.edu.et`
   }
 
   // Step 2: Content Sharing & Community Policy
@@ -184,6 +199,7 @@ export function CourseRegistrationWizard({
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [registrationId, setRegistrationId] = useState('')
+  const [showSuccessPassword, setShowSuccessPassword] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -421,11 +437,11 @@ export function CourseRegistrationWizard({
 
   // Step definitions
   const stepsList = [
-    { num: 1, label: 'BASIC INFO' },
-    { num: 2, label: 'Content Sharing & Community Policy' },
-    { num: 3, label: 'BACKGROUND' },
-    { num: 4, label: 'PAYMENT' },
-    { num: 5, label: 'CONFIRMATION' },
+    { num: 1, label: language === 'am' ? 'መሰረታዊ መረጃ' : 'BASIC INFO' },
+    { num: 2, label: language === 'am' ? 'የስልጠና ደንቦች' : 'TRAINING POLICY' },
+    { num: 3, label: language === 'am' ? 'የትምህርት ደረጃ' : 'BACKGROUND' },
+    { num: 4, label: language === 'am' ? 'የክፍያ ዕቅድ' : 'PAYMENT PLAN' },
+    { num: 5, label: language === 'am' ? 'ክፍያ ማረጋገጫ' : 'CONFIRMATION' },
   ]
 
   // Success view
@@ -436,65 +452,107 @@ export function CourseRegistrationWizard({
           <CheckCircle2 className="size-10" />
         </div>
         <span className="mt-4 inline-block rounded-full bg-blue-500/10 px-4 py-1 text-xs font-bold text-blue-600 dark:text-sky-400">
-          Registration Submitted
+          {isAm ? 'የምዝገባ ማመልከቻዎ ተሳክቷል' : 'Registration Submitted'}
         </span>
-        <h2 className="mt-3 text-3xl font-extrabold tracking-tight">
-          Welcome to ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET), {fullName.split(' ')[0]}!
+        <h2 className="mt-3 text-2xl md:text-3xl font-extrabold tracking-tight">
+          {isAm
+            ? `እንኳን ደህና መጡ ወደ ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል፣ ${fullName.split(' ')[0]}!`
+            : `Welcome to Hello Technology Training Center, ${fullName.split(' ')[0]}!`}
         </h2>
         <p className="mt-3 text-sm text-muted-foreground max-w-lg mx-auto leading-6">
-          Your course registration application and payment verification have been received. Our admissions
-          office is validating your cohort intake enrollment.
+          {isAm
+            ? 'የስልጠና ማመልከቻዎ እና የክፍያ ማረጋገጫዎ ደርሶናል። የተማሪዎች ቅበላ ቢሮ መረጃዎን በማጣራት የክፍል መጀመሪያ ጊዜዎን ያሳውቅዎታል።'
+            : 'Your course registration application and payment verification have been received. Our admissions office is validating your cohort intake enrollment.'}
         </p>
 
         <div className="mt-8 rounded-2xl border bg-muted/30 p-6 text-left space-y-3">
           <div className="flex justify-between items-center pb-3 border-b text-sm">
-            <span className="text-muted-foreground">Application ID:</span>
+            <span className="text-muted-foreground">{isAm ? 'የምዝገባ መለያ ቁጥር፡' : 'Application ID:'}</span>
             <span className="font-mono font-bold text-primary">{registrationId}</span>
           </div>
 
           {/* Student Account Credentials Box */}
-          <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 space-y-2">
+          <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 space-y-2.5">
             <div className="flex items-center gap-2 text-blue-700 dark:text-sky-300 font-bold text-xs uppercase tracking-wider">
-              <Sparkles className="size-4" /> Official Student Account Created
+              <Sparkles className="size-4" /> {isAm ? 'ይፋዊ የተማሪ አካውንት ተፈጥሯል' : 'Official Student Account Created'}
             </div>
+            
+            {/* Email with Copy */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-sm pt-1">
-              <span className="text-muted-foreground">Student Portal Email:</span>
-              <span className="font-mono font-bold text-blue-600 dark:text-sky-400">
-                {createdEmail || formatPreviewEmail(fullName)}
-              </span>
+              <span className="text-muted-foreground">{isAm ? 'የተማሪ ፖርታል ኢሜይል፡' : 'Student Portal Email:'}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-bold text-blue-600 dark:text-sky-400">
+                  {createdEmail || formatPreviewEmail(fullName)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleCopy(createdEmail || formatPreviewEmail(fullName), 'email')}
+                  className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                  title={isAm ? 'ኢሜይል ገልብጥ' : 'Copy Email'}
+                >
+                  {copiedKey === 'email' ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+                </button>
+              </div>
             </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Portal Password:</span>
-              <span className="font-semibold text-foreground">•••••••• (Your chosen password)</span>
+
+            {/* Password with Reveal & Copy */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-sm">
+              <span className="text-muted-foreground">{isAm ? 'የፖርታል ይለፍ ቃል፡' : 'Portal Password:'}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-bold text-foreground">
+                  {showSuccessPassword ? (password || 'Hello@2026') : '••••••••'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowSuccessPassword(!showSuccessPassword)}
+                  className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                  title={showSuccessPassword ? 'Hide' : 'Show'}
+                >
+                  {showSuccessPassword ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleCopy(password || 'Hello@2026', 'pwd')}
+                  className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                  title={isAm ? 'የይለፍ ቃል ገልብጥ' : 'Copy Password'}
+                >
+                  {copiedKey === 'pwd' ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+                </button>
+              </div>
             </div>
+
             <p className="text-[11px] text-muted-foreground pt-1 border-t border-blue-500/20">
-              Use this institutional email and your chosen password to log into your student dashboard anytime.
+              {isAm
+                ? 'በዚህ ይፋዊ የተማሪ ኢሜይል እና በመረጡት የይለፍ ቃል በማንኛውም ጊዜ ወደ ተማሪ ዳሽቦርድዎ መግባት ይችላሉ።'
+                : 'Use this institutional email and your chosen password to log into your student dashboard anytime.'}
             </p>
           </div>
 
           <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Enrolled Course:</span>
+            <span className="text-muted-foreground">{isAm ? 'የተመዘገቡበት ስልጠና፡' : 'Enrolled Course:'}</span>
             <span className="font-semibold text-foreground">{selectedCourse}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Cohort Shift:</span>
+            <span className="text-muted-foreground">{isAm ? 'የስልጠና ፈረቃ፡' : 'Cohort Shift:'}</span>
             <span className="font-semibold text-foreground">
               {SHIFT_OPTIONS.find((s) => s.id === selectedShift)?.title}
             </span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Payment Plan:</span>
+            <span className="text-muted-foreground">{isAm ? 'የክፍያ ዕቅድ፡' : 'Payment Plan:'}</span>
             <span className="font-semibold text-foreground">
-              {paymentPlan === 'full' ? 'Full Access (10% Discount)' : 'Two-Part Installment'}
+              {paymentPlan === 'full'
+                ? (isAm ? 'ሙሉ ክፍያ (10% ቅናሽ)' : 'Full Access (10% Discount)')
+                : (isAm ? 'የሁለት ዙር ክፍያ' : 'Two-Part Installment')}
             </span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-muted-foreground">Amount:</span>
-            <span className="font-bold text-blue-600 dark:text-sky-400">{finalPrice} Birr</span>
+            <span className="text-muted-foreground">{isAm ? 'የተከፈለ መጠን፡' : 'Amount:'}</span>
+            <span className="font-bold text-blue-600 dark:text-sky-400">{finalPrice} {isAm ? 'ብር' : 'Birr'}</span>
           </div>
           {telegramUsername && (
             <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Telegram Handle:</span>
+              <span className="text-muted-foreground">{isAm ? 'የቴሌግራም አድራሻ፡' : 'Telegram Handle:'}</span>
               <span className="font-semibold text-blue-600 dark:text-sky-400">
                 {telegramUsername.startsWith('@') ? telegramUsername : `@${telegramUsername}`}
               </span>
@@ -502,7 +560,7 @@ export function CourseRegistrationWizard({
           )}
           {transactionRef && (
             <div className="flex justify-between items-center text-sm">
-              <span className="text-muted-foreground">Transaction Reference:</span>
+              <span className="text-muted-foreground">{isAm ? 'የግብይት ቁጥር (Reference)፡' : 'Transaction Reference:'}</span>
               <span className="font-mono text-xs">{transactionRef}</span>
             </div>
           )}
@@ -511,17 +569,17 @@ export function CourseRegistrationWizard({
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link href="/student/dashboard">
             <Button className="w-full sm:w-auto rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md shadow-blue-500/20">
-              <Sparkles className="mr-2 size-4" /> Access Student Dashboard
+              <Sparkles className="mr-2 size-4" /> {isAm ? 'ወደ ተማሪ ዳሽቦርድ ይግቡ' : 'Access Student Dashboard'}
             </Button>
           </Link>
-          <a href="https://t.me/helloschool_et" target="_blank" rel="noreferrer">
+          <a href={schoolConfig.telegram} target="_blank" rel="noreferrer">
             <Button variant="outline" className="w-full sm:w-auto rounded-xl">
-              <Send className="mr-2 size-4" /> Connect with Admissions on Telegram
+              <Send className="mr-2 size-4" /> {isAm ? 'አድሚሽንን በቴሌግራም ያግኙ' : 'Connect with Admissions on Telegram'}
             </Button>
           </a>
           <Link href="/courses">
             <Button variant="ghost" className="w-full sm:w-auto rounded-xl">
-              <ArrowLeft className="mr-2 size-4" /> Browse Courses
+              <ArrowLeft className="mr-2 size-4" /> {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Browse Courses'}
             </Button>
           </Link>
         </div>
@@ -536,23 +594,25 @@ export function CourseRegistrationWizard({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-xl md:text-2xl font-black tracking-tight uppercase text-foreground">
-              Course Registration
+              {isAm ? 'የኮርስ ምዝገባ ማመልከቻ' : 'Course Registration'}
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Secure your seat for the upcoming technical cohort intake.
+              {isAm
+                ? 'ለቀጣዩ ተግባራዊ የስልጠና ዙር ቦታዎን አሁኑኑ ያስይዙ።'
+                : 'Secure your seat for the upcoming technical cohort intake.'}
             </p>
             {/* Flyer Promotions & Badges */}
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/25">
-                <Sparkles className="size-3" /> በነፃ፦ ከ2 በላይ ሲመዘገቡ 1 በነፃ! (2+1 Free Offer)
+                <Sparkles className="size-3" /> {isAm ? 'በነፃ፦ ከ2 በላይ ሲመዘገቡ 1 በነፃ!' : 'Special: Enroll in 2+, Get 1 Free!'}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-blue-600 dark:text-sky-400 border border-blue-500/20">
-                <ShieldCheck className="size-3" /> ሙሉ ዕውቅና ያለው & COC Level Aligned
+                <ShieldCheck className="size-3" /> {isAm ? 'ሙሉ ዕውቅና ያለው & COC Level Aligned' : 'Fully Accredited & COC Level Aligned'}
               </span>
             </div>
           </div>
           <span className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full bg-blue-500/10 px-3.5 py-1 text-xs font-bold text-blue-600 dark:text-sky-400 border border-blue-500/20">
-            Step {currentStep} of 5
+            {isAm ? `ደረጃ ${currentStep} ከ 5` : `Step ${currentStep} of 5`}
           </span>
         </div>
 
@@ -606,22 +666,24 @@ export function CourseRegistrationWizard({
         {currentStep === 1 && (
           <div className="space-y-6 animate-fade-in-up">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold">Basic Information</h2>
+              <h2 className="text-xl md:text-2xl font-bold">{isAm ? 'መሰረታዊ መረጃ' : 'Basic Information'}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Enter your contact details and select the training cohort you want to join.
+                {isAm
+                  ? 'የመገኛ አድራሻዎን ያስገቡና መቀላቀል የሚፈልጉትን የስልጠና ዘርፍ ይምረጡ።'
+                  : 'Enter your contact details and select the training cohort you want to join.'}
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
               <label className="flex flex-col gap-2 text-sm font-medium">
-                Full Name *
+                {isAm ? 'ሙሉ ስም *' : 'Full Name *'}
                 <div className="relative">
                   <User className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Abebe Kebede"
+                    placeholder={isAm ? 'ለምሳሌ፡ አበበ ከበደ' : 'e.g. Abebe Kebede'}
                     className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                   />
@@ -629,14 +691,14 @@ export function CourseRegistrationWizard({
               </label>
 
               <label className="flex flex-col gap-2 text-sm font-medium">
-                Phone Number *
+                {isAm ? 'ስልክ ቁጥር *' : 'Phone Number *'}
                 <div className="relative">
                   <Phone className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="e.g. 0911234567 or +251 9..."
+                    placeholder={isAm ? 'ለምሳሌ፡ 0911234567' : 'e.g. 0911234567 or +251 9...'}
                     className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-3.5 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                   />
@@ -644,7 +706,7 @@ export function CourseRegistrationWizard({
               </label>
 
               <label className="flex flex-col gap-2 text-sm font-medium">
-                Telegram Username
+                {isAm ? 'የቴሌግራም ተጠቃሚ ስም (Telegram)' : 'Telegram Username'}
                 <div className="relative">
                   <Send className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-sky-500" />
                   <input
@@ -656,12 +718,14 @@ export function CourseRegistrationWizard({
                   />
                 </div>
                 <span className="text-[11px] text-muted-foreground">
-                  Your Telegram handle for cohort admissions & schedule notifications
+                  {isAm
+                    ? 'ለስልጠና መርሃግብር እና ለአድሚሽን ማሳወቂያዎች የሚያገለግል የቴሌግራም አድራሻ'
+                    : 'Your Telegram handle for cohort admissions & schedule notifications'}
                 </span>
               </label>
 
               <label className="flex flex-col gap-2 text-sm font-medium">
-                Email Address (Optional)
+                {isAm ? 'ኢሜይል አድራሻ (አስገዳጅ ያልሆነ)' : 'Email Address (Optional)'}
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <input
@@ -673,19 +737,19 @@ export function CourseRegistrationWizard({
                   />
                 </div>
                 <span className="text-[11px] text-muted-foreground">
-                  For receipts and enrollment documentation
+                  {isAm ? 'ለክፍያ ደረሰኞችና ለኦፊሴላዊ መረጃዎች' : 'For receipts and enrollment documentation'}
                 </span>
               </label>
 
               <label className="flex flex-col gap-2 text-sm font-medium">
-                Create Portal Password *
+                {isAm ? 'የተማሪ ፖርታል የይለፍ ቃል ፍጠር *' : 'Create Portal Password *'}
                 <div className="relative">
                   <KeyRound className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-sky-500" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 6 characters (e.g. Pass@123)"
+                    placeholder={isAm ? 'ቢያንስ 6 ፊደላት (ምሳሌ፡ Pass@123)' : 'Min 6 characters (e.g. Pass@123)'}
                     className="h-11 w-full rounded-xl border border-input bg-background/90 pl-10 pr-10 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                   />
@@ -700,7 +764,9 @@ export function CourseRegistrationWizard({
                   </button>
                 </div>
                 <span className="text-[11px] text-muted-foreground">
-                  Choose a password to log into your student dashboard & course resources
+                  {isAm
+                    ? 'ወደ ተማሪ ዳሽቦርድዎ ገብተው የኮርስ ማቴሪያሎችን ለማግኘት የሚያገለግል የይለፍ ቃል'
+                    : 'Choose a password to log into your student dashboard & course resources'}
                 </span>
               </label>
 
@@ -713,24 +779,26 @@ export function CourseRegistrationWizard({
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-1">
                       <span className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-sky-300">
-                        Official Student Portal Email (Auto-Generated)
+                        {isAm ? 'ይፋዊ የተማሪ ፖርታል ኢሜይል (በራስ-ሰር የተፈጠረ)' : 'Official Student Portal Email (Auto-Generated)'}
                       </span>
                       <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-semibold text-blue-700 dark:text-sky-300">
-                        Hello TVET Institutional ID
+                        Hello Technology Institutional ID
                       </span>
                     </div>
                     <p className="mt-1 font-mono text-sm sm:text-base font-bold text-foreground">
                       {formatPreviewEmail(fullName)}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                      Your institutional account will be created automatically with this email. You will use it with your chosen password to access your Student Dashboard.
+                      {isAm
+                        ? 'የተማሪ አካውንትዎ በዚህ ይፋዊ ኢሜይል ይፈጠራል። በፈጠሩት የይለፍ ቃል ተጠቅመው ወደ ዳሽቦርድዎ መግባት ይችላሉ።'
+                        : 'Your institutional account will be created automatically with this email. You will use it with your chosen password to access your Student Dashboard.'}
                     </p>
                   </div>
                 </div>
               )}
 
               <label className="flex flex-col gap-2 text-sm font-medium md:col-span-2">
-                Select Course Track *
+                {isAm ? 'የስልጠና ዘርፍ ይምረጡ *' : 'Select Course Track *'}
                 <div className="relative">
                   <BookOpen className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <select
@@ -756,7 +824,7 @@ export function CourseRegistrationWizard({
             {/* Shift Selection */}
             <div>
               <label className="block text-sm font-medium mb-3">
-                Preferred Cohort Shift *
+                {isAm ? 'የስልጠና ፈረቃ ይምረጡ *' : 'Preferred Cohort Shift *'}
               </label>
               <div className="grid gap-3 sm:grid-cols-3">
                 {SHIFT_OPTIONS.map((shift) => {
@@ -773,12 +841,16 @@ export function CourseRegistrationWizard({
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-sm text-foreground">{shift.title}</span>
+                        <span className="font-semibold text-sm text-foreground">
+                          {isAm ? shift.titleAm : shift.title}
+                        </span>
                         {selected && <CheckCircle2 className="size-4 text-blue-600 dark:text-sky-400" />}
                       </div>
-                      <p className="mt-1.5 text-xs text-muted-foreground">{shift.time}</p>
+                      <p className="mt-1.5 text-xs text-muted-foreground">
+                        {isAm ? shift.timeAm : shift.time}
+                      </p>
                       <span className="mt-1 block text-[11px] font-medium text-blue-600 dark:text-sky-400">
-                        {shift.days}
+                        {isAm ? shift.daysAm : shift.days}
                       </span>
                     </button>
                   )
@@ -788,22 +860,30 @@ export function CourseRegistrationWizard({
 
             {/* Preferred Contact Method */}
             <div>
-              <label className="block text-sm font-medium mb-2">Preferred Contact Method</label>
+              <label className="block text-sm font-medium mb-2">
+                {isAm ? 'ተመራጭ የመገናኛ መንገድ' : 'Preferred Contact Method'}
+              </label>
               <div className="flex flex-wrap gap-2">
-                {['Phone Call', 'Telegram', 'WhatsApp'].map((method) => (
-                  <button
-                    key={method}
-                    type="button"
-                    onClick={() => setPreferredContact(method)}
-                    className={`rounded-xl px-4 py-2 text-xs font-semibold border transition ${
-                      preferredContact === method
-                        ? 'border-blue-600 bg-blue-500/15 text-blue-600 dark:text-sky-400'
-                        : 'border-border bg-background hover:bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {method}
-                  </button>
-                ))}
+                {['Phone Call', 'Telegram', 'WhatsApp'].map((method) => {
+                  const label =
+                    method === 'Phone Call'
+                      ? (isAm ? 'በስልክ ጥሪ' : 'Phone Call')
+                      : method
+                  return (
+                    <button
+                      key={method}
+                      type="button"
+                      onClick={() => setPreferredContact(method)}
+                      className={`rounded-xl px-4 py-2 text-xs font-semibold border transition ${
+                        preferredContact === method
+                          ? 'border-blue-600 bg-blue-500/15 text-blue-600 dark:text-sky-400'
+                          : 'border-border bg-background hover:bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -813,10 +893,13 @@ export function CourseRegistrationWizard({
         {currentStep === 2 && (
           <div className="space-y-6 animate-fade-in-up">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold">Content Sharing & Community Policy</h2>
+              <h2 className="text-xl md:text-2xl font-bold">
+                {isAm ? 'የስልጠና ደንቦችና የላብራቶሪ መመሪያዎች' : 'Content Sharing & Community Policy'}
+              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET) is dedicated to high-standard practical trade training. Please read and accept our
-                workshop safety and curriculum guidelines.
+                {isAm
+                  ? 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል ለከፍተኛ ደረጃ ተግባራዊ የሙያ ስልጠና ቁርጠኛ ነው። እባክዎ የወርክሾፕ ደህንነት እና የትምህርት መመሪያዎቻችንን ያንብቡ።'
+                  : 'Hello Technology Training Center is dedicated to high-standard practical trade training. Please read and accept our workshop safety and curriculum guidelines.'}
               </p>
             </div>
 
@@ -824,47 +907,48 @@ export function CourseRegistrationWizard({
               <div>
                 <h3 className="font-bold text-foreground flex items-center gap-2">
                   <ShieldCheck className="size-4 text-blue-600 dark:text-sky-400" />
-                  1. Proprietary Course Content & Technical Schematics
+                  {isAm ? '1. የኮርስ ማቴሪያሎችና የቴክኒክ ሰርኪዩት ንድፎች ጥበቃ' : '1. Proprietary Course Content & Technical Schematics'}
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground pl-6">
-                  All laboratory handouts, motherboard boardview files, micro-soldering schematics, and video
-                  recordings provided during your cohort are intellectual property of ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET). Reproduction,
-                  redistribution, or unauthorized resale without explicit written consent is strictly prohibited.
+                  {isAm
+                    ? 'በስልጠናው ወቅት የሚሰጡ ሁሉም የላብራቶሪ ጽሑፎች፣ የማዘርቦርድ ቦርድ ቪው፣ የማይክሮ-ሶልደሪንግ ንድፎችና ቪዲዮዎች የሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል የፈጠራ ሀብት ናቸው። ያለ ፈቃድ ማባዛት ወይም ለሌላ አሳልፎ መስጠት በጥብቅ የተከለከለ ነው።'
+                    : 'All laboratory handouts, motherboard boardview files, micro-soldering schematics, and video recordings provided during your cohort are intellectual property of Hello Technology Training Center. Reproduction, redistribution, or unauthorized resale without explicit written consent is strictly prohibited.'}
                 </p>
               </div>
 
               <div>
                 <h3 className="font-bold text-foreground flex items-center gap-2">
                   <Sparkles className="size-4 text-blue-600 dark:text-sky-400" />
-                  2. Laboratory Safety & Workstation Protocols
+                  {isAm ? '2. የላብራቶሪ ደህንነት እና የስራ ጠረጴዛ ደንቦች' : '2. Laboratory Safety & Workstation Protocols'}
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground pl-6">
-                  Trainees must adhere strictly to workshop ESD (Electrostatic Discharge) grounding, safe hot-air
-                  rework temperatures, thermal mat care, and chemical ventilation procedures. Protective eyewear
-                  must be worn during desoldering exercises.
+                  {isAm
+                    ? 'ሰልጣኞች የወርክሾፕ የኤሌክትሮስታቲክ (ESD) መከላከያ፣ የካውያ እና የሙቅ ንፋስ ማስተካከያ፣ እና የአየር ማናፈሻ ስርዓቶችን በጥብቅ መከተል አለባቸው። በካውያ ስራ ወቅት የመከላከያ መነጽር ማድረግ ግዴታ ነው።'
+                    : 'Trainees must adhere strictly to workshop ESD (Electrostatic Discharge) grounding, safe hot-air rework temperatures, thermal mat care, and chemical ventilation procedures. Protective eyewear must be worn during desoldering exercises.'}
                 </p>
               </div>
 
               <div>
                 <h3 className="font-bold text-foreground flex items-center gap-2">
                   <GraduationCap className="size-4 text-blue-600 dark:text-sky-400" />
-                  3. Community Respect & Peer Mentorship
+                  {isAm ? '3. የወንድማማችነት እና የሙያ ስነ-ምግባር' : '3. Community Respect & Peer Mentorship'}
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground pl-6">
-                  ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET) promotes collaborative peer problem-solving. All trainees are expected to treat
-                  instructors, lab assistants, and classmates with mutual respect, constructive communication, and
-                  professional trade etiquette.
+                  {isAm
+                    ? 'ሰልጣኞች አብረው በመተጋገዝ እንዲሰሩ እናበረታታለን። ሁሉም ሰልጣኞች ከመምህራን እና ከክፍል ጓደኞቻቸው ጋር በሙሉ አክብሮትና በሙያዊ ስነ-ምግባር የመግባባት ግዴታ አለባቸው።'
+                    : 'Hello Technology Training Center promotes collaborative peer problem-solving. All trainees are expected to treat instructors, lab assistants, and classmates with mutual respect, constructive communication, and professional trade etiquette.'}
                 </p>
               </div>
 
               <div>
                 <h3 className="font-bold text-foreground flex items-center gap-2">
                   <CheckCircle2 className="size-4 text-blue-600 dark:text-sky-400" />
-                  4. Technical Assessment & Certification Integrity
+                  {isAm ? '4. የተግባር ምዘና እና የእውቅና ማረጋገጫ ታማኝነት' : '4. Technical Assessment & Certification Integrity'}
                 </h3>
                 <p className="mt-1 text-xs text-muted-foreground pl-6">
-                  The ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET) Certificate of Technical Competence requires personal, verified completion of
-                  hands-on diagnostic milestones. Plagiarism or proxy project submission is not permitted.
+                  {isAm
+                    ? 'የሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል የሙያ ብቃት ሰርተፍኬት የሚሰጠው የተግባር ፈተናዎችንና የላብራቶሪ ብልሽት መለያ ደረጃዎችን በግል አጠናቆ ለተገኘ ሰልጣኝ ብቻ ነው።'
+                    : 'The Hello Technology Training Center Certificate of Technical Competence requires personal, verified completion of hands-on diagnostic milestones. Plagiarism or proxy project submission is not permitted.'}
                 </p>
               </div>
             </div>
@@ -878,7 +962,9 @@ export function CourseRegistrationWizard({
                 className="mt-1 size-5 rounded accent-blue-600 cursor-pointer shrink-0"
               />
               <span className="text-sm font-medium text-foreground">
-                I have read, understood, and agree to ሄሎ የቴክኒክና ሙያ ማሰልጠኛ (Hello TVET)&apos;s Content Sharing & Community Policy.
+                {isAm
+                  ? 'የሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል የስልጠና ደንቦችንና የላብራቶሪ መመሪያዎችን አንብቤ ተስማምቻለሁ።'
+                  : 'I have read, understood, and agree to Hello Technology Training Center\'s Content Sharing & Community Policy.'}
               </span>
             </label>
           </div>
@@ -888,27 +974,32 @@ export function CourseRegistrationWizard({
         {currentStep === 3 && (
           <div className="space-y-6 animate-fade-in-up">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold">Educational Background</h2>
+              <h2 className="text-xl md:text-2xl font-bold">
+                {isAm ? 'የትምህርት ደረጃ እና የስራ ልምድ' : 'Educational Background'}
+              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Share your background so our workshop instructors can customize hands-on mentoring to your
-                experience level.
+                {isAm
+                  ? 'የእኛ መምህራን ተግባራዊ ስልጠናውን ከእርስዎ ልምድ ጋር ለማስማማት እንዲችሉ የትምህርትና የስራ ልምድዎን ያጋሩን።'
+                  : 'Share your background so our workshop instructors can customize hands-on mentoring to your experience level.'}
               </p>
             </div>
 
             <div className="space-y-6">
               {/* Field 1: Highest Education Level */}
               <label className="flex flex-col gap-2 text-sm font-semibold">
-                Highest Education Level *
+                {isAm ? 'ከፍተኛ የትምህርት ደረጃዎ *' : 'Highest Education Level *'}
                 <div className="relative">
                   <select
                     value={highestEducation}
                     onChange={(e) => setHighestEducation(e.target.value)}
                     className="h-12 w-full appearance-none rounded-xl border border-input bg-background/90 px-4 pr-10 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
                   >
-                    <option value="">Select your education level</option>
+                    <option value="">
+                      {isAm ? 'የትምህርት ደረጃዎን ይምረጡ' : 'Select your education level'}
+                    </option>
                     {EDUCATION_LEVELS.map((level) => (
-                      <option key={level} value={level}>
-                        {level}
+                      <option key={level.id} value={level.id}>
+                        {isAm ? level.labelAm : level.labelEn}
                       </option>
                     ))}
                   </select>
@@ -918,17 +1009,19 @@ export function CourseRegistrationWizard({
 
               {/* Field 2: Years of Professional Experience */}
               <label className="flex flex-col gap-2 text-sm font-semibold">
-                Years of Professional Experience *
+                {isAm ? 'የስራ ልምድ (በኤሌክትሮኒክስ ወይም ጥገና) *' : 'Years of Professional Experience *'}
                 <div className="relative">
                   <select
                     value={experienceYears}
                     onChange={(e) => setExperienceYears(e.target.value)}
                     className="h-12 w-full appearance-none rounded-xl border border-input bg-background/90 px-4 pr-10 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
                   >
-                    <option value="">Select your experience</option>
+                    <option value="">
+                      {isAm ? 'የስራ ልምድዎን ይምረጡ' : 'Select your experience'}
+                    </option>
                     {EXPERIENCE_YEARS.map((exp) => (
-                      <option key={exp} value={exp}>
-                        {exp}
+                      <option key={exp.id} value={exp.id}>
+                        {isAm ? exp.labelAm : exp.labelEn}
                       </option>
                     ))}
                   </select>
@@ -943,17 +1036,20 @@ export function CourseRegistrationWizard({
         {currentStep === 4 && (
           <div className="space-y-8 animate-fade-in-up">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold">Payment Information</h2>
+              <h2 className="text-xl md:text-2xl font-bold">
+                {isAm ? 'የክፍያ አማራጭ እና መረጃ' : 'Payment Information'}
+              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Please Select a Payment Plan and Method. The final price will be calculated based on your selections
-                and any applicable discounts.
+                {isAm
+                  ? 'እባክዎ የተመቸዎትን የክፍያ ዕቅድና የመክፈያ መንገድ ይምረጡ። የመጨረሻው ዋጋ እንደ ምርጫዎ ይሰላል።'
+                  : 'Please Select a Payment Plan and Method. The final price will be calculated based on your selections and any applicable discounts.'}
               </p>
             </div>
 
             {/* Plan Cards Comparison */}
             <div>
               <label className="block text-sm font-semibold mb-3">
-                Select Your Payment Plan *
+                {isAm ? 'የክፍያ ዕቅድዎን ይምረጡ *' : 'Select Your Payment Plan *'}
               </label>
               <div className="grid gap-5 md:grid-cols-2">
                 {/* Plan 1: Full Access */}
@@ -967,47 +1063,47 @@ export function CourseRegistrationWizard({
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-bold text-base text-foreground">
-                      Pay once and unlock full access
+                      {isAm ? 'ሙሉ ክፍያ (10% ቅናሽ ያለው)' : 'Pay once and unlock full access'}
                     </h3>
                     <span className="rounded-full bg-blue-500/15 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:text-sky-400">
-                      10% Discount
+                      {isAm ? '10% ቅናሽ' : '10% Discount'}
                     </span>
                   </div>
 
                   <div className="mt-4 flex items-baseline gap-2.5">
                     <span className="text-sm line-through text-muted-foreground">
-                      {basePrice} Birr
+                      {basePrice} {isAm ? 'ብር' : 'Birr'}
                     </span>
                     <span className="text-3xl font-extrabold text-blue-600 dark:text-sky-400">
-                      {priceAfterPlan} Birr
+                      {priceAfterPlan} {isAm ? 'ብር' : 'Birr'}
                     </span>
                   </div>
 
                   <ul className="mt-5 space-y-2.5 text-xs">
                     <li className="flex items-center gap-2">
                       <Check className="size-4 text-emerald-500 shrink-0" />
-                      <span>Full 4-Month Course Access</span>
+                      <span>{isAm ? 'ሙሉ የ4 ወራት ተግባራዊ ስልጠና' : 'Full 4-Month Course Access'}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="size-4 text-emerald-500 shrink-0" />
-                      <span>Lifetime Class Record & Schematics Access</span>
+                      <span>{isAm ? 'ያልተገደበ የሰርኪዩት ንድፎችና የክፍል መዛግብት መዳረሻ' : 'Lifetime Class Record & Schematics Access'}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="size-4 text-emerald-500 shrink-0" />
-                      <span>Lifetime Learning Module Access</span>
+                      <span>{isAm ? 'የዲጂታል ቤተ-መጽሐፍት ሙሉ መመሪያዎች' : 'Lifetime Learning Module Access'}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="size-4 text-emerald-500 shrink-0" />
-                      <span>Lifetime Learning Community Access</span>
+                      <span>{isAm ? 'የቴክኒሻኖች ማህበረሰብ እና የቡድን ውይይት' : 'Lifetime Learning Community Access'}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="size-4 text-emerald-500 shrink-0" />
-                      <span>Private Access to Mentors</span>
+                      <span>{isAm ? 'ከአሰልጣኞች ጋር ቀጥተኛ ክትትል' : 'Private Access to Mentors'}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="size-4 text-emerald-500 shrink-0" />
                       <span className="font-semibold text-foreground">
-                        One-Time Payment, Full Access Guaranteed
+                        {isAm ? 'የአንድ ጊዜ ክፍያ፣ ሙሉ አገልግሎት' : 'One-Time Payment, Full Access Guaranteed'}
                       </span>
                     </li>
                   </ul>
@@ -1024,46 +1120,38 @@ export function CourseRegistrationWizard({
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-bold text-base text-foreground">
-                      Pay in two parts with limited features
+                      {isAm ? 'በሁለት ዙር የሚከፈል (የከፊል ክፍያ)' : 'Pay in two parts with limited features'}
                     </h3>
                     <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
-                      No Discount
+                      {isAm ? 'መደበኛ ዋጋ' : 'No Discount'}
                     </span>
                   </div>
 
                   <div className="mt-4 flex items-baseline gap-2">
                     <span className="text-3xl font-extrabold text-foreground">
-                      {basePrice} Birr
+                      {basePrice} {isAm ? 'ብር' : 'Birr'}
                     </span>
                     <span className="text-xs font-medium text-muted-foreground">
-                      (each 1500 Birr)
+                      {isAm ? '(በእያንዳንዱ ዙር 1500 ብር)' : '(each 1500 Birr)'}
                     </span>
                   </div>
 
                   <ul className="mt-5 space-y-2.5 text-xs">
                     <li className="flex items-center gap-2">
                       <Check className="size-4 text-emerald-500 shrink-0" />
-                      <span>2-Month Access Per Payment</span>
+                      <span>{isAm ? 'በየክፍያው የ2 ወራት መዳረሻ' : '2-Month Access Per Payment'}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="size-4 text-emerald-500 shrink-0" />
-                      <span>Private Access to Mentors</span>
+                      <span>{isAm ? 'ከአሰልጣኞች ጋር ቀጥተኛ ክትትል' : 'Private Access to Mentors'}</span>
                     </li>
                     <li className="flex items-center gap-2 text-muted-foreground">
                       <X className="size-4 text-rose-500 shrink-0" />
-                      <span>Classroom Access Only While Paid</span>
+                      <span>{isAm ? 'ክፍያ እስካልተጠናቀቀ የክፍል መዳረሻ ውስን ነው' : 'Classroom Access Only While Paid'}</span>
                     </li>
                     <li className="flex items-center gap-2 text-muted-foreground">
                       <X className="size-4 text-rose-500 shrink-0" />
-                      <span>Module Access Only While Paid</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-muted-foreground">
-                      <X className="size-4 text-rose-500 shrink-0" />
-                      <span>Community Access Only While Paid</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-muted-foreground">
-                      <X className="size-4 text-rose-500 shrink-0" />
-                      <span>Removed if Second Payment Not Made</span>
+                      <span>{isAm ? 'ሁለተኛው ክፍያ ሲጠናቀቅ ሙሉ መዳረሻ ይሰጣል' : 'Full access upon second installment'}</span>
                     </li>
                   </ul>
                 </div>
@@ -1072,7 +1160,9 @@ export function CourseRegistrationWizard({
 
             {/* Payment Method Dropdown & Account Box */}
             <div className="space-y-4">
-              <label className="block text-sm font-semibold">Payment Method *</label>
+              <label className="block text-sm font-semibold">
+                {isAm ? 'የመክፈያ መንገድ ይምረጡ *' : 'Payment Method *'}
+              </label>
               <div className="relative">
                 <select
                   value={paymentMethod}
@@ -1104,7 +1194,9 @@ export function CourseRegistrationWizard({
                     {/* Account Name */}
                     <div className="flex items-center justify-between rounded-xl border bg-card p-3">
                       <div>
-                        <span className="block text-muted-foreground font-medium">Account Name</span>
+                        <span className="block text-muted-foreground font-medium">
+                          {isAm ? 'የሂሳብ ስም' : 'Account Name'}
+                        </span>
                         <span className="font-semibold text-foreground">
                           {PAYMENT_METHODS[paymentMethod].accountName}
                         </span>
@@ -1118,7 +1210,9 @@ export function CourseRegistrationWizard({
                         title="Copy account name"
                       >
                         {copiedKey === 'accountName' ? (
-                          <span className="text-[11px] font-bold text-emerald-500">Copied!</span>
+                          <span className="text-[11px] font-bold text-emerald-500">
+                            {isAm ? 'ተቀድቷል!' : 'Copied!'}
+                          </span>
                         ) : (
                           <Copy className="size-4" />
                         )}
@@ -1129,7 +1223,7 @@ export function CourseRegistrationWizard({
                     <div className="flex items-center justify-between rounded-xl border bg-card p-3">
                       <div>
                         <span className="block text-muted-foreground font-medium">
-                          {PAYMENT_METHODS[paymentMethod].note || 'Account Number'}
+                          {PAYMENT_METHODS[paymentMethod].note || (isAm ? 'የሂሳብ ቁጥር' : 'Account Number')}
                         </span>
                         <span className="font-mono font-bold text-foreground tracking-wider text-sm">
                           {PAYMENT_METHODS[paymentMethod].accountNumber}
@@ -1144,7 +1238,9 @@ export function CourseRegistrationWizard({
                         title="Copy account number"
                       >
                         {copiedKey === 'accountNumber' ? (
-                          <span className="text-[11px] font-bold text-emerald-500">Copied!</span>
+                          <span className="text-[11px] font-bold text-emerald-500">
+                            {isAm ? 'ተቀድቷል!' : 'Copied!'}
+                          </span>
                         ) : (
                           <Copy className="size-4" />
                         )}
@@ -1157,17 +1253,19 @@ export function CourseRegistrationWizard({
 
             {/* Coupon Code Section */}
             <div>
-              <label className="block text-sm font-semibold mb-2">Coupon Code (optional)</label>
+              <label className="block text-sm font-semibold mb-2">
+                {isAm ? 'የቅናሽ ኩፖን ካለዎት ያስገቡ (አማራጭ)' : 'Coupon Code (optional)'}
+              </label>
               <form onSubmit={handleApplyCoupon} className="flex gap-2">
                 <input
                   type="text"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
-                  placeholder="Enter coupon code if you have one"
+                  placeholder={isAm ? 'የኩፖን ኮድ እዚህ ያስገቡ' : 'Enter coupon code if you have one'}
                   className="h-11 flex-1 rounded-xl border border-input bg-background/90 px-4 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 uppercase"
                 />
                 <Button type="submit" variant="outline" className="rounded-xl px-5">
-                  Apply
+                  {isAm ? 'ተግብር' : 'Apply'}
                 </Button>
               </form>
               {couponMessage && (
@@ -1187,9 +1285,13 @@ export function CourseRegistrationWizard({
         {currentStep === 5 && (
           <div className="space-y-6 animate-fade-in-up">
             <div>
-              <h2 className="text-xl md:text-2xl font-bold">Payment Confirmation</h2>
+              <h2 className="text-xl md:text-2xl font-bold">
+                {isAm ? 'የክፍያ ማረጋገጫና ደረሰኝ' : 'Payment Confirmation'}
+              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Provide proof of payment to finalize your registration and secure your cohort seat.
+                {isAm
+                  ? 'የከፈሉበትን የግብይት ቁጥር (Reference) በማስገባት ምዝገባዎን ያጠናቁ።'
+                  : 'Provide proof of payment to finalize your registration and secure your cohort seat.'}
               </p>
             </div>
 
@@ -1198,30 +1300,69 @@ export function CourseRegistrationWizard({
               <div className="flex gap-3">
                 <AlertCircle className="size-5 text-blue-600 dark:text-sky-400 shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-foreground">Payment Verification:</h4>
+                  <h4 className="font-bold text-foreground">
+                    {isAm ? 'የክፍያ ማረጋገጫ መመሪያ፡' : 'Payment Verification:'}
+                  </h4>
                   <p className="mt-1 text-xs text-muted-foreground leading-5">
-                    To complete your registration, please provide evidence of your payment. You can upload a
-                    screenshot of your receipt, or provide a payment link or transaction reference.
+                    {isAm
+                      ? 'ምዝገባዎን ለማጠናቀቅ የከፈሉበትን የግብይት ቁጥር ወይም የደረሰኝ ፎቶ እዚህ ያስገቡ።'
+                      : 'To complete your registration, please provide evidence of your payment. You can upload a screenshot of your receipt, or provide a payment link or transaction reference.'}
                   </p>
                 </div>
               </div>
             </div>
 
             {/* Transaction Reference Number */}
-            <label className="flex flex-col gap-2 text-sm font-semibold">
-              Transaction Reference Number
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold">
+                {isAm ? 'የግብይት መለያ ቁጥር (Transaction Reference) *' : 'Transaction Reference Number *'}
+              </label>
               <input
                 type="text"
                 value={transactionRef}
                 onChange={(e) => setTransactionRef(e.target.value)}
-                placeholder="e.g., FT2123456789 or Telebirr Trans ID"
+                placeholder={
+                  isAm
+                    ? 'ምሳሌ፦ CL... (Telebirr) ወይም FT... (CBE Birr)'
+                    : 'e.g., FT2123456789 or Telebirr Trans ID'
+                }
                 className="h-11 rounded-xl border border-input bg-background/90 px-4 text-sm outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
-            </label>
+
+              {/* Visual Helper Guide */}
+              <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-3.5 text-xs text-muted-foreground space-y-1.5">
+                <span className="font-bold text-foreground flex items-center gap-1.5">
+                  <HelpCircle className="size-3.5 text-blue-600 dark:text-sky-400" />
+                  {isAm
+                    ? 'የግብይት ቁጥር (Transaction Ref) የት ይገኛል?'
+                    : 'Where do I find my Transaction Reference?'}
+                </span>
+                <div className="grid gap-1.5 sm:grid-cols-2 text-[11px] leading-relaxed">
+                  <div className="p-2 rounded-xl bg-card border border-border/60">
+                    <strong className="text-emerald-600 dark:text-emerald-400 block mb-0.5">
+                      Telebirr:
+                    </strong>
+                    {isAm
+                      ? 'በቴሌብር የደረሰኝ SMS ውስጥ ወይም በ SuperApp የክፍያ ታሪክ ላይ የሚገኝ "CL..." ወይም ባለ 10 አሃዝ ቁጥር።'
+                      : 'Found in Telebirr confirmation SMS or SuperApp receipt history (starts with "CL..." or 10 alphanumeric digits).'}
+                  </div>
+                  <div className="p-2 rounded-xl bg-card border border-border/60">
+                    <strong className="text-purple-600 dark:text-purple-400 block mb-0.5">
+                      CBE Mobile / Birr:
+                    </strong>
+                    {isAm
+                      ? 'ከ 127 ወይም ከ CBE Mobile Banking በሚደርስዎ SMS ውስጥ የሚገኝ "FT..." ወይም የግብይት ቁጥር።'
+                      : 'Found in the CBE confirmation SMS starting with "FT..." (e.g. FT26...).'}
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Upload Payment Receipt */}
             <div>
-              <label className="block text-sm font-semibold mb-2">Upload Payment Receipt</label>
+              <label className="block text-sm font-semibold mb-2">
+                {isAm ? 'የደረሰኝ ፎቶ ወይም ፒዲኤፍ ይጫኑ (አማራጭ)' : 'Upload Payment Receipt'}
+              </label>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -1254,10 +1395,12 @@ export function CourseRegistrationWizard({
                     <UploadCloud className="size-6" />
                   </div>
                   <p className="mt-3 text-sm font-semibold text-foreground">
-                    {receiptUploading ? 'Uploading file...' : 'Drop file here or click to upload'}
+                    {receiptUploading
+                      ? (isAm ? 'ፋይሉ እየተጫነ ነው...' : 'Uploading file...')
+                      : (isAm ? 'የደረሰኝ ፎቶ እዚህ ይጣሉ ወይም ለመምረጥ ይጫኑ' : 'Drop file here or click to upload')}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    (Max size: 5MB, Formats: JPG, PNG, PDF)
+                    {isAm ? '(ከፍተኛ መጠን፡ 5MB፣ ፎርማቶች፡ JPG, PNG, PDF)' : '(Max size: 5MB, Formats: JPG, PNG, PDF)'}
                   </p>
                 </div>
               ) : (
@@ -1271,7 +1414,7 @@ export function CourseRegistrationWizard({
                         {receiptFileName || 'payment-receipt.jpg'}
                       </p>
                       <span className="text-xs text-emerald-500 font-semibold flex items-center gap-1">
-                        <Check className="size-3" /> Uploaded successfully
+                        <Check className="size-3" /> {isAm ? 'በተሳካ ሁኔታ ተጭኗል' : 'Uploaded successfully'}
                       </span>
                     </div>
                   </div>
@@ -1292,7 +1435,7 @@ export function CourseRegistrationWizard({
 
             {/* Payment Confirmation Link */}
             <label className="flex flex-col gap-2 text-sm font-semibold">
-              Payment Confirmation Link (optional)
+              {isAm ? 'የክፍያ ማረጋገጫ ሊንክ (አማራጭ)' : 'Payment Confirmation Link (optional)'}
               <input
                 type="url"
                 value={confirmationLink}
@@ -1322,7 +1465,7 @@ export function CourseRegistrationWizard({
               <span className="font-bold text-sm text-foreground">{selectedCourse}</span>
               <span className="text-xs text-muted-foreground">
                 {SHIFT_OPTIONS.find((s) => s.id === selectedShift)?.title} ·{' '}
-                {paymentPlan === 'full' ? 'Full Access' : 'Installment'}
+                {paymentPlan === 'full' ? (isAm ? 'ሙሉ ክፍያ' : 'Full Access') : (isAm ? 'የከፊል ክፍያ' : 'Installment')}
               </span>
             </div>
 
@@ -1330,19 +1473,21 @@ export function CourseRegistrationWizard({
               <div className="flex items-center gap-2">
                 {paymentPlan === 'full' && (
                   <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    10% Off
+                    {isAm ? '10% ቅናሽ' : '10% Off'}
                   </span>
                 )}
                 {couponApplied && (
                   <span className="text-xs font-bold text-blue-600 dark:text-sky-400">
-                    + Coupon
+                    + {isAm ? 'ኩፖን' : 'Coupon'}
                   </span>
                 )}
               </div>
               <span className="text-base font-extrabold text-blue-600 dark:text-sky-400">
-                {finalPrice} Birr{' '}
+                {finalPrice} {isAm ? 'ብር' : 'Birr'}{' '}
                 <span className="text-xs font-normal text-muted-foreground">
-                  {paymentPlan === 'full' ? '(10% off)' : '(Part 1)'}
+                  {paymentPlan === 'full'
+                    ? (isAm ? '(10% ቅናሽ ተደርጓል)' : '(10% off)')
+                    : (isAm ? '(ክፍል 1)' : '(Part 1)')}
                 </span>
               </span>
             </div>
@@ -1358,7 +1503,7 @@ export function CourseRegistrationWizard({
                 disabled={submitting}
                 className="rounded-xl px-5 font-bold uppercase tracking-wider text-xs"
               >
-                Previous
+                {isAm ? 'ወደኋላ' : 'Previous'}
               </Button>
             )}
 
@@ -1368,7 +1513,7 @@ export function CourseRegistrationWizard({
                 onClick={handleNextStep}
                 className="rounded-xl px-6 font-bold uppercase tracking-wider text-xs bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02]"
               >
-                Next Step <ArrowRight className="ml-1.5 size-4" />
+                {isAm ? 'ቀጣይ ደረጃ' : 'Next Step'} <ArrowRight className="ml-1.5 size-4" />
               </Button>
             ) : (
               <Button
@@ -1377,7 +1522,9 @@ export function CourseRegistrationWizard({
                 disabled={submitting || receiptUploading}
                 className="rounded-xl px-6 font-bold uppercase tracking-wider text-xs bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02]"
               >
-                {submitting ? 'Submitting...' : 'Submit Registration'}
+                {submitting
+                  ? (isAm ? 'በመላክ ላይ...' : 'Submitting...')
+                  : (isAm ? 'ምዝገባውን አጠናቅቅ' : 'Submit Registration')}
                 {!submitting && <CheckCircle2 className="ml-1.5 size-4" />}
               </Button>
             )}

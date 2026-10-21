@@ -67,18 +67,36 @@ export async function GET() {
       },
     })
 
-    // Get digital library resources that the student can study
+    // Get all published digital library resources that the student can study/purchase
     const libraryResources = await (prisma as any).libraryResource.findMany({
       where: { published: true },
-      orderBy: { sortOrder: 'asc' },
-      take: 8,
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
     })
+
+    // Get student's unlocked digital courses & manuals
+    let digitalPurchases: any[] = []
+    try {
+      if ((prisma as any).digitalPurchase) {
+        digitalPurchases = await (prisma as any).digitalPurchase.findMany({
+          where: { studentId: student.id },
+          orderBy: { createdAt: 'desc' },
+        })
+      } else {
+        digitalPurchases = (await (prisma as any).$queryRawUnsafe(
+          'SELECT * FROM DigitalPurchase WHERE studentId = ? ORDER BY createdAt DESC',
+          student.id
+        )) as any[]
+      }
+    } catch (e) {
+      console.error('Error fetching digital purchases:', e)
+    }
 
     return NextResponse.json({
       student,
       registrations,
       courses,
       libraryResources,
+      digitalPurchases,
     })
   } catch (error: any) {
     console.error('Error fetching student me:', error)

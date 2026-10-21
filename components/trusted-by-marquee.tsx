@@ -2,12 +2,16 @@
 
 import { PublicTrustedPartner } from '@/lib/content'
 import { Building2, ExternalLink, ShieldCheck, Sparkles } from 'lucide-react'
+import { useLanguage } from '@/components/language-provider'
 
 export function TrustedBySection({
   partners,
 }: {
   partners: PublicTrustedPartner[]
 }) {
+  const { language } = useLanguage()
+  const isAm = language === 'am'
+
   if (!partners || partners.length === 0) return null
 
   // Duplicate items for continuous seamless infinite marquee looping
@@ -21,14 +25,18 @@ export function TrustedBySection({
       <div className="container relative mx-auto max-w-7xl px-5 text-center lg:px-8 mb-10">
         <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-[#155DFC] dark:text-sky-400">
           <ShieldCheck className="size-3.5" />
-          <span>Institutional Trust & Partnerships</span>
+          <span>{isAm ? 'የተቋማት አመኔታ እና አጋርነት' : 'Institutional Trust & Partnerships'}</span>
         </div>
 
         <h3 className="mt-3 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          Trusted by Leading Hospitals, Industries & Universities
+          {isAm
+            ? 'በዋነኛ ሆስፒታሎች፣ ኢንዱስትሪዎች እና ዩኒቨርሲቲዎች የታመነ'
+            : 'Trusted by Leading Hospitals, Industries & Universities'}
         </h3>
         <p className="mt-2 text-xs sm:text-sm text-muted-foreground max-w-2xl mx-auto">
-          Technical teams from regional healthcare networks, higher education institutions, manufacturing plants, and telecom enterprises rely on Hello TVET for workforce practical competence.
+          {isAm
+            ? 'የክልል የጤና አውታሮች፣ የከፍተኛ ትምህርት ተቋማት፣ የማምረቻ ፋብሪካዎች እና የቴሌኮም ድርጅቶች የቴክኒክ ሰራተኞቻቸውን የተግባር ብቃት ለማሳደግ በሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል ይታመናሉ።'
+            : 'Technical teams from regional healthcare networks, higher education institutions, manufacturing plants, and telecom enterprises rely on Hello Technology Training Center for workforce practical competence.'}
         </p>
       </div>
 

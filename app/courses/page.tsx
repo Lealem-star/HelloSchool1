@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     canonical: '/courses',
   },
   openGraph: {
-    title: 'Certified Repair Courses & Practical Curriculum | Hello TVET',
+    title: 'Certified Repair Courses & Practical Curriculum | Hello Technology Training Center',
     description:
       'Explore hands-on technical courses in smartphone hardware, laptop component maintenance, circuit diagnostics, and television repair in Bahir Dar.',
     url: '/courses',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Certified Repair Courses & Practical Curriculum | Hello TVET',
+    title: 'Certified Repair Courses & Practical Curriculum | Hello Technology Training Center',
     description:
       'Explore hands-on technical courses in smartphone hardware, laptop component maintenance, circuit diagnostics, and television repair in Bahir Dar.',
   },

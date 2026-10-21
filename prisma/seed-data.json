@@ -647,39 +647,33 @@
   "trainingGallery": [
     {
       "id": "workshop-1",
-      "title": "Soldering Station Workshop",
-      "description": "Students practice precision soldering and component-level repairs using professional-grade equipment.",
-      "image": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=85"
+      "title": "የኤሌክትሮኒክስ ሰርኪውት ሶልደሪንግ እና የቦርድ ጥገና ስልጠና (Soldering Workstations & PCB Assembly)",
+      "description": "በሄሎ ቴክኖሎጂ ላብራቶሪ እያንዳንዱ ሰልጣኝ በራሱ የሙቀት መቆጣጠሪያ ሶልደር እና ሰሌዳ በመያዝ የኮምፖነንት መገጣጠም፣ ጃምፐር ማገናኘት እና የቦርድ ጥገናን ሲለማመዱ። Dedicated soldering stations where students master component assembly, SMD rework, and PCB soldering.",
+      "image": "/images/studentathellobench3.png"
     },
     {
       "id": "workshop-2",
-      "title": "Mobile Repair Workbench",
-      "description": "Specialized workstations equipped with microscopes and precision tools for smartphone repairs.",
-      "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1000&q=85"
+      "title": "የስማርትፎን ሃርድዌር እና ማይክሮ-ሶልደሪንግ ጥገና (Smartphone Micro-Soldering Workbench)",
+      "description": "የሞባይል ስልኮችን ቻርጅንግ ፖርት፣ ማዘርቦርድ እና የማይክሮ-ኤሌክትሮኒክስ ክፍሎችን በቅርበት የመመርመርና የመበየድ የተግባር ልምምድ። Real smartphone motherboard diagnostics, SMD charging ports, and precision micro-soldering bench practice.",
+      "image": "/images/studentathellobench4.png"
     },
     {
       "id": "workshop-3",
-      "title": "Electronics Laboratory",
-      "description": "Equipped with oscilloscopes, multimeters, and diagnostic equipment for advanced troubleshooting.",
-      "image": "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1000&q=85"
+      "title": "የፎቶኮፒ፣ ፕሪንተርና የቢሮ ማሽነሪዎች ጥገና (Photocopier & Printer Diagnostics)",
+      "description": "ተማሪዎችና አሰልጣኙ የፎቶኮፒና የፕሪንተር ማሽኖችን መካኒካል ክፍሎች፣ ሮለሮች፣ ስካነር እና የፓወር ቦርድ ብልሽቶችን በተግባር ሲፈቱ። Live teardown and diagnostic troubleshooting of laser printers, photocopiers, optical scanners, and power circuit boards.",
+      "image": "/images/studentathellobench2.png"
     },
     {
       "id": "workshop-4",
-      "title": "Laptop Repair Station",
-      "description": "Complete setup for laptop hardware diagnostics, upgrades, and component-level repairs.",
-      "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1000&q=85"
+      "title": "የህንፃዎች ኤሌክትሪክ መስመር ዝርጋታ እና የቁጥጥር ሰሌዳዎች (Electrical Installation & Panel Wiring)",
+      "description": "በተግባር ሰሌዳዎች ላይ የሰርኪውት ብሬከሮች፣ የኮንትሮል ስዊቾች እና የኢንዱስትሪ መስመሮች የዝርጋታና ፍተሻ ስልጠና። Practical wiring drills covering distribution panels, circuit breakers, conduit routing, and national COC panel simulations.",
+      "image": "/images/studentathellobench.png"
     },
     {
       "id": "workshop-5",
-      "title": "Testing & Diagnostics Area",
-      "description": "Validation and testing equipment to ensure repairs meet quality standards.",
-      "image": "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=1000&q=85"
-    },
-    {
-      "id": "workshop-6",
-      "title": "Parts & Components Library",
-      "description": "Organized inventory of replacement parts, components, and repair supplies used in training.",
-      "image": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=1000&q=85"
+      "title": "የዲሽ ተከላ፣ የሳተላይት ምልክት መፈለጊያ (LNB) እና ሪሲቨር ጥገና (Satellite Dish & RF Alignment)",
+      "description": "የሳተላይት ዲሽ አንቴናዎችን በትክክለኛ ዲግሪ ማስተካከል፣ የLNB ፍሪኩዌንሲ መለካት እና የዲጂታል ሪሲቨር ሶፍትዌርና ሃርድዌር ጥገና። Parabolic dish tracking, multi-satellite LNB calibration, spectrum signal alignment, and digital decoder servicing.",
+      "image": "/images/studentathellobench5.png"
     }
   ],
   "digitalLibraryResources": [

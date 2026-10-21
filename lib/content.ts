@@ -54,14 +54,18 @@ export type PublicGalleryItem = {
 export type PublicLibraryItem = {
   id: string
   title: string
+  subtitle?: string
   category: string
   description: string
   format: string
   level: string
   status: string
   price: string
+  priceETB?: number
   pages: string
   fileUrl?: string | null
+  instructor?: string
+  badgeText?: string
 }
 
 function toPublicCourse(course: {
@@ -131,17 +135,21 @@ export async function getPublishedLibrary(): Promise<PublicLibraryItem[]> {
     where: { published: true },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
   })
-  return items.map((item) => ({
+  return items.map((item: any) => ({
     id: item.id,
     title: item.title,
+    subtitle: item.subtitle ?? '',
     category: item.category,
     description: item.description ?? '',
-    format: item.format ?? '',
+    format: item.format ?? 'Technical Repair Manual',
     level: item.level ?? '',
     status: item.status,
-    price: item.price ?? '',
+    price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
+    priceETB: item.priceETB ?? 0,
     pages: item.pages ?? '',
     fileUrl: item.fileUrl ?? null,
+    instructor: item.instructor ?? '',
+    badgeText: item.badgeText ?? '',
   }))
 }
 

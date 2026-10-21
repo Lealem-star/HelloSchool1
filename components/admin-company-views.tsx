@@ -717,7 +717,7 @@ export function TrustedPartnersView({
             <ShieldCheck className="mx-auto size-8 text-slate-400 dark:text-slate-600" />
             <p className="mt-2 text-sm font-semibold text-slate-700 dark:text-slate-300">No partners added yet</p>
             <p className="text-xs text-slate-500">
-              Click &quot;Add Partner Logo&quot; to showcase organizations that trust Hello TVET.
+              Click &quot;Add Partner Logo&quot; to showcase organizations that trust Hello Technology Training Center.
             </p>
           </div>
         ) : (

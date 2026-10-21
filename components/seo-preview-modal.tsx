@@ -55,7 +55,7 @@ export function CourseSeoPreviewModal({
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://helloschool.edu.et'
   const courseUrl = `${siteUrl}/courses/${course.slug}`
   const ogImageUrl = `/api/og/course/${course.slug}`
-  const metaTitle = `${course.title} - Practical Workshop Training | Hello TVET`
+  const metaTitle = `${course.title} - Practical Workshop Training | Hello Technology Training Center`
   const metaDescription =
     course.description ||
     'Certified hands-on training in electronics repair, schematic diagnosis, and component maintenance in Bahir Dar, Ethiopia.'
@@ -168,7 +168,7 @@ export function CourseSeoPreviewModal({
                   </div>
                   <div className="leading-tight">
                     <p className="text-xs font-medium text-slate-800 dark:text-slate-200">
-                      Hello TVET · Technical and Vocational Training
+                      Hello Technology Training Center
                     </p>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-md">
                       {courseUrl}
@@ -240,7 +240,7 @@ export function CourseSeoPreviewModal({
                     helloschool.edu.et
                   </p>
                   <h4 className="mt-1 text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
-                    {course.title} | Hello TVET
+                    {course.title} | Hello Technology Training Center
                   </h4>
                   <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                     {metaDescription}
@@ -287,7 +287,7 @@ export function CourseSeoPreviewModal({
                     <span className="text-sky-500">@helloschool_et</span>
                   </div>
                   <h4 className="mt-1 text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
-                    {course.title} | Hello TVET
+                    {course.title} | Hello Technology Training Center
                   </h4>
                   <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                     {metaDescription}

@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     const randomSuffix = Math.floor(1000 + Math.random() * 9000)
     const registrationNumber = `HS-${yearCode}-${randomSuffix}`
 
-    // Generate unique official institutional email, e.g. lealem.meseret@hellotvet.edu.et
+    // Generate unique official institutional email, e.g. lealem.meseret@hellotechnology.edu.et
     const baseEmail = generateInstitutionalEmail(body.fullName)
     let institutionalEmail = baseEmail
     let counter = 1

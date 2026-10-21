@@ -48,6 +48,10 @@ import {
   Upload,
   FileText,
   Building2,
+  Video,
+  Play,
+  DollarSign,
+  Star,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/components/ui/dialog-modal'
@@ -82,6 +86,7 @@ import {
   BatchOverview,
   CandidateStudent,
 } from '@/components/admin-batch-view'
+import { AdminLibraryView } from '@/components/admin-library-view'
 
 /* ──────────────────────────────────────────────────────────────
    Shared types
@@ -136,14 +141,25 @@ type GalleryItem = {
 type LibraryItem = {
   id: string
   title: string
+  subtitle?: string | null
   category: string
   description: string | null
   format: string | null
   level: string | null
   status: string
   price: string | null
+  priceETB?: number | null
   pages: string | null
   fileUrl: string | null
+  thumbnailUrl?: string | null
+  instructor?: string | null
+  instructorRole?: string | null
+  rating?: number | null
+  reviewCount?: number | null
+  badgeText?: string | null
+  skillsLearned?: string | null
+  lessons?: any
+  chapters?: any
   published: boolean
   sortOrder: number
 }
@@ -1053,25 +1069,60 @@ export default function AdminPage() {
   /* ─── Library operations ─── */
   function openNewLibrary() {
     const defaultCat =
-      categories.find((c) => c.type === 'library')?.name || 'PDF Guides'
+      categories.find((c) => c.type === 'library')?.name || 'Technical Hardware'
     setEditingLibrary({
       id: '',
       title: '',
+      subtitle: '',
       category: defaultCat,
       description: null,
-      format: 'PDF Guide',
-      level: null,
-      status: 'Coming Soon',
-      price: null,
-      pages: null,
+      format: 'Technical Repair Manual',
+      level: 'All Skill Levels',
+      status: 'Available',
+      price: '450 ETB',
+      priceETB: 450,
+      pages: '85 Pages',
       fileUrl: null,
+      thumbnailUrl: null,
+      instructor: 'Hello Technology Faculty',
+      instructorRole: 'Technical Instructor',
+      rating: 4.9,
+      reviewCount: 95,
+      badgeText: 'Popular',
+      skillsLearned: 'Schematic tracing, Multimeter diagnosis, Board repair',
+      lessons: [],
+      chapters: [],
       published: true,
       sortOrder: library.length,
     })
     setLibraryOpen(true)
   }
   function openEditLibrary(l: LibraryItem) {
-    setEditingLibrary({ ...l })
+    const pETB = typeof l.priceETB === 'number'
+      ? l.priceETB
+      : parseInt(String(l.price || '').replace(/[^0-9]/g, ''), 10) || 0
+    let parsedLessons = []
+    try {
+      parsedLessons = typeof l.lessons === 'string' ? JSON.parse(l.lessons) : (l.lessons || [])
+    } catch {}
+    let parsedChapters = []
+    try {
+      parsedChapters = typeof l.chapters === 'string' ? JSON.parse(l.chapters) : (l.chapters || [])
+    } catch {}
+
+    setEditingLibrary({
+      ...l,
+      priceETB: pETB,
+      price: l.price || (pETB === 0 ? 'Free' : `${pETB} ETB`),
+      subtitle: l.subtitle || '',
+      instructor: l.instructor || 'Hello Technology Faculty',
+      instructorRole: l.instructorRole || 'Technical Instructor',
+      rating: l.rating ?? 4.9,
+      reviewCount: l.reviewCount ?? 100,
+      badgeText: l.badgeText || (pETB === 0 ? 'Free' : 'Popular'),
+      lessons: parsedLessons,
+      chapters: parsedChapters,
+    })
     setLibraryOpen(true)
   }
   async function saveLibrary(formData: LibraryItem) {
@@ -1446,10 +1497,10 @@ export default function AdminPage() {
         <div className="mb-8 flex flex-col items-center gap-3">
           <img
             src="/images/helloschool.jpg"
-            alt="Hello TVET"
+            alt="Hello Technology Training Center"
             className="h-16 w-auto rounded-2xl object-contain bg-white p-1.5 shadow-xl"
           />
-          <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Hello TVET · Admin Portal</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-blue-100">Hello Technology · Admin Portal</p>
         </div>
 
         <div className="w-full max-w-sm rounded-3xl border border-white/30 bg-white p-8 shadow-2xl text-slate-900">
@@ -1507,130 +1558,214 @@ export default function AdminPage() {
   }
 
   /* ──────────────────────────────────────────────────────────
-     DASHBOARD
+     DASHBOARD (Grouped Navigation)
      ────────────────────────────────────────────────────────── */
-  const navItems = [
+  type AdminTabId =
+    | 'registrations'
+    | 'batches'
+    | 'inquiries'
+    | 'company-inquiries'
+    | 'trusted-partners'
+    | 'courses'
+    | 'gallery'
+    | 'library'
+    | 'categories'
+    | 'instructors'
+    | 'facilities'
+    | 'projects'
+    | 'profile'
+
+  interface AdminNavItem {
+    id: AdminTabId
+    label: string
+    shortLabel: string
+    icon: React.ComponentType<{ className?: string }>
+    count: number
+    badge: string | number | null
+  }
+
+  interface AdminNavGroup {
+    id: string
+    title: string
+    icon: React.ComponentType<{ className?: string }>
+    items: AdminNavItem[]
+  }
+
+  const adminNavGroups: AdminNavGroup[] = [
     {
-      id: 'registrations' as const,
-      label: 'Registrations',
-      icon: FileText,
-      count: registrations.length,
-      badge: regOverview.pending > 0 ? regOverview.pending : null,
+      id: 'admissions',
+      title: 'Admissions & Cohorts',
+      icon: Users,
+      items: [
+        {
+          id: 'registrations',
+          label: 'Registrations',
+          shortLabel: 'Registrations',
+          icon: FileText,
+          count: registrations.length,
+          badge: regOverview.pending > 0 ? `${regOverview.pending} New` : null,
+        },
+        {
+          id: 'batches',
+          label: 'Batches (ዙሮች)',
+          shortLabel: 'Batches',
+          icon: Layers,
+          count: batches.length,
+          badge: batchOverview.openBatches > 0 ? `${batchOverview.openBatches} Open` : null,
+        },
+        {
+          id: 'inquiries',
+          label: 'Student Inquiries',
+          shortLabel: 'Inquiries',
+          icon: Mail,
+          count: inquiries.length,
+          badge: overview.new > 0 ? `${overview.new} New` : null,
+        },
+      ],
     },
     {
-      id: 'batches' as const,
-      label: 'Batches (ዙሮች)',
-      icon: Layers,
-      count: batches.length,
-      badge: batchOverview.openBatches > 0 ? `${batchOverview.openBatches} Open` : null,
+      id: 'content',
+      title: 'Content Management',
+      icon: BookOpen,
+      items: [
+        { id: 'courses', label: 'Courses & Tracks', shortLabel: 'Courses', icon: BookOpen, count: courses.length, badge: null },
+        { id: 'library', label: 'Digital Library & DRM', shortLabel: 'Library & DRM', icon: Folder, count: library.length, badge: null },
+        { id: 'gallery', label: 'Workshop Gallery', shortLabel: 'Gallery', icon: ImageIcon, count: gallery.length, badge: null },
+        { id: 'categories', label: 'Categories & Depts', shortLabel: 'Categories', icon: Tag, count: categories.length, badge: null },
+      ],
     },
-    { id: 'inquiries' as const, label: 'Student Inquiries', icon: Users, count: inquiries.length, badge: overview.new > 0 ? overview.new : null },
     {
-      id: 'company-inquiries' as const,
-      label: 'Company Training',
+      id: 'campus',
+      title: 'Campus & Academics',
+      icon: GraduationCap,
+      items: [
+        { id: 'instructors', label: 'Instructors', shortLabel: 'Instructors', icon: GraduationCap, count: instructors.length, badge: null },
+        { id: 'facilities', label: 'Workshop Facilities', shortLabel: 'Facilities', icon: Wrench, count: facilities.length, badge: null },
+        { id: 'projects', label: 'Student Projects', shortLabel: 'Projects', icon: Cpu, count: projects.length, badge: null },
+      ],
+    },
+    {
+      id: 'corporate',
+      title: 'Corporate & Partners',
       icon: Building2,
-      count: companyInquiries.length,
-      badge: companyOverview.new > 0 ? companyOverview.new : null,
+      items: [
+        {
+          id: 'company-inquiries',
+          label: 'Company Training',
+          shortLabel: 'Corporate Training',
+          icon: Building2,
+          count: companyInquiries.length,
+          badge: companyOverview.new > 0 ? `${companyOverview.new} New` : null,
+        },
+        { id: 'trusted-partners', label: 'Trusted Partners', shortLabel: 'Partners', icon: ShieldCheck, count: trustedPartners.length, badge: null },
+      ],
     },
     {
-      id: 'trusted-partners' as const,
-      label: 'Trusted Partners',
-      icon: ShieldCheck,
-      count: trustedPartners.length,
-      badge: null,
+      id: 'settings',
+      title: 'System & Account',
+      icon: UserCog,
+      items: [
+        { id: 'profile', label: 'My Admin Profile', shortLabel: 'Profile', icon: UserCog, count: 0, badge: null },
+      ],
     },
-    { id: 'courses' as const, label: 'Courses', icon: BookOpen, count: courses.length, badge: null },
-    { id: 'library' as const, label: 'Library', icon: Folder, count: library.length, badge: null },
-    { id: 'categories' as const, label: 'Categories', icon: Tag, count: categories.length, badge: null },
-    { id: 'gallery' as const, label: 'Gallery', icon: ImageIcon, count: gallery.length, badge: null },
-    { id: 'instructors' as const, label: 'Instructors', icon: GraduationCap, count: instructors.length, badge: null },
-    { id: 'facilities' as const, label: 'Facilities', icon: Wrench, count: facilities.length, badge: null },
-    { id: 'projects' as const, label: 'Projects', icon: Cpu, count: projects.length, badge: null },
-    { id: 'profile' as const, label: 'My Profile', icon: UserCog, count: 0, badge: null },
   ]
 
-  const currentSection = navItems.find((n) => n.id === tab)
+  const allNavItems = adminNavGroups.flatMap((g) => g.items)
+  const currentItem = allNavItems.find((n) => n.id === tab) || allNavItems[0]
+  const currentGroup = adminNavGroups.find((g) => g.items.some((i) => i.id === tab)) || adminNavGroups[0]
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100/90 dark:bg-card/90 backdrop-blur-xs">
 
       {/* ── SIDEBAR ── */}
-      <aside className="flex w-64 shrink-0 flex-col overflow-y-auto border-r border-blue-950/40 bg-[#0b1d47] text-white">
+      <aside className="flex w-64 xl:w-72 shrink-0 flex-col overflow-y-auto border-r border-blue-950/40 bg-[#0b1d47] text-white">
 
         {/* Logo area */}
         <div className="flex h-16 shrink-0 items-center gap-3 border-b border-blue-900/40 px-5">
           <img
             src="/images/helloschool.jpg"
-            alt="Hello TVET"
+            alt="Hello Technology"
             className="h-10 w-auto rounded-lg object-contain bg-white/95 p-0.5"
           />
           <div className="flex flex-col leading-none">
-            <span className="text-sm font-bold text-white">Hello TVET</span>
-            <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-blue-200">Admin</span>
+            <span className="text-sm font-bold text-white">Hello Technology</span>
+            <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-sky-400">Admin Control</span>
           </div>
         </div>
 
-        {/* Nav section */}
-        <nav className="flex-1 px-3 py-5">
-          <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-blue-300/70">
-            Content
-          </p>
-          <ul className="flex flex-col gap-0.5">
-            {navItems.map((item) => {
-              const active = tab === item.id
-              return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => setTab(item.id)}
-                    className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-                      active
-                        ? 'bg-[#155DFC] text-white font-bold shadow-md shadow-blue-500/25'
-                        : 'text-blue-100/80 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <item.icon className={`size-4 shrink-0 ${active ? 'text-white' : 'text-blue-200 group-hover:text-white'}`} />
-                    <span className="flex-1 text-left">{item.label}</span>
-                    {item.badge != null ? (
-                      <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#155DFC]">
-                        {item.badge}
-                      </span>
-                    ) : item.count > 0 ? (
-                      <span className={`text-xs font-semibold ${active ? 'text-white/90' : 'text-blue-200/90'}`}>
-                        {item.count}
-                      </span>
-                    ) : null}
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
+        {/* Nav section grouped */}
+        <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto">
+          {adminNavGroups.map((group) => {
+            const isGroupActive = group.items.some((i) => i.id === tab)
+            return (
+              <div key={group.id} className="space-y-1">
+                <div className="flex items-center gap-1.5 px-2.5 py-1">
+                  <group.icon className={`size-3.5 ${isGroupActive ? 'text-sky-400' : 'text-blue-300/50'}`} />
+                  <p className={`text-[10px] font-bold uppercase tracking-wider ${isGroupActive ? 'text-sky-300' : 'text-blue-300/60'}`}>
+                    {group.title}
+                  </p>
+                </div>
+                <ul className="flex flex-col gap-0.5">
+                  {group.items.map((item) => {
+                    const active = tab === item.id
+                    return (
+                      <li key={item.id}>
+                        <button
+                          onClick={() => setTab(item.id)}
+                          className={`group flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold transition-all cursor-pointer ${
+                            active
+                              ? 'bg-[#155DFC] text-white font-bold shadow-md shadow-blue-500/25'
+                              : 'text-blue-100/75 hover:bg-white/10 hover:text-white'
+                          }`}
+                        >
+                          <item.icon className={`size-4 shrink-0 ${active ? 'text-white' : 'text-blue-200/70 group-hover:text-white'}`} />
+                          <span className="flex-1 text-left truncate">{item.label}</span>
+                          {item.badge != null ? (
+                            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#155DFC] px-1.5 shadow-xs">
+                              {item.badge}
+                            </span>
+                          ) : item.count > 0 ? (
+                            <span className={`text-[11px] font-mono font-medium ${active ? 'text-white/90' : 'text-blue-200/70'}`}>
+                              {item.count}
+                            </span>
+                          ) : null}
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )
+          })}
 
           {/* Quick stats divider */}
-          <div className="mt-6 border-t border-blue-900/40 pt-5">
+          <div className="border-t border-blue-900/40 pt-4 px-1">
             <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-blue-300/70">
-              Overview
+              Live Pipeline Overview
             </p>
-            <div className="flex flex-col gap-2 px-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-blue-200/70">Student Inquiries</span>
+            <div className="flex flex-col gap-1.5 rounded-xl bg-white/5 p-2.5 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-blue-200/70">Total Inquiries</span>
                 <span className="font-semibold text-white">{overview.total}</span>
               </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-blue-200/70">Company Inquiries</span>
+              <div className="flex items-center justify-between">
+                <span className="text-blue-200/70">Pending Admissions</span>
+                <span className="font-semibold text-amber-300">{regOverview.pending}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-blue-200/70">Active Batches</span>
+                <span className="font-semibold text-emerald-300">{batchOverview.openBatches}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-blue-200/70">Company Training</span>
                 <span className="font-semibold text-sky-300">{companyOverview.total}</span>
               </div>
-              {companyOverview.new > 0 && (
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-blue-200/70">New Company Inquiries</span>
-                  <span className="font-semibold text-amber-300">{companyOverview.new}</span>
-                </div>
-              )}
             </div>
           </div>
         </nav>
 
         {/* Bottom user strip */}
-        <div className="shrink-0 border-t border-blue-900/40 p-3">
+        <div className="shrink-0 border-t border-blue-900/40 p-3 bg-[#081533]">
           <div className="flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5">
             {user.avatarUrl ? (
               <img
@@ -1659,7 +1794,7 @@ export default function AdminPage() {
             <ThemeToggle size="sm" className="border-blue-900/50 bg-white/10 text-white hover:bg-white/20 hover:border-white/30" />
             <button
               onClick={handleLogout}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-blue-200 transition hover:bg-white/10 hover:text-red-300"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-blue-200 transition hover:bg-white/10 hover:text-red-300 cursor-pointer"
             >
               <LogOut className="size-3" /> Logout
             </button>
@@ -1670,27 +1805,77 @@ export default function AdminPage() {
       {/* ── MAIN CONTENT ── */}
       <div className="flex flex-1 flex-col overflow-hidden">
 
-        {/* Top bar */}
-        <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-6 dark:border-slate-800/80 dark:bg-slate-900/90">
-          <div className="flex items-center gap-2">
-            {currentSection && <currentSection.icon className="size-4 text-slate-400" />}
-            <h1 className="text-base font-semibold text-slate-800 dark:text-white">
-              {currentSection?.label ?? 'Dashboard'}
-            </h1>
+        {/* Top bar with Group Header & Segmented Sub-Pills */}
+        <header className="flex flex-col border-b border-slate-200/80 bg-white/95 backdrop-blur-md px-6 dark:border-slate-800/80 dark:bg-slate-900/95 shrink-0 z-10">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-blue-50 text-[#155DFC] dark:bg-blue-950/50 dark:text-sky-400">
+                <currentGroup.icon className="size-4" />
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                    {currentGroup.title}
+                  </span>
+                  <span className="text-muted-foreground/50">•</span>
+                  <span className="text-[11px] font-semibold text-blue-600 dark:text-sky-400">
+                    {currentItem.label}
+                  </span>
+                </div>
+                <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                  {currentItem.label}
+                </h1>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <ThemeToggle size="sm" />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshCurrent}
+                disabled={loading}
+                className="rounded-xl border-slate-200 text-slate-600 hover:text-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:text-white gap-1.5 font-medium cursor-pointer"
+              >
+                <RefreshCw className={`size-3.5 ${loading ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle size="sm" />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refreshCurrent}
-              disabled={loading}
-              className="rounded-lg border-slate-200 text-slate-600 hover:text-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:text-white"
-            >
-              <RefreshCw className={`mr-1.5 size-3.5 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-          </div>
+
+          {/* Segmented Sub-Nav Pills for Current Group */}
+          {currentGroup.items.length > 1 && (
+            <div className="flex items-center gap-1.5 pb-3 overflow-x-auto no-scrollbar border-t border-slate-100 dark:border-slate-800/60 pt-2.5">
+              {currentGroup.items.map((subItem) => {
+                const isSubActive = tab === subItem.id
+                return (
+                  <button
+                    key={subItem.id}
+                    onClick={() => setTab(subItem.id)}
+                    className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all shrink-0 cursor-pointer ${
+                      isSubActive
+                        ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25'
+                        : 'bg-slate-100 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <subItem.icon className="size-3.5 shrink-0" />
+                    <span>{subItem.shortLabel}</span>
+                    {subItem.badge ? (
+                      <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                        isSubActive ? 'bg-white text-blue-700' : 'bg-blue-500/15 text-blue-600 dark:text-sky-300'
+                      }`}>
+                        {subItem.badge}
+                      </span>
+                    ) : subItem.count > 0 ? (
+                      <span className={`text-[10px] font-medium opacity-80`}>
+                        ({subItem.count})
+                      </span>
+                    ) : null}
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </header>
 
         {/* Scrollable content */}
@@ -1891,48 +2076,13 @@ export default function AdminPage() {
 
           {/* ─── TAB: LIBRARY ─── */}
           {tab === 'library' && (
-            <ListView<LibraryItem>
-              title="Digital Library"
-              subtitle="Manage guides, manuals, video courses and learning materials"
-              loading={loading}
-              search={search}
-              setSearch={setSearch}
-              items={library}
-              searchableFields={['title', 'category', 'description', 'format', 'level']}
-              onAdd={openNewLibrary}
-              onEdit={openEditLibrary}
-              onDelete={deleteLibrary}
-              savingId={savingId}
-              columns={[
-                { key: 'title', label: 'Title', className: 'font-semibold' },
-                { key: 'category', label: 'Category' },
-                { key: 'format', label: 'Format' },
-                { key: 'level', label: 'Level' },
-                {
-                  key: 'status',
-                  label: 'Status',
-                  render: (v) => (
-                    <span
-                      className={`rounded-lg border px-2 py-0.5 text-xs font-semibold ${
-                        v === 'Available'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : v === 'Coming Soon'
-                          ? 'bg-amber-50 text-amber-700 border-amber-200'
-                          : 'bg-slate-100 text-slate-600 border-slate-200'
-                      }`}
-                    >
-                      {String(v)}
-                    </span>
-                  ),
-                },
-                { key: 'price', label: 'Price' },
-                {
-                  key: 'sortOrder',
-                  label: 'Order',
-                  className: 'text-center text-muted-foreground',
-                },
-              ]}
-              addLabel="Add library resource"
+            <AdminLibraryView
+              items={library as any}
+              categories={categories.filter((c) => c.type === 'library').map((c) => c.name)}
+              onRefresh={loadLibrary}
+              onEdit={(item) => openEditLibrary(item as any)}
+              onCreate={openNewLibrary}
+              onDelete={(id) => deleteLibrary(id)}
             />
           )}
 
@@ -2761,7 +2911,7 @@ function InquiryDetailModal({
                 <span>{inquiry.email}</span>
               </div>
               <a
-                href={`mailto:${inquiry.email}?subject=Hello TVET Enrollment Inquiry - ${inquiry.course || 'Technical Training'}`}
+                href={`mailto:${inquiry.email}?subject=Hello Technology Enrollment Inquiry - ${inquiry.course || 'Technical Training'}`}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
               >
                 <Mail className="size-3 text-primary" /> Send Email
@@ -4494,14 +4644,19 @@ function LibraryEditor({
   categoryOptions?: string[]
 }) {
   const [form, setForm] = useState<LibraryItem>(initial)
+  const [uploadingPdf, setUploadingPdf] = useState(false)
+  const [uploadingVideoIdx, setUploadingVideoIdx] = useState<number | null>(null)
   const isEdit = !!initial.id
 
   const defaultLibCats = [
-    'PDF Guides',
-    'Video Courses',
-    'Schematics',
+    'Smartphone Hardware',
+    'Laptop Hardware',
+    'Electronics Diagnostics',
+    'Software & Firmware',
     'Tools & Equipment',
-    'Reference Books',
+    'Technical Hardware',
+    'PDF Guides',
+    'Schematics',
   ]
   const availableCats = Array.from(
     new Set([
@@ -4511,159 +4666,609 @@ function LibraryEditor({
   )
 
   useEffect(() => {
-    setForm(initial)
+    let parsedLessons = []
+    try {
+      parsedLessons = typeof initial.lessons === 'string' ? JSON.parse(initial.lessons) : (initial.lessons || [])
+    } catch {}
+    let parsedChapters = []
+    try {
+      parsedChapters = typeof initial.chapters === 'string' ? JSON.parse(initial.chapters) : (initial.chapters || [])
+    } catch {}
+
+    const pETB = typeof initial.priceETB === 'number'
+      ? initial.priceETB
+      : parseInt(String(initial.price || '').replace(/[^0-9]/g, ''), 10) || 0
+
+    setForm({
+      ...initial,
+      priceETB: pETB,
+      price: initial.price || (pETB === 0 ? 'Free' : `${pETB} ETB`),
+      subtitle: initial.subtitle || '',
+      instructor: initial.instructor || 'Hello Technology Faculty',
+      instructorRole: initial.instructorRole || 'Technical Instructor',
+      rating: initial.rating ?? 4.9,
+      reviewCount: initial.reviewCount ?? 100,
+      badgeText: initial.badgeText || (pETB === 0 ? 'Free Gift' : 'Popular'),
+      skillsLearned: initial.skillsLearned || '',
+      lessons: parsedLessons,
+      chapters: parsedChapters,
+    })
   }, [initial, open])
 
   function update<K extends keyof LibraryItem>(k: K, v: LibraryItem[K]) {
-    setForm((p) => ({ ...p, [k]: v }))
+    setForm((p) => {
+      const next = { ...p, [k]: v }
+      if (k === 'priceETB') {
+        const val = Number(v) || 0
+        next.price = val === 0 ? 'Free' : `${val} ETB`
+      }
+      return next
+    })
+  }
+
+  // Lesson helpers for Video courses
+  function addLesson() {
+    const currentLessons = Array.isArray(form.lessons) ? [...form.lessons] : []
+    const newLesson = {
+      id: `les-${Date.now()}`,
+      title: `Lesson ${currentLessons.length + 1}: Diagnostic Procedure & Bench Testing`,
+      duration: '30 min',
+      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      summary: 'Practical hands-on multimeter analysis and workbench demonstration.',
+      labExercise: 'Execute diode mode voltage drop measurement on battery connector.',
+      keyTakeaways: ['Power sequencing', 'Multimeter readings'],
+    }
+    update('lessons', [...currentLessons, newLesson])
+  }
+
+  function updateLesson(index: number, field: string, val: any) {
+    const currentLessons = Array.isArray(form.lessons) ? [...form.lessons] : []
+    if (!currentLessons[index]) return
+    currentLessons[index] = { ...currentLessons[index], [field]: val }
+    update('lessons', currentLessons)
+  }
+
+  function removeLesson(index: number) {
+    const currentLessons = Array.isArray(form.lessons) ? [...form.lessons] : []
+    currentLessons.splice(index, 1)
+    update('lessons', currentLessons)
+  }
+
+  // Chapter helpers for Manuals & Guides
+  function addChapter() {
+    const currentChapters = Array.isArray(form.chapters) ? [...form.chapters] : []
+    const newChapter = {
+      id: `ch-${Date.now()}`,
+      title: `Chapter ${currentChapters.length + 1}: Power Sequencing & Troubleshooting`,
+      pageRange: `pp. ${currentChapters.length * 20 + 1}-${currentChapters.length * 20 + 20}`,
+      summary: 'Schematic tracing, test point locations, and typical short-circuit symptoms.',
+    }
+    update('chapters', [...currentChapters, newChapter])
+  }
+
+  function updateChapter(index: number, field: string, val: any) {
+    const currentChapters = Array.isArray(form.chapters) ? [...form.chapters] : []
+    if (!currentChapters[index]) return
+    currentChapters[index] = { ...currentChapters[index], [field]: val }
+    update('chapters', currentChapters)
+  }
+
+  function removeChapter(index: number) {
+    const currentChapters = Array.isArray(form.chapters) ? [...form.chapters] : []
+    currentChapters.splice(index, 1)
+    update('chapters', currentChapters)
   }
 
   function submit() {
     if (!form.title.trim() || !form.category.trim()) return
-    onSave(form)
+    const pETB = typeof form.priceETB === 'number' ? form.priceETB : 0
+    onSave({
+      ...form,
+      priceETB: pETB,
+      price: form.price?.trim() || (pETB === 0 ? 'Free' : `${pETB} ETB`),
+    })
   }
+
+  const isVideoFormat =
+    (form.format && form.format.toLowerCase().includes('video')) ||
+    (form.category && form.category.toLowerCase().includes('video'))
+
+  const lessonsList: any[] = Array.isArray(form.lessons) ? form.lessons : []
+  const chaptersList: any[] = Array.isArray(form.chapters) ? form.chapters : []
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={isEdit ? 'Edit Library Resource' : 'Add Library Resource'}
+      title={isEdit ? 'Edit Digital Library Resource' : 'Add Digital Library Resource'}
+      width="max-w-4xl"
     >
-      <div className="space-y-5">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Title *">
+      <div className="space-y-6">
+        {/* Basic Resource Info */}
+        <div className="rounded-2xl border bg-muted/20 p-4 space-y-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
+            1. Resource Overview &amp; Categorization
+          </h4>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Title *">
+              <input
+                className={inputCls}
+                value={form.title}
+                onChange={(e) => update('title', e.target.value)}
+                placeholder="e.g. Complete Mobile Phone Hardware Diagnostic Manual"
+              />
+            </Field>
+            <Field label="Category *">
+              <select
+                className={inputCls}
+                value={form.category}
+                onChange={(e) => update('category', e.target.value)}
+              >
+                {availableCats.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          <Field label="Subtitle / Tagline">
             <input
               className={inputCls}
-              value={form.title}
-              onChange={(e) => update('title', e.target.value)}
-              placeholder="Mobile Repair Complete Handbook"
+              value={form.subtitle || ''}
+              onChange={(e) => update('subtitle', e.target.value || null)}
+              placeholder="e.g. Step-by-step schematics, multimeter board diagnosis, power IC & baseband repair"
             />
           </Field>
-          <Field label="Category *">
-            <select
-              className={inputCls}
-              value={form.category}
-              onChange={(e) => update('category', e.target.value)}
-            >
-              {availableCats.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-          </Field>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label="Format">
+              <select
+                className={inputCls}
+                value={form.format || 'Technical Repair Manual'}
+                onChange={(e) => update('format', e.target.value || null)}
+              >
+                <option>Technical Repair Manual</option>
+                <option>Video Masterclass</option>
+                <option>Quick Reference Guide</option>
+                <option>Schematic & Circuit Handbook</option>
+                <option>Book</option>
+                <option>PDF Guide</option>
+              </select>
+            </Field>
+            <Field label="Level">
+              <select
+                className={inputCls}
+                value={form.level || 'All Skill Levels'}
+                onChange={(e) => update('level', e.target.value || null)}
+              >
+                <option>All Skill Levels</option>
+                <option>Beginner</option>
+                <option>Intermediate</option>
+                <option>Intermediate to Advanced</option>
+                <option>Advanced</option>
+              </select>
+            </Field>
+            <Field label="Pages / Video Duration">
+              <input
+                className={inputCls}
+                value={form.pages || ''}
+                onChange={(e) => update('pages', e.target.value || null)}
+                placeholder="e.g. 18 Lessons (14 Hours) or 128 Pages"
+              />
+            </Field>
+          </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Format">
-            <select
-              className={inputCls}
-              value={form.format || ''}
-              onChange={(e) => update('format', e.target.value || null)}
-            >
-              <option value="">Select...</option>
-              <option>PDF Guide</option>
-              <option>Video Course</option>
-              <option>Schematic Set</option>
-              <option>Book</option>
-              <option>Handouts</option>
-            </select>
-          </Field>
-          <Field label="Level">
-            <select
-              className={inputCls}
-              value={form.level || ''}
-              onChange={(e) => update('level', e.target.value || null)}
-            >
-              <option value="">Select...</option>
-              <option>Beginner</option>
-              <option>Intermediate</option>
-              <option>Advanced</option>
-              <option>All Levels</option>
-            </select>
-          </Field>
-          <Field label="Pages / Length">
-            <input
-              className={inputCls}
-              value={form.pages || ''}
-              onChange={(e) => update('pages', e.target.value || null)}
-              placeholder="80 pages or 5 hrs"
-            />
-          </Field>
+
+        {/* Pricing, Commercial & Access */}
+        <div className="rounded-2xl border bg-muted/20 p-4 space-y-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
+            2. Live Pricing &amp; Access Controls
+          </h4>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label="Price in Birr (ETB) *">
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  step="50"
+                  className={inputCls}
+                  value={form.priceETB ?? 0}
+                  onChange={(e) => update('priceETB', Number(e.target.value) || 0)}
+                  placeholder="e.g. 850 (0 for Free)"
+                />
+                <span className="absolute right-3 top-3 text-xs font-bold text-muted-foreground">
+                  ETB
+                </span>
+              </div>
+            </Field>
+
+            <Field label="Display Price Label">
+              <input
+                className={inputCls}
+                value={form.price || ''}
+                onChange={(e) => update('price', e.target.value || null)}
+                placeholder="e.g. 850 ETB or Free"
+              />
+            </Field>
+
+            <Field label="Access Status">
+              <select
+                className={inputCls}
+                value={form.status}
+                onChange={(e) => update('status', e.target.value)}
+              >
+                {LIBRARY_STATUS.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label="Badge Text">
+              <input
+                className={inputCls}
+                value={form.badgeText || ''}
+                onChange={(e) => update('badgeText', e.target.value || null)}
+                placeholder="e.g. Bestseller, Masterclass, Free Gift"
+              />
+            </Field>
+            <Field label="Rating (1.0 - 5.0)">
+              <input
+                type="number"
+                step="0.1"
+                min="1"
+                max="5"
+                className={inputCls}
+                value={form.rating ?? 4.9}
+                onChange={(e) => update('rating', parseFloat(e.target.value) || 4.9)}
+              />
+            </Field>
+            <Field label="Reviews Count">
+              <input
+                type="number"
+                min="0"
+                className={inputCls}
+                value={form.reviewCount ?? 100}
+                onChange={(e) => update('reviewCount', parseInt(e.target.value, 10) || 0)}
+              />
+            </Field>
+          </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Access Status">
-            <select
-              className={inputCls}
-              value={form.status}
-              onChange={(e) => update('status', e.target.value)}
-            >
-              {LIBRARY_STATUS.map((s) => (
-                <option key={s}>{s}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Price">
-            <input
-              className={inputCls}
-              value={form.price || ''}
-              onChange={(e) => update('price', e.target.value || null)}
-              placeholder="Free or ETB 450"
+
+        {/* Instructor & Accreditation */}
+        <div className="rounded-2xl border bg-muted/20 p-4 space-y-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
+            3. Author &amp; Instructor Faculty
+          </h4>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Instructor / Author Name">
+              <input
+                className={inputCls}
+                value={form.instructor || ''}
+                onChange={(e) => update('instructor', e.target.value || null)}
+                placeholder="e.g. Eng. Dawit Tadesse"
+              />
+            </Field>
+            <Field label="Instructor Role / Title">
+              <input
+                className={inputCls}
+                value={form.instructorRole || ''}
+                onChange={(e) => update('instructorRole', e.target.value || null)}
+                placeholder="e.g. Senior Hardware & BGA Diagnostic Specialist"
+              />
+            </Field>
+          </div>
+        </div>
+
+        {/* Description & Technical Documentation Details */}
+        <div className="space-y-4">
+          <Field label="Description">
+            <textarea
+              rows={3}
+              className={textareaCls}
+              value={form.description || ''}
+              onChange={(e) => update('description', e.target.value || null)}
+              placeholder="Describe what students will learn, diagnostic skills acquired, and equipment covered..."
             />
           </Field>
-          <Field label="Sort Order">
+
+          <Field label="Skills Learned (comma-separated)">
+            <input
+              className={inputCls}
+              value={form.skillsLearned || ''}
+              onChange={(e) => update('skillsLearned', e.target.value || null)}
+              placeholder="e.g. Board Schematics, Multimeter Diagnostics, Short Circuit Hunting, BGA Soldering"
+            />
+          </Field>
+
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-foreground">
+                DRM Document / PDF Manual URL
+              </label>
+              <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline">
+                <Upload className="size-3.5" /> Upload PDF Document
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0]
+                    if (!f) return
+                    const fd = new FormData()
+                    fd.append('file', f)
+                    fd.append('folder', 'manuals')
+                    try {
+                      setUploadingPdf(true)
+                      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+                      const d = await res.json()
+                      if (d.url) {
+                        update('fileUrl', d.url)
+                      } else {
+                        alert(d.error || 'Failed to upload PDF')
+                      }
+                    } catch (err: any) {
+                      alert(err.message || 'Error uploading file')
+                    } finally {
+                      setUploadingPdf(false)
+                    }
+                  }}
+                />
+              </label>
+            </div>
+            <div className="flex gap-2">
+              <input
+                className={`${inputCls} flex-1`}
+                value={form.fileUrl || ''}
+                onChange={(e) => update('fileUrl', e.target.value || null)}
+                placeholder="/uploads/manuals/... or https://..."
+              />
+              {uploadingPdf && (
+                <div className="flex items-center gap-1.5 text-xs text-blue-600 px-3 py-2 bg-blue-500/10 rounded-xl">
+                  <Loader2 className="size-4 animate-spin" /> Uploading PDF...
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Interactive Curriculum Builder */}
+        <div className="rounded-2xl border bg-card p-5 space-y-4 shadow-sm">
+          <div className="flex items-center justify-between border-b pb-3">
+            <div>
+              <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                {isVideoFormat ? <Video className="size-4 text-blue-600" /> : <BookOpen className="size-4 text-blue-600" />}
+                {isVideoFormat ? 'Video Lessons Curriculum' : 'Manual Chapters & Diagnostic Sections'}
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                {isVideoFormat
+                  ? 'Define the structured lessons students watch inside the secure DRM player.'
+                  : 'Define the reading chapters and diagnostic tables students study inside the platform reader.'}
+              </p>
+            </div>
+            {isVideoFormat ? (
+              <Button size="sm" type="button" onClick={addLesson} className="gap-1.5 rounded-xl text-xs">
+                <Plus className="size-3.5" /> Add Lesson
+              </Button>
+            ) : (
+              <Button size="sm" type="button" onClick={addChapter} className="gap-1.5 rounded-xl text-xs">
+                <Plus className="size-3.5" /> Add Chapter
+              </Button>
+            )}
+          </div>
+
+          {/* Video Lessons list */}
+          {isVideoFormat && (
+            <div className="space-y-3">
+              {lessonsList.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic py-3 text-center">
+                  No lessons defined yet. Click &quot;Add Lesson&quot; to configure course videos.
+                </p>
+              ) : (
+                lessonsList.map((les, idx) => (
+                  <div key={les.id || idx} className="rounded-xl border bg-muted/30 p-3.5 space-y-3 text-xs">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-foreground">
+                        Lesson #{idx + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeLesson(idx)}
+                        className="text-muted-foreground hover:text-destructive p-1 rounded transition"
+                        title="Remove lesson"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <div className="sm:col-span-2">
+                        <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Lesson Title</label>
+                        <input
+                          className={inputCls + ' h-9 text-xs'}
+                          value={les.title || ''}
+                          onChange={(e) => updateLesson(idx, 'title', e.target.value)}
+                          placeholder="e.g. Identifying Short Circuits with Thermal Camera"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Duration</label>
+                        <input
+                          className={inputCls + ' h-9 text-xs'}
+                          value={les.duration || ''}
+                          onChange={(e) => updateLesson(idx, 'duration', e.target.value)}
+                          placeholder="e.g. 42 min"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[11px] font-semibold text-muted-foreground block">
+                            Video Embed / Stream URL
+                          </label>
+                          <label className="cursor-pointer inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:underline">
+                            <Upload className="size-3" /> Upload MP4 Video
+                            <input
+                              type="file"
+                              accept="video/mp4,video/webm,video/quicktime"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const f = e.target.files?.[0]
+                                if (!f) return
+                                const fd = new FormData()
+                                fd.append('file', f)
+                                fd.append('folder', 'videos')
+                                try {
+                                  setUploadingVideoIdx(idx)
+                                  const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+                                  const d = await res.json()
+                                  if (d.url) {
+                                    updateLesson(idx, 'videoUrl', d.url)
+                                  } else {
+                                    alert(d.error || 'Failed to upload video')
+                                  }
+                                } catch (err: any) {
+                                  alert(err.message || 'Error uploading video')
+                                } finally {
+                                  setUploadingVideoIdx(null)
+                                }
+                              }}
+                            />
+                          </label>
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            className={inputCls + ' h-9 text-xs font-mono flex-1'}
+                            value={les.videoUrl || ''}
+                            onChange={(e) => updateLesson(idx, 'videoUrl', e.target.value)}
+                            placeholder="https://... or /uploads/videos/..."
+                          />
+                          {uploadingVideoIdx === idx && (
+                            <span className="flex items-center text-[11px] text-blue-600 whitespace-nowrap">
+                              <Loader2 className="size-3 animate-spin mr-1" /> Uploading...
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Lab Practical Exercise</label>
+                        <input
+                          className={inputCls + ' h-9 text-xs'}
+                          value={les.labExercise || ''}
+                          onChange={(e) => updateLesson(idx, 'labExercise', e.target.value)}
+                          placeholder="e.g. Measure voltage drop on battery terminal pins"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+
+          {/* Chapters list for Manuals */}
+          {!isVideoFormat && (
+            <div className="space-y-3">
+              {chaptersList.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic py-3 text-center">
+                  No chapters defined yet. Click &quot;Add Chapter&quot; to configure reading guide sections.
+                </p>
+              ) : (
+                chaptersList.map((ch, idx) => (
+                  <div key={ch.id || idx} className="rounded-xl border bg-muted/30 p-3.5 space-y-3 text-xs">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-foreground">
+                        Chapter #{idx + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeChapter(idx)}
+                        className="text-muted-foreground hover:text-destructive p-1 rounded transition"
+                        title="Remove chapter"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <div className="sm:col-span-2">
+                        <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Chapter Title</label>
+                        <input
+                          className={inputCls + ' h-9 text-xs'}
+                          value={ch.title || ''}
+                          onChange={(e) => updateChapter(idx, 'title', e.target.value)}
+                          placeholder="e.g. Motherboard Power Rail Sequencing & Short Isolation"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Page Range</label>
+                        <input
+                          className={inputCls + ' h-9 text-xs'}
+                          value={ch.pageRange || ''}
+                          onChange={(e) => updateChapter(idx, 'pageRange', e.target.value)}
+                          placeholder="e.g. pp. 1-28"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Summary &amp; Key Test Points</label>
+                      <input
+                        className={inputCls + ' h-9 text-xs'}
+                        value={ch.summary || ''}
+                        onChange={(e) => updateChapter(idx, 'summary', e.target.value)}
+                        placeholder="e.g. Primary power rail diagnostics, buck converter inductors, VBUS line testing"
+                      />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Sort Order & Publishing Visibility */}
+        <div className="grid gap-4 sm:grid-cols-2 items-center rounded-2xl border bg-muted/20 p-4">
+          <Field label="Catalog Sort Order (lower numbers appear first)">
             <input
               type="number"
               className={inputCls}
               value={form.sortOrder}
-              onChange={(e) =>
-                update('sortOrder', Number(e.target.value) || 0)
-              }
+              onChange={(e) => update('sortOrder', Number(e.target.value) || 0)}
             />
           </Field>
+          <div>
+            <Field label="Catalog Visibility">
+              <div className="flex h-11 items-center">
+                <label className="inline-flex cursor-pointer items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={form.published}
+                    onChange={(e) => update('published', e.target.checked)}
+                    className="size-4 accent-primary"
+                  />
+                  <span className="text-sm font-semibold">
+                    Visible in Public Catalog &amp; Student Dashboard
+                  </span>
+                </label>
+              </div>
+            </Field>
+          </div>
         </div>
-        <Field label="Description">
-          <textarea
-            rows={3}
-            className={textareaCls}
-            value={form.description || ''}
-            onChange={(e) => update('description', e.target.value || null)}
-            placeholder="Describe this resource..."
-          />
-        </Field>
-        <Field label="Download / File URL (once available)">
-          <input
-            className={inputCls}
-            value={form.fileUrl || ''}
-            onChange={(e) => update('fileUrl', e.target.value || null)}
-            placeholder="https://.../download.pdf"
-          />
-        </Field>
-        <div>
-          <Field label="Visibility">
-            <div className="flex h-11 items-center">
-              <label className="inline-flex cursor-pointer items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.published}
-                  onChange={(e) => update('published', e.target.checked)}
-                  className="size-4 accent-primary"
-                />
-                <span className="text-sm font-normal">Visible in catalog</span>
-              </label>
-            </div>
-          </Field>
-        </div>
+
+        {/* Action Buttons */}
         <div className="flex justify-end gap-3 border-t pt-5">
-          <Button variant="outline" onClick={onClose} disabled={saving}>
+          <Button variant="outline" onClick={onClose} disabled={saving} className="rounded-xl">
             Cancel
           </Button>
-          <Button onClick={submit} disabled={saving}>
+          <Button onClick={submit} disabled={saving} className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold">
             {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
             {saving
-              ? 'Saving...'
+              ? 'Saving Changes...'
               : isEdit
-              ? 'Save Changes'
-              : 'Create Resource'}
+              ? 'Save & Synchronize Resource'
+              : 'Create & Synchronize Resource'}
           </Button>
         </div>
       </div>

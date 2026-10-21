@@ -29,7 +29,7 @@ function hashToken(token: string) {
 }
 
 /**
- * Generates official institutional email: e.g. "Lealem Meseret" -> "lealem.meseret@hellotvet.edu.et"
+ * Generates official institutional email: e.g. "Lealem Meseret" -> "lealem.meseret@hellotechnology.edu.et"
  */
 export function generateInstitutionalEmail(fullName: string): string {
   const parts = fullName
@@ -40,8 +40,8 @@ export function generateInstitutionalEmail(fullName: string): string {
     .filter(Boolean)
 
   const firstName = parts[0] || 'student'
-  const fatherName = parts[1] || (parts.length > 2 ? parts[parts.length - 1] : 'tvet')
-  return `${firstName}.${fatherName}@hellotvet.edu.et`
+  const fatherName = parts[1] || (parts.length > 2 ? parts[parts.length - 1] : 'tech')
+  return `${firstName}.${fatherName}@hellotechnology.edu.et`
 }
 
 /**

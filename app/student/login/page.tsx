@@ -19,9 +19,13 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Header, Footer } from '@/components/site'
+import { useLanguage } from '@/components/language-provider'
 
 export default function StudentLoginPage() {
   const router = useRouter()
+  const { language } = useLanguage()
+  const isAm = language === 'am'
+
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -42,12 +46,22 @@ export default function StudentLoginPage() {
 
       const data = await res.json()
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to sign in. Please verify your credentials.')
+        throw new Error(
+          data.error ||
+            (isAm
+              ? 'መግባት አልተቻለም። እባክዎ መረጃዎን በትክክል ያስገቡ።'
+              : 'Failed to sign in. Please verify your credentials.')
+        )
       }
 
       router.push('/student/dashboard')
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your email and password.')
+      setError(
+        err.message ||
+          (isAm
+            ? 'መግባት አልተቻለም። እባክዎ ኢሜይልዎን ወይም የይለፍ ቃልዎን ያረጋግጡ።'
+            : 'Login failed. Please check your email and password.')
+      )
     } finally {
       setLoading(false)
     }
@@ -67,18 +81,21 @@ export default function StudentLoginPage() {
             <Link href="/" className="inline-flex items-center gap-2 mb-4 group">
               <img
                 src="/images/helloschool.jpg"
-                alt="Hello TVET"
+                alt="Hello Technology Training Center"
                 className="h-12 w-auto rounded-xl object-contain bg-white/95 p-1 shadow-md transition-transform group-hover:scale-105"
               />
             </Link>
             <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-600 dark:text-sky-400 border border-blue-500/20 mb-2">
-              <GraduationCap className="size-3.5" /> Hello TVET Student Portal
+              <GraduationCap className="size-3.5" />
+              {isAm ? 'የሄሎ ቴክኖሎጂ የተማሪ ፖርታል' : 'Hello Technology Student Portal'}
             </div>
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
-              Log In
+              {isAm ? 'ይግቡ' : 'Log In'}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Access your enrolled cohort courses, syllabus, and technical learning resources.
+              {isAm
+                ? 'የተመዘገቡበትን የስልጠና መርሃግብር፣ ሲላበስ እና የቴክኒክ ማቴሪያሎችን ለማግኘት ይግቡ።'
+                : 'Access your enrolled cohort courses, syllabus, and technical learning resources.'}
             </p>
           </div>
 
@@ -93,14 +110,18 @@ export default function StudentLoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <label className="flex flex-col gap-2 text-sm font-medium">
-                Student Email or Phone Number
+                {isAm ? 'የተማሪ ኢሜይል ወይም ስልክ ቁጥር' : 'Student Email or Phone Number'}
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="e.g. lealem.meseret@hellotvet.edu.et or 0911..."
+                    placeholder={
+                      isAm
+                        ? 'ለምሳሌ፡ lealem.meseret@hellotechnology.edu.et ወይም 09...'
+                        : 'e.g. lealem.meseret@hellotechnology.edu.et or 0911...'
+                    }
                     className="h-11 w-full rounded-xl border border-input bg-background/80 pl-10 pr-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                     autoFocus
@@ -109,7 +130,7 @@ export default function StudentLoginPage() {
               </label>
 
               <label className="flex flex-col gap-2 text-sm font-medium">
-                Portal Password
+                {isAm ? 'የፖርታል ይለፍ ቃል' : 'Portal Password'}
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <input
@@ -139,11 +160,13 @@ export default function StudentLoginPage() {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 size-4 animate-spin" /> Verifying Credentials...
+                    <Loader2 className="mr-2 size-4 animate-spin" />{' '}
+                    {isAm ? 'ማረጋገጫ በመፈተሽ ላይ...' : 'Verifying Credentials...'}
                   </>
                 ) : (
                   <>
-                    Sign In to Portal <ArrowRight className="ml-2 size-4" />
+                    {isAm ? 'ወደ ፖርታል ይግቡ' : 'Sign In to Portal'}{' '}
+                    <ArrowRight className="ml-2 size-4" />
                   </>
                 )}
               </Button>
@@ -154,16 +177,20 @@ export default function StudentLoginPage() {
               <div className="rounded-2xl border border-blue-500/25 bg-blue-500/5 p-3.5 flex items-start gap-3">
                 <Sparkles className="size-4 text-sky-500 shrink-0 mt-0.5" />
                 <div className="text-xs text-muted-foreground leading-relaxed">
-                  <span className="font-semibold text-foreground">How your email is formatted:</span>
-                  <br />
-                  Your institutional login is automatically generated from your name and father&apos;s name:{' '}
-                  <span className="font-mono text-blue-600 dark:text-sky-400 font-bold">
-                    firstname.fathername@hellotvet.edu.et
+                  <span className="font-semibold text-foreground">
+                    {isAm ? 'የተማሪ ኢሜይል አሰራር፡' : 'How your email is formatted:'}
                   </span>
                   <br />
-                  (e.g.{' '}
+                  {isAm
+                    ? 'የእርስዎ ይፋዊ መለያ በስምዎ እና በአባትዎ ስም የተዋቀረ ነው፦'
+                    : 'Your institutional login is automatically generated from your name and father\'s name:'}{' '}
+                  <span className="font-mono text-blue-600 dark:text-sky-400 font-bold">
+                    firstname.fathername@hellotechnology.edu.et
+                  </span>
+                  <br />
+                  ({isAm ? 'ለምሳሌ፡' : 'e.g.'}{' '}
                   <span className="font-mono text-foreground font-semibold">
-                    lealem.meseret@hellotvet.edu.et
+                    lealem.meseret@hellotechnology.edu.et
                   </span>
                   )
                 </div>
@@ -172,12 +199,12 @@ export default function StudentLoginPage() {
 
             {/* Registration CTA */}
             <div className="mt-6 text-center text-xs text-muted-foreground">
-              Don&apos;t have an enrolled student account yet?{' '}
+              {isAm ? 'እስካሁን የተመዘገበ የተማሪ አካውንት የለዎትም?' : 'Don\'t have an enrolled student account yet?'}{' '}
               <Link
                 href="/register"
                 className="font-bold text-blue-600 dark:text-sky-400 hover:underline inline-flex items-center gap-1"
               >
-                Register for a Course <ArrowRight className="size-3" />
+                {isAm ? 'ለስልጠና ይመዝገቡ' : 'Register for a Course'} <ArrowRight className="size-3" />
               </Link>
             </div>
           </div>

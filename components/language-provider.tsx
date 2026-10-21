@@ -28,8 +28,8 @@ export const translations = {
     languageToggle: 'Change Language',
 
     // Branding
-    schoolTitle: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ',
-    schoolSubtitle: 'Hello TVET · Technical & Vocational Training',
+    schoolTitle: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል',
+    schoolSubtitle: 'Hello Technology Training Center',
     
     // Quick Actions
     exploreCourses: 'Explore Courses',
@@ -59,8 +59,8 @@ export const translations = {
     languageToggle: 'ቋንቋ ይምረጡ',
 
     // Branding
-    schoolTitle: 'ሄሎ የቴክኒክና ሙያ ማሰልጠኛ',
-    schoolSubtitle: 'ሄሎ ቴክኒክና ሙያ ማሰልጠኛ · ባሕር ዳር',
+    schoolTitle: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል',
+    schoolSubtitle: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል · ባሕር ዳር',
 
     // Quick Actions
     exploreCourses: 'ስልጠናዎችን ይመልከቱ',

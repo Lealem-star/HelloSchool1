@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 import { getPublishedCourseBySlug } from '@/lib/content'
 
 export const runtime = 'nodejs'
-export const alt = 'Hello TVET Course Curriculum & Practical Bench Training'
+export const alt = 'Hello Technology Course Curriculum & Practical Bench Training'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -72,13 +72,13 @@ export default async function OpenGraphImage({
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span
                 style={{
-                  fontSize: '24px',
+                  fontSize: '20px',
                   fontWeight: 900,
                   letterSpacing: '0.05em',
                   color: '#ffffff',
                 }}
               >
-                HELLO TVET
+                HELLO TECHNOLOGY
               </span>
               <span
                 style={{
@@ -88,7 +88,7 @@ export default async function OpenGraphImage({
                   color: '#dbeafe',
                 }}
               >
-                TECHNICAL & VOCATIONAL TRAINING · BAHIR DAR
+                TRAINING CENTER · BAHIR DAR
               </span>
             </div>
           </div>

@@ -24,17 +24,32 @@ export async function POST(request: Request) {
         { error: 'title and category required' },
         { status: 400 }
       )
-    const item = await prisma.libraryResource.create({
+    const priceETBVal = typeof body.priceETB === 'number' 
+      ? body.priceETB 
+      : parseInt(String(body.price || '').replace(/[^0-9]/g, ''), 10) || 0
+
+    const item = await (prisma as any).libraryResource.create({
       data: {
         title: String(body.title),
+        subtitle: body.subtitle ? String(body.subtitle) : null,
         category: String(body.category),
         description: body.description ? String(body.description) : null,
-        format: body.format ? String(body.format) : null,
-        level: body.level ? String(body.level) : null,
-        status: body.status ? String(body.status) : 'Coming Soon',
-        price: body.price ? String(body.price) : null,
+        format: body.format ? String(body.format) : 'Technical Repair Manual',
+        level: body.level ? String(body.level) : 'All Skill Levels',
+        status: body.status ? String(body.status) : 'Available',
+        price: body.price ? String(body.price) : `${priceETBVal} ETB`,
+        priceETB: priceETBVal,
         pages: body.pages ? String(body.pages) : null,
         fileUrl: body.fileUrl ? String(body.fileUrl) : null,
+        thumbnailUrl: body.thumbnailUrl ? String(body.thumbnailUrl) : null,
+        instructor: body.instructor ? String(body.instructor) : 'Hello Technology Faculty',
+        instructorRole: body.instructorRole ? String(body.instructorRole) : 'Technical Instructor',
+        rating: typeof body.rating === 'number' ? body.rating : 4.9,
+        reviewCount: typeof body.reviewCount === 'number' ? body.reviewCount : 100,
+        badgeText: body.badgeText ? String(body.badgeText) : null,
+        skillsLearned: body.skillsLearned ? (typeof body.skillsLearned === 'string' ? body.skillsLearned : JSON.stringify(body.skillsLearned)) : null,
+        lessons: body.lessons ? (typeof body.lessons === 'string' ? body.lessons : JSON.stringify(body.lessons)) : null,
+        chapters: body.chapters ? (typeof body.chapters === 'string' ? body.chapters : JSON.stringify(body.chapters)) : null,
         published: typeof body.published === 'boolean' ? body.published : true,
         sortOrder: typeof body.sortOrder === 'number' ? body.sortOrder : 0,
       },
@@ -58,30 +73,46 @@ export async function PUT(request: Request) {
     const data: any = {}
     const fields = [
       'title',
+      'subtitle',
       'category',
       'description',
       'format',
       'level',
       'status',
       'price',
+      'priceETB',
       'pages',
       'fileUrl',
+      'thumbnailUrl',
+      'instructor',
+      'instructorRole',
+      'badgeText',
+      'rating',
+      'reviewCount',
+      'skillsLearned',
+      'lessons',
+      'chapters',
       'sortOrder',
       'published',
     ]
     for (const f of fields) {
       if (rest[f] !== undefined) {
         if (f === 'published') data[f] = Boolean(rest[f])
-        else if (f === 'sortOrder') data[f] = Number(rest[f])
-        else data[f] = String(rest[f])
+        else if (f === 'sortOrder' || f === 'priceETB' || f === 'reviewCount') data[f] = Number(rest[f])
+        else if (f === 'rating') data[f] = parseFloat(String(rest[f])) || 4.9
+        else if (f === 'lessons' || f === 'chapters' || f === 'skillsLearned') {
+          data[f] = typeof rest[f] === 'string' ? rest[f] : JSON.stringify(rest[f])
+        } else {
+          data[f] = String(rest[f])
+        }
       }
     }
-    const updated = await prisma.libraryResource.update({ where: { id }, data })
+    const updated = await (prisma as any).libraryResource.update({ where: { id }, data })
     revalidatePublicSite()
     return NextResponse.json(updated)
-  } catch (e) {
+  } catch (e: any) {
     console.error(e)
-    return NextResponse.json({ error: 'Update failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Update failed: ' + e.message }, { status: 500 })
   }
 }
 

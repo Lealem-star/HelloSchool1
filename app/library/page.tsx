@@ -5,7 +5,7 @@ import { getCategoryNames, getPublishedLibrary } from '@/lib/content'
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: 'Digital Library & Repair Manuals | Hello TVET',
+  title: 'Digital Library & Repair Manuals | Hello Technology Training Center',
   description:
     'Free technical repair manuals, multimeter cheat sheets, smartphone schematics, and laptop motherboard power rail diagnostic guides in Ethiopia.',
 }

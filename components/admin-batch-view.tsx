@@ -2026,7 +2026,7 @@ function EnrollStudentModal({
                 Official Student Portal Account Included
               </p>
               <p className="text-muted-foreground text-[11px] mt-0.5 leading-relaxed">
-                Just like online registration, enrolling here automatically generates an official student account with an institutional email (<span className="font-mono font-medium text-foreground">@hellotvet.edu.et</span>), student ID, and login credentials. The student can immediately sign in at <span className="font-semibold text-[#155DFC]">/student</span>.
+                Just like online registration, enrolling here automatically generates an official student account with an institutional email (<span className="font-mono font-medium text-foreground">@hellotechnology.edu.et</span>), student ID, and login credentials. The student can immediately sign in at <span className="font-semibold text-[#155DFC]">/student</span>.
               </p>
             </div>
           </div>

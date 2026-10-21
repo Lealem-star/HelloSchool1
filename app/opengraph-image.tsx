@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'nodejs'
-export const alt = 'Hello TVET - Technical & Vocational Training (ሄሎ የቴክኒክና ሙያ ማሰልጠኛ)'
+export const alt = 'Hello Technology Training Center (ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል)'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -53,13 +53,13 @@ export default async function OpenGraphImage() {
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <span
                 style={{
-                  fontSize: '28px',
+                  fontSize: '24px',
                   fontWeight: 900,
                   letterSpacing: '0.04em',
                   color: '#ffffff',
                 }}
               >
-                HELLO TVET
+                HELLO TECHNOLOGY
               </span>
               <span
                 style={{
@@ -69,7 +69,7 @@ export default async function OpenGraphImage() {
                   color: '#dbeafe',
                 }}
               >
-                TECHNICAL & VOCATIONAL TRAINING · BAHIR DAR
+                TRAINING CENTER · BAHIR DAR
               </span>
             </div>
           </div>

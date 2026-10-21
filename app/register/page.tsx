@@ -20,23 +20,25 @@ import prisma from '@/lib/prisma'
 export const revalidate = 60
 
 export const metadata = {
-  title: 'Course Registration & Cohort Admissions | Hello TVET',
+  title: 'Course Registration & Cohort Admissions | Hello Technology Training Center',
   description:
-    'Enroll in hands-on practical technical and vocational training at Hello TVET (ሄሎ የቴክኒክና ሙያ ማሰልጠኛ). Reserve your seat for the upcoming cohort intake.',
+    'Enroll in hands-on practical technical and vocational training at Hello Technology Training Center (ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል). Reserve your seat for the upcoming cohort intake.',
 }
 
 export default async function RegisterPage(props: {
   searchParams?: Promise<{ course?: string }>
 }) {
   const searchParams = (await props.searchParams) || {}
-  const [publishedCourses, openBatches] = await Promise.all([
+  const [publishedCourses, activeBatch] = await Promise.all([
     getPublishedCourses(),
-    prisma.$queryRaw<any[]>`
-      SELECT * FROM Batch WHERE status = 'Open' ORDER BY sortOrder ASC, createdAt DESC LIMIT 1
-    `.catch(() => []),
+    (prisma as any).batch
+      ? (prisma as any).batch.findFirst({
+          where: { status: 'Open' },
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+        }).catch(() => null)
+      : null,
   ])
 
-  const activeBatch = Array.isArray(openBatches) && openBatches.length > 0 ? openBatches[0] : null
   const hasOpenBatch = Boolean(activeBatch)
 
   // Match initial course from query param (by slug or title)

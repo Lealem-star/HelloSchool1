@@ -98,7 +98,7 @@ export async function GET(request: Request) {
         status: 200,
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',
-          'Content-Disposition': `attachment; filename="helloschool_registrations_${dateStr}.csv"`,
+          'Content-Disposition': `attachment; filename="hello_technology_registrations_${dateStr}.csv"`,
           'Cache-Control': 'no-store',
         },
       })

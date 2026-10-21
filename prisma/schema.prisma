@@ -61,23 +61,35 @@ model TrainingGallery {
 }
 
 model LibraryResource {
-  id          String   @id @default(cuid())
-  title       String
-  category    String
-  description String?
-  format      String?
-  level       String?
-  status      String   @default("Coming Soon")
-  price       String?
-  pages       String?
-  fileUrl     String?
-  published   Boolean  @default(true)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  title         String
+  subtitle      String?
+  category      String
+  description   String?  @db.Text
+  format        String?  // "Video Masterclass", "Technical Repair Manual", "Schematic & Circuit Handbook", "Quick Reference Guide"
+  level         String?  // "Beginner", "Intermediate", "Advanced", "All Skill Levels"
+  status        String   @default("Available") // "Available", "Coming Soon", "Draft"
+  price         String?  // e.g. "850 ETB"
+  priceETB      Int      @default(0) // Numeric value e.g. 850
+  pages         String?  // e.g. "142 Pages" or "18 Lessons"
+  fileUrl       String?  @db.Text
+  thumbnailUrl  String?  @db.Text
+  instructor    String?  // e.g. "Master Tech Haile"
+  instructorRole String? // e.g. "Lead Diagnostic Instructor"
+  rating        Float    @default(4.9)
+  reviewCount   Int      @default(100)
+  badgeText     String?  // e.g. "Bestseller Video Masterclass"
+  skillsLearned String?  @db.Text // JSON array serialized
+  lessons       String?  @db.Text // JSON array of lessons
+  chapters      String?  @db.Text // JSON array of chapters
+  published     Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([category])
   @@index([status])
+  @@index([published])
 }
 
 model AdminUser {
@@ -230,6 +242,7 @@ model Student {
   updatedAt          DateTime         @updatedAt
   registrations      Registration[]
   sessions           StudentSession[]
+  digitalPurchases   DigitalPurchase[]
 
   @@index([phone])
   @@index([institutionalEmail])
@@ -304,6 +317,29 @@ model Batch {
 
   @@index([status])
   @@index([sortOrder])
+}
+
+model DigitalPurchase {
+  id               String   @id @default(cuid())
+  studentId        String
+  resourceId       String   // e.g. "course-1", "manual-1", "manual-2"
+  resourceType     String   // "video_course" | "manual" | "book" | "reference"
+  title            String
+  amount           Int      @default(0) // in ETB
+  paymentMethod    String   @default("telebirr") // "telebirr" | "cbe" | "included_in_tvet"
+  transactionRef   String?
+  status           String   @default("Active") // 'Active', 'Pending'
+  progress         Int      @default(0) // 0 to 100%
+  completedLessons String?  @db.Text // JSON array of completed lesson IDs e.g. ["l1","l2"]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  student          Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, resourceId])
+  @@index([studentId])
+  @@index([resourceId])
+  @@index([status])
 }
 
 

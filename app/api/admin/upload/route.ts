@@ -7,14 +7,24 @@ import crypto from 'crypto'
 export const runtime = 'nodejs'
 
 const ALLOWED_MIME_TYPES = new Set([
+  // Images
   'image/jpeg',
   'image/png',
   'image/webp',
   'image/gif',
   'image/avif',
+  // Documents
+  'application/pdf',
+  // Videos
+  'video/mp4',
+  'video/webm',
+  'video/quicktime',
+  'video/x-matroska',
+  'video/ogg',
+  'video/mpeg',
 ])
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5 MB
+const MAX_FILE_SIZE = 250 * 1024 * 1024 // 250 MB for videos, manuals, and documents
 
 export async function POST(request: Request) {
   const user = await getCurrentUser()
@@ -25,7 +35,7 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData()
     const file = formData.get('file') as File | null
-    const folder = String(formData.get('folder') || 'avatars').replace(/[^a-zA-Z0-9_-]/g, '')
+    const folder = String(formData.get('folder') || 'library').replace(/[^a-zA-Z0-9_-]/g, '')
 
     if (!file || typeof file === 'string') {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
@@ -33,14 +43,14 @@ export async function POST(request: Request) {
 
     if (!ALLOWED_MIME_TYPES.has(file.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.' },
+        { error: `Invalid file type (${file.type}). Supported types: PDF, MP4, WebM, JPEG, PNG, WebP.` },
         { status: 400 }
       )
     }
 
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: 'File size exceeds 5MB limit.' },
+        { error: 'File size exceeds 250MB limit.' },
         { status: 400 }
       )
     }
@@ -48,11 +58,15 @@ export async function POST(request: Request) {
     // Determine extension
     let ext = path.extname(file.name).toLowerCase()
     if (!ext || ext.length > 5) {
-      if (file.type === 'image/jpeg') ext = '.jpg'
+      if (file.type === 'application/pdf') ext = '.pdf'
+      else if (file.type === 'video/mp4') ext = '.mp4'
+      else if (file.type === 'video/webm') ext = '.webm'
+      else if (file.type === 'video/quicktime') ext = '.mov'
+      else if (file.type === 'image/jpeg') ext = '.jpg'
       else if (file.type === 'image/png') ext = '.png'
       else if (file.type === 'image/webp') ext = '.webp'
       else if (file.type === 'image/gif') ext = '.gif'
-      else ext = '.png'
+      else ext = '.bin'
     }
 
     const randomId = crypto.randomBytes(8).toString('hex')

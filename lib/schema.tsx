@@ -123,7 +123,7 @@ export function getCourseListSchema(courses: PublicCourse[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Hello TVET Technical Training Courses',
+    name: `${schoolConfig.englishName} Technical Training Courses`,
     description: 'Certified hands-on electronics maintenance and hardware repair courses.',
     url: `${SITE_URL}/courses`,
     numberOfItems: courses.length,
