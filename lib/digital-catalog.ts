@@ -44,6 +44,8 @@ export type DigitalResourceMeta = {
   skillsLearned: string[]
   lessons?: LessonItem[]
   chapters?: ManualChapter[]
+  thumbnailUrl?: string | null
+  pages?: string | null
 }
 
 export const DIGITAL_CATALOG: Record<string, DigitalResourceMeta> = {
@@ -607,6 +609,8 @@ export function formatResourceToMeta(res: any): DigitalResourceMeta {
       : (fallback.skillsLearned || ['Schematic tracing', 'Component level repair', 'Board diagnosis']),
     lessons,
     chapters,
+    thumbnailUrl: res.thumbnailUrl || null,
+    pages: res.pages || null,
   }
 }
 

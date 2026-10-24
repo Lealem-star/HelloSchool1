@@ -42,6 +42,10 @@ import {
   Printer,
   Menu,
   ArrowLeft,
+  BarChart3,
+  ListChecks,
+  Volume2,
+  ArrowRight,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { LanguageToggle } from '@/components/language-toggle'
@@ -52,6 +56,8 @@ import { DIGITAL_CATALOG, DigitalResourceMeta, formatResourceToMeta } from '@/li
 import { SecureLearningStudio } from '@/components/secure-learning-studio'
 import { OfficialReceiptModal, ReceiptData } from '@/components/official-receipt-modal'
 import { StudentCertificate, CertificateData } from '@/components/student-certificate'
+import { ChapaInlineModal, ChapaResourceProps } from '@/components/chapa-inline-modal'
+import { DigitalPurchaseModal, PurchaseResourceData } from '@/components/digital-purchase-modal'
 
 type StudentProfile = {
   id: string
@@ -156,12 +162,12 @@ export default function StudentDashboardPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'mycourses' | 'catalog' | 'credentials'>('overview')
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
-  // Studio and Purchase Modal States
+  // Studio and Digital Library Purchase Modal States
   const [activeStudioResource, setActiveStudioResource] = useState<DigitalResourceMeta | null>(null)
   const [purchasingResource, setPurchasingResource] = useState<DigitalResourceMeta | null>(null)
-  const [purchasePaymentMethod, setPurchasePaymentMethod] = useState<'telebirr' | 'cbe' | 'tvet_enrolled'>('telebirr')
-  const [purchaseTxnRef, setPurchaseTxnRef] = useState('')
-  const [purchaseLoading, setPurchaseLoading] = useState(false)
+  const [chapaResource, setChapaResource] = useState<ChapaResourceProps | null>(null)
+  const [manualPurchaseResource, setManualPurchaseResource] = useState<PurchaseResourceData | null>(null)
+  const [freeUnlockLoading, setFreeUnlockLoading] = useState(false)
   const [helpModalOpen, setHelpModalOpen] = useState(false)
   const [activeReceipt, setActiveReceipt] = useState<ReceiptData | null>(null)
   const [activeCertificate, setActiveCertificate] = useState<CertificateData | null>(null)
@@ -248,43 +254,59 @@ export default function StudentDashboardPage() {
     setTimeout(() => setCopiedKey(null), 2000)
   }
 
-  // Handle purchasing / unlocking a digital resource
-  const handleConfirmPurchase = async () => {
-    if (!purchasingResource) return
-    setPurchaseLoading(true)
+  // Digital Library Purchase Triggers
+  const handleOpenChapaModal = (resource: DigitalResourceMeta) => {
+    setPurchasingResource(null)
+    setChapaResource({
+      id: resource.id,
+      title: resource.title,
+      subtitle: resource.subtitle,
+      format: resource.format,
+      price: resource.priceDisplay,
+      priceETB: resource.priceETB,
+      instructor: resource.instructor,
+      thumbnailUrl: resource.thumbnailUrl,
+    })
+  }
+
+  const handleOpenManualModal = (resource: DigitalResourceMeta) => {
+    setPurchasingResource(null)
+    setManualPurchaseResource({
+      id: resource.id,
+      title: resource.title,
+      subtitle: resource.subtitle,
+      category: resource.category,
+      format: resource.format,
+      price: resource.priceDisplay,
+      priceETB: resource.priceETB,
+      instructor: resource.instructor,
+    })
+  }
+
+  const handleFreeUnlock = async (resource: DigitalResourceMeta) => {
+    setFreeUnlockLoading(true)
     try {
       const res = await fetch('/api/student/purchases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          resourceId: purchasingResource.id,
-          paymentMethod: purchasePaymentMethod,
-          transactionRef: purchaseTxnRef || `TXN-${Date.now().toString().slice(-6)}`,
+          resourceId: resource.id,
+          paymentMethod: 'free_grant',
+          transactionRef: `FREE-${Date.now().toString().slice(-6)}`,
         }),
       })
       const result = await res.json()
       if (result.success && result.purchase) {
-        // Update local list
-        setDigitalPurchases((prev) => {
-          const filtered = prev.filter((p) => p.resourceId !== purchasingResource.id)
-          return [result.purchase, ...filtered]
-        })
-        const purchasedItem = purchasingResource
-        const isApproved = result.purchase.status === 'Active'
         setPurchasingResource(null)
-        setPurchaseTxnRef('')
-        if (isApproved) {
-          setActiveStudioResource(purchasedItem)
-        } else {
-          setActiveTab('mycourses')
-        }
+        await fetchStudentData()
+        setActiveStudioResource(resource)
       } else {
-        alert(result.error || 'Failed to complete transaction')
+        alert(result.error || 'Failed to unlock material')
       }
     } catch (e: any) {
       alert(e.message || 'Error unlocking resource')
     } finally {
-      setPurchaseLoading(false)
+      setFreeUnlockLoading(false)
     }
   }
 
@@ -1199,60 +1221,153 @@ export default function StudentDashboardPage() {
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {popularMasterCourses.map((item) => {
                     const unlocked = isResourcePurchased(item.id)
-                    const isVideo = item.format === 'Video Masterclass'
+                    const isPending = getPurchaseStatus(item.id) === 'Pending'
+                    const isVideo =
+                      item.format.toLowerCase().includes('video') ||
+                      (item.lessons && item.lessons.length > 0)
+
+                    let durationOrPages = item.pages || (isVideo ? '6:00 Hours' : `${(item.chapters?.length || 8) * 20} Pages`)
+                    let activityCount = isVideo
+                      ? `${item.lessons?.length || 18} Lessons`
+                      : `${item.chapters?.length || 8} Chapters`
+
+                    if (item.pages && item.pages.includes('·')) {
+                      const parts = item.pages.split('·')
+                      durationOrPages = parts[0].trim().replace(/Hours?/i, '').trim()
+                      activityCount = parts[1].trim()
+                    }
+
+                    const thumbImage =
+                      item.thumbnailUrl ||
+                      (isVideo ? '/images/course-preview-hero.jpg' : '/images/manual-book-cover.jpg')
 
                     return (
-                      <div
+                      <article
                         key={item.id}
-                        className="group flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-6 shadow-md card-hover-lift hover:border-blue-500/50 transition-all"
+                        className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl"
                       >
                         <div>
-                          {/* Top Badges */}
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="flex size-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 border border-blue-500/20">
-                              {isVideo ? <Video className="size-5" /> : <BookOpen className="size-5" />}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                                <Star className="size-3 fill-amber-400 text-amber-400" />
-                                {item.rating} ({item.reviewCount})
+                          {/* Media Thumbnail Container with Circular Play Overlay */}
+                          <div
+                            onClick={() => {
+                              if (unlocked) {
+                                setActiveStudioResource(item)
+                              } else {
+                                router.push(`/library/${item.id}`)
+                              }
+                            }}
+                            className="relative block aspect-[16/10] overflow-hidden bg-slate-900 cursor-pointer"
+                          >
+                            <img
+                              src={thumbImage}
+                              alt={item.title}
+                              className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+
+                            {/* Top-Left Format Pill */}
+                            <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                              <span
+                                className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold text-white shadow-md backdrop-blur-md ${
+                                  isVideo ? 'bg-blue-600/90' : 'bg-indigo-600/90'
+                                }`}
+                              >
+                                {isVideo ? <Video className="size-3" /> : <BookOpen className="size-3" />}
+                                {isVideo
+                                  ? (isAm ? 'ቪዲዮ ኮርስ' : 'Video Course')
+                                  : (isAm ? 'ቴክኒካል መጽሐፍ' : 'Book / Manual')}
                               </span>
-                              <span className="rounded-full bg-blue-500/10 px-3 py-0.5 text-xs font-extrabold text-blue-600 dark:text-sky-400">
-                                {item.priceDisplay}
+                            </div>
+
+                            {/* Top-Right Price Tag */}
+                            <div className="absolute top-3 right-3">
+                              <span
+                                className={`inline-flex items-center rounded-lg px-2.5 py-1 text-[11px] font-bold shadow-md backdrop-blur-md ${
+                                  item.priceETB === 0
+                                    ? 'bg-emerald-600/90 text-white'
+                                    : 'bg-black/75 text-white border border-white/20'
+                                }`}
+                              >
+                                {item.priceETB === 0
+                                  ? (isAm ? 'ነፃ' : 'Free')
+                                  : item.priceDisplay}
                               </span>
+                            </div>
+
+                            {/* Centered Circular Dark Play Button */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="flex size-12 items-center justify-center rounded-full bg-slate-950/70 backdrop-blur-md text-white shadow-xl border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:border-primary">
+                                {isVideo ? (
+                                  <Play className="size-5 fill-white ml-0.5" />
+                                ) : (
+                                  <BookOpen className="size-5 text-white" />
+                                )}
+                              </div>
                             </div>
                           </div>
 
-                          {/* Title & Subtitle */}
-                          <span className="mt-5 block text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400">
-                            {item.category}
-                          </span>
-                          <h4 className="mt-1 text-lg font-bold text-foreground group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors">
-                            {item.title}
-                          </h4>
-                          <p className="mt-1 text-xs text-muted-foreground font-medium">
-                            {item.subtitle}
-                          </p>
-                          <p className="mt-3 text-xs leading-relaxed text-muted-foreground line-clamp-3">
-                            {item.description}
-                          </p>
+                          {/* Card Body */}
+                          <div className="p-5">
+                            {/* Title */}
+                            <Link href={`/library/${item.id}`} className="block">
+                              <h4 className="text-base sm:text-lg font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2 cursor-pointer">
+                                {item.title}
+                              </h4>
+                            </Link>
 
-                          {/* Content Specs */}
-                          <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Clock className="size-3.5 text-blue-500" />
-                              {isVideo
-                                ? `${item.lessons?.length || 0} ${isAm ? 'ትምህርቶች' : 'Lessons'}`
-                                : `${item.chapters?.length || 0} ${isAm ? 'ምዕራፎች' : 'Chapters'}`}
-                            </span>
-                            <span className="flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                              <Lock className="size-3" /> {isAm ? 'በራስ ፍጥነት የሚጠና' : '100% Self-Paced'}
-                            </span>
+                            {/* Instructor / Author byline */}
+                            <p className="mt-1.5 text-xs text-muted-foreground font-medium">
+                              {isVideo ? (isAm ? 'መምህር፦ ' : 'A Course By : ') : (isAm ? 'አዘጋጅ፦ ' : 'Author : ')}
+                              <span className="font-semibold text-foreground">
+                                {item.instructor || 'Hello Technology Academy'}
+                              </span>
+                            </p>
+
+                            {/* Description */}
+                            <p className="mt-2.5 text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-3 min-h-[3.6rem]">
+                              {item.description}
+                            </p>
+
+                            {/* 3-Column Metadata Row */}
+                            <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-3 gap-2 text-xs">
+                              {/* Column 1: Level */}
+                              <div className="flex flex-col">
+                                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                                  <BarChart3 className="size-3 text-sky-500" />
+                                  {isAm ? 'ደረጃ' : 'Level'}
+                                </span>
+                                <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
+                                  {item.level || (isAm ? 'ለሁሉም' : 'Everyone')}
+                                </span>
+                              </div>
+
+                              {/* Column 2: Duration / Pages */}
+                              <div className="flex flex-col">
+                                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                                  <Clock className="size-3 text-amber-500" />
+                                  {isVideo ? (isAm ? 'ቆይታ' : 'Duration') : (isAm ? 'ገጾች' : 'Pages')}
+                                </span>
+                                <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
+                                  {durationOrPages}
+                                </span>
+                              </div>
+
+                              {/* Column 3: Activity */}
+                              <div className="flex flex-col">
+                                <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                                  <ListChecks className="size-3 text-emerald-500" />
+                                  {isAm ? 'ክፍል' : 'Activity'}
+                                </span>
+                                <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
+                                  {activityCount}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Action Button */}
-                        <div className="mt-6 pt-4 border-t border-border/60">
+                        {/* Card Actions */}
+                        <div className="p-5 pt-0 border-t border-border/50 mt-4">
                           {unlocked ? (
                             <Button
                               onClick={() => setActiveStudioResource(item)}
@@ -1260,7 +1375,7 @@ export default function StudentDashboardPage() {
                             >
                               <Play className="size-4" /> {isAm ? 'ትምህርቱን ጀምር' : 'Study on Platform'}
                             </Button>
-                          ) : getPurchaseStatus(item.id) === 'Pending' ? (
+                          ) : isPending ? (
                             <Button
                               disabled
                               className="w-full rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 font-bold text-xs gap-1.5 cursor-not-allowed"
@@ -1268,15 +1383,29 @@ export default function StudentDashboardPage() {
                               <Clock className="size-4" /> {isAm ? 'የአስተዳዳሪ ማረጋገጫ በመጠባበቅ ላይ' : 'Waiting for Admin Approval'}
                             </Button>
                           ) : (
-                            <Button
-                              onClick={() => setPurchasingResource(item)}
-                              className="w-full rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-blue-600/20 hover:scale-[1.02] transition-all"
-                            >
-                              <ShoppingBag className="size-4" /> {isAm ? `ይዘቱን ይክፈቱ (${item.priceDisplay})` : `Purchase & Unlock (${item.priceDisplay})`}
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Link href={`/library/${item.id}`} className="flex-1">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full rounded-xl border-sky-500/40 text-sky-600 dark:text-sky-400 font-bold hover:bg-sky-500 hover:text-white transition-all text-xs"
+                                >
+                                  <ExternalLink className="size-3.5 mr-1" />
+                                  {isAm ? 'ማሳያ' : 'Preview'}
+                                </Button>
+                              </Link>
+                              <Button
+                                size="sm"
+                                onClick={() => setPurchasingResource(item)}
+                                className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-blue-600/20 hover:scale-[1.02] transition-all"
+                              >
+                                <ShoppingBag className="size-3.5" />
+                                {isAm ? `ክፈት (${item.priceDisplay})` : `Purchase (${item.priceDisplay})`}
+                              </Button>
+                            </div>
                           )}
                         </div>
-                      </div>
+                      </article>
                     )
                   })}
                 </div>
@@ -1487,60 +1616,153 @@ export default function StudentDashboardPage() {
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {popularMasterCourses.map((item) => {
                   const unlocked = isResourcePurchased(item.id)
-                  const isVideo = item.format === 'Video Masterclass'
+                  const isPending = getPurchaseStatus(item.id) === 'Pending'
+                  const isVideo =
+                    item.format.toLowerCase().includes('video') ||
+                    (item.lessons && item.lessons.length > 0)
+
+                  let durationOrPages = item.pages || (isVideo ? '6:00 Hours' : `${(item.chapters?.length || 8) * 20} Pages`)
+                  let activityCount = isVideo
+                    ? `${item.lessons?.length || 18} Lessons`
+                    : `${item.chapters?.length || 8} Chapters`
+
+                  if (item.pages && item.pages.includes('·')) {
+                    const parts = item.pages.split('·')
+                    durationOrPages = parts[0].trim().replace(/Hours?/i, '').trim()
+                    activityCount = parts[1].trim()
+                  }
+
+                  const thumbImage =
+                    item.thumbnailUrl ||
+                    (isVideo ? '/images/course-preview-hero.jpg' : '/images/manual-book-cover.jpg')
 
                   return (
-                    <div
+                    <article
                       key={item.id}
-                      className="group flex flex-col justify-between rounded-3xl border border-border/80 bg-card p-6 shadow-md card-hover-lift hover:border-blue-500/50 transition-all"
+                      className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl"
                     >
                       <div>
-                        {/* Top Badges */}
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="flex size-11 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 border border-blue-500/20">
-                            {isVideo ? <Video className="size-5" /> : <BookOpen className="size-5" />}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span className="flex items-center gap-1 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                              <Star className="size-3 fill-amber-400 text-amber-400" />
-                              {item.rating} ({item.reviewCount})
+                        {/* Media Thumbnail Container with Circular Play Overlay */}
+                        <div
+                          onClick={() => {
+                            if (unlocked) {
+                              setActiveStudioResource(item)
+                            } else {
+                              router.push(`/library/${item.id}`)
+                            }
+                          }}
+                          className="relative block aspect-[16/10] overflow-hidden bg-slate-900 cursor-pointer"
+                        >
+                          <img
+                            src={thumbImage}
+                            alt={item.title}
+                            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+
+                          {/* Top-Left Format Pill */}
+                          <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                            <span
+                              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold text-white shadow-md backdrop-blur-md ${
+                                isVideo ? 'bg-blue-600/90' : 'bg-indigo-600/90'
+                              }`}
+                            >
+                              {isVideo ? <Video className="size-3" /> : <BookOpen className="size-3" />}
+                              {isVideo
+                                ? (isAm ? 'ቪዲዮ ኮርስ' : 'Video Course')
+                                : (isAm ? 'ቴክኒካል መጽሐፍ' : 'Book / Manual')}
                             </span>
-                            <span className="rounded-full bg-blue-500/10 px-3 py-0.5 text-xs font-extrabold text-blue-600 dark:text-sky-400">
-                              {item.priceDisplay}
+                          </div>
+
+                          {/* Top-Right Price Tag */}
+                          <div className="absolute top-3 right-3">
+                            <span
+                              className={`inline-flex items-center rounded-lg px-2.5 py-1 text-[11px] font-bold shadow-md backdrop-blur-md ${
+                                item.priceETB === 0
+                                  ? 'bg-emerald-600/90 text-white'
+                                  : 'bg-black/75 text-white border border-white/20'
+                              }`}
+                            >
+                              {item.priceETB === 0
+                                ? (isAm ? 'ነፃ' : 'Free')
+                                : item.priceDisplay}
                             </span>
+                          </div>
+
+                          {/* Centered Circular Dark Play Button */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="flex size-12 items-center justify-center rounded-full bg-slate-950/70 backdrop-blur-md text-white shadow-xl border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:border-primary">
+                              {isVideo ? (
+                                <Play className="size-5 fill-white ml-0.5" />
+                              ) : (
+                                <BookOpen className="size-5 text-white" />
+                              )}
+                            </div>
                           </div>
                         </div>
 
-                        {/* Title & Subtitle */}
-                        <span className="mt-5 block text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400">
-                          {item.category}
-                        </span>
-                        <h3 className="mt-1 text-lg font-bold text-foreground group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors">
-                          {item.title}
-                        </h3>
-                        <p className="mt-1 text-xs text-muted-foreground font-medium">
-                          {item.subtitle}
-                        </p>
-                        <p className="mt-3 text-xs leading-relaxed text-muted-foreground line-clamp-3">
-                          {item.description}
-                        </p>
+                        {/* Card Body */}
+                        <div className="p-5">
+                          {/* Title */}
+                          <Link href={`/library/${item.id}`} className="block">
+                            <h4 className="text-base sm:text-lg font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2 cursor-pointer">
+                              {item.title}
+                            </h4>
+                          </Link>
 
-                        {/* Content Specs */}
-                        <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Clock className="size-3.5 text-blue-500" />
-                            {isVideo
-                              ? `${item.lessons?.length || 0} ${isAm ? 'ትምህርቶች' : 'Lessons'}`
-                              : `${item.chapters?.length || 0} ${isAm ? 'ምዕራፎች' : 'Chapters'}`}
-                          </span>
-                          <span className="flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                            <Lock className="size-3" /> {isAm ? 'በራስ ፍጥነት የሚጠና' : '100% Self-Paced'}
-                          </span>
+                          {/* Instructor / Author byline */}
+                          <p className="mt-1.5 text-xs text-muted-foreground font-medium">
+                            {isVideo ? (isAm ? 'መምህር፦ ' : 'A Course By : ') : (isAm ? 'አዘጋጅ፦ ' : 'Author : ')}
+                            <span className="font-semibold text-foreground">
+                              {item.instructor || 'Hello Technology Academy'}
+                            </span>
+                          </p>
+
+                          {/* Description */}
+                          <p className="mt-2.5 text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-3 min-h-[3.6rem]">
+                            {item.description}
+                          </p>
+
+                          {/* 3-Column Metadata Row */}
+                          <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-3 gap-2 text-xs">
+                            {/* Column 1: Level */}
+                            <div className="flex flex-col">
+                              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                                <BarChart3 className="size-3 text-sky-500" />
+                                {isAm ? 'ደረጃ' : 'Level'}
+                              </span>
+                              <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
+                                {item.level || (isAm ? 'ለሁሉም' : 'Everyone')}
+                              </span>
+                            </div>
+
+                            {/* Column 2: Duration / Pages */}
+                            <div className="flex flex-col">
+                              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                                <Clock className="size-3 text-amber-500" />
+                                {isVideo ? (isAm ? 'ቆይታ' : 'Duration') : (isAm ? 'ገጾች' : 'Pages')}
+                              </span>
+                              <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
+                                {durationOrPages}
+                              </span>
+                            </div>
+
+                            {/* Column 3: Activity */}
+                            <div className="flex flex-col">
+                              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                                <ListChecks className="size-3 text-emerald-500" />
+                                {isAm ? 'ክፍል' : 'Activity'}
+                              </span>
+                              <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
+                                {activityCount}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Action Button */}
-                      <div className="mt-6 pt-4 border-t border-border/60">
+                      {/* Card Actions */}
+                      <div className="p-5 pt-0 border-t border-border/50 mt-4">
                         {unlocked ? (
                           <Button
                             onClick={() => setActiveStudioResource(item)}
@@ -1548,7 +1770,7 @@ export default function StudentDashboardPage() {
                           >
                             <Play className="size-4" /> {isAm ? 'ትምህርቱን ጀምር' : 'Study on Platform'}
                           </Button>
-                        ) : getPurchaseStatus(item.id) === 'Pending' ? (
+                        ) : isPending ? (
                           <Button
                             disabled
                             className="w-full rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 font-bold text-xs gap-1.5 cursor-not-allowed"
@@ -1556,15 +1778,29 @@ export default function StudentDashboardPage() {
                             <Clock className="size-4" /> {isAm ? 'የአስተዳዳሪ ማረጋገጫ በመጠባበቅ ላይ' : 'Waiting for Admin Approval'}
                           </Button>
                         ) : (
-                          <Button
-                            onClick={() => setPurchasingResource(item)}
-                            className="w-full rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-blue-600/20 hover:scale-[1.02] transition-all"
-                          >
-                            <ShoppingBag className="size-4" /> {isAm ? `ይዘቱን ይክፈቱ (${item.priceDisplay})` : `Purchase & Unlock (${item.priceDisplay})`}
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <Link href={`/library/${item.id}`} className="flex-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full rounded-xl border-sky-500/40 text-sky-600 dark:text-sky-400 font-bold hover:bg-sky-500 hover:text-white transition-all text-xs"
+                              >
+                                <ExternalLink className="size-3.5 mr-1" />
+                                {isAm ? 'ማሳያ' : 'Preview'}
+                              </Button>
+                            </Link>
+                            <Button
+                              size="sm"
+                              onClick={() => setPurchasingResource(item)}
+                              className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-blue-600/20 hover:scale-[1.02] transition-all"
+                            >
+                              <ShoppingBag className="size-3.5" />
+                              {isAm ? `ክፈት (${item.priceDisplay})` : `Purchase (${item.priceDisplay})`}
+                            </Button>
+                          </div>
                         )}
                       </div>
-                    </div>
+                    </article>
                   )
                 })}
               </div>
@@ -1695,151 +1931,189 @@ export default function StudentDashboardPage() {
         </main>
       </div>
 
-      {/* ─── MODAL 1: PURCHASE & UNLOCK MODAL ─── */}
+      {/* ─── DIGITAL LIBRARY CHECKOUT MODAL ─── */}
       {purchasingResource && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md animate-fade-in overflow-y-auto"
           onClick={() => setPurchasingResource(null)}
         >
           <div
-            className="relative w-full max-w-lg rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-2xl animate-scale-in"
+            className="relative my-6 w-full max-w-xl rounded-3xl border border-border/80 bg-card p-6 sm:p-8 shadow-2xl animate-scale-in flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between pb-4 border-b">
+            {/* Close button */}
+            <button
+              onClick={() => setPurchasingResource(null)}
+              className="absolute right-5 top-5 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <X className="size-5" />
+            </button>
+
+            {/* Header */}
+            <div className="flex items-start gap-3.5 pb-4 border-b pr-8">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400 border border-blue-500/20">
+                {purchasingResource.format.toLowerCase().includes('video') ? (
+                  <Video className="size-6" />
+                ) : (
+                  <BookOpen className="size-6" />
+                )}
+              </div>
               <div>
-                <span className="rounded-full bg-blue-500/10 px-3 py-0.5 text-xs font-bold text-blue-600 dark:text-sky-400">
+                <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[11px] font-bold text-blue-600 dark:text-sky-400 border border-blue-500/20">
                   {purchasingResource.format}
                 </span>
-                <h3 className="text-xl font-black text-foreground mt-2">
-                  {isAm ? `${purchasingResource.title} ክፈት` : `Unlock ${purchasingResource.title}`}
+                <h3 className="text-lg sm:text-xl font-black text-foreground mt-1.5 leading-snug">
+                  {purchasingResource.title}
                 </h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {isAm
-                    ? 'ወዲያውኑ በተማሪ ፖርታልዎ ላይ ይሰራል · 24/7 የዕድሜ ልክ የመማሪያ መዳረሻ'
-                    : 'Instant activation to your student dashboard · 24/7 Lifetime access'}
+                  {isAm ? 'መምህር፦ ' : 'Instructor: '}
+                  <span className="font-semibold text-foreground">{purchasingResource.instructor}</span>
                 </p>
               </div>
-              <button
-                onClick={() => setPurchasingResource(null)}
-                className="p-1.5 rounded-xl hover:bg-muted text-muted-foreground"
-              >
-                <X className="size-5" />
-              </button>
             </div>
 
-            <div className="mt-5 space-y-4">
-              {/* Price card */}
-              <div className="flex items-center justify-between p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
-                <span className="text-xs font-semibold text-muted-foreground">
-                  {isAm ? 'የኮርስ ክፍያ፦' : 'Tuition Fee:'}
+            {/* Price Banner */}
+            <div className="mt-4 flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-blue-500/10 via-sky-500/10 to-transparent border border-blue-500/20">
+              <div>
+                <span className="text-xs text-muted-foreground block font-medium">
+                  {isAm ? 'የስልጠና ዋጋ / ክፍያ፦' : 'Total Course Tuition:'}
                 </span>
-                <span className="text-2xl font-black text-blue-600 dark:text-sky-400">
+                <span className="text-2xl font-black text-foreground">
                   {purchasingResource.priceDisplay}
                 </span>
               </div>
-
-              {/* Payment Methods */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-foreground block">
-                  {isAm ? 'የመክፈያ ዘዴ ይምረጡ፦' : 'Select Unlocking Method:'}
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPurchasePaymentMethod('telebirr')}
-                    className={`p-3 rounded-xl border text-xs font-bold transition-all text-left ${
-                      purchasePaymentMethod === 'telebirr'
-                        ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
-                        : 'border-border/80 bg-muted/30 hover:border-blue-500/40 text-foreground'
-                    }`}
-                  >
-                    <p>Telebirr</p>
-                    <p className="text-[10px] opacity-80 mt-0.5">{schoolConfig.phone}</p>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPurchasePaymentMethod('cbe')}
-                    className={`p-3 rounded-xl border text-xs font-bold transition-all text-left ${
-                      purchasePaymentMethod === 'cbe'
-                        ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
-                        : 'border-border/80 bg-muted/30 hover:border-blue-500/40 text-foreground'
-                    }`}
-                  >
-                    <p>CBE Birr / Bank</p>
-                    <p className="text-[10px] opacity-80 mt-0.5">100047747070</p>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPurchasePaymentMethod('tvet_enrolled')}
-                    className={`p-3 rounded-xl border text-xs font-bold transition-all text-left ${
-                      purchasePaymentMethod === 'tvet_enrolled'
-                        ? 'border-emerald-600 bg-emerald-600 text-white shadow-sm'
-                        : 'border-border/80 bg-muted/30 hover:border-emerald-500/40 text-foreground'
-                    }`}
-                  >
-                    <p>{isAm ? 'የቴክኒክና ሙያ ተማሪ' : 'TVET Student'}</p>
-                    <p className="text-[10px] opacity-80 mt-0.5">{isAm ? 'የተመዘገበ ተማሪ ቅናሽ' : 'Enrolled Benefit'}</p>
-                  </button>
-                </div>
-              </div>
-
-              {/* Transaction Ref input */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-foreground">
-                    {isAm ? 'የግብይት መለያ (Transaction ID)፦' : 'Transaction ID / Reference:'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setPurchaseTxnRef(`TLB-${Date.now().toString().slice(-6)}`)}
-                    className="text-blue-600 dark:text-sky-400 font-bold hover:underline"
-                  >
-                    {isAm ? 'የሙከራ ቁጥር ፍጠር' : 'Generate Test ID'}
-                  </button>
-                </div>
-                <input
-                  type="text"
-                  value={purchaseTxnRef}
-                  onChange={(e) => setPurchaseTxnRef(e.target.value)}
-                  placeholder={isAm ? 'ምሳሌ፦ TLB89218491 ወይም የደረሰኝ ቁጥር' : 'e.g. TLB89218491 or Slip number'}
-                  className="w-full h-10 rounded-xl border border-input bg-background px-3 text-xs font-mono outline-none focus:border-blue-500"
-                />
-              </div>
-
-              {/* Anti-piracy disclaimer */}
-              <div className="rounded-xl border border-border/80 bg-muted/30 p-3 text-[11px] text-muted-foreground flex items-center gap-2">
-                <Lock className="size-4 text-emerald-500 shrink-0" />
-                <span>
-                  {isAm
-                    ? 'ሊወርድ የማይችል የDRM ይዘት። በስምዎና መለያዎ በሚታይ ዋተርማርክ በቀጥታ በስቱዲዮዎ ውስጥ ይገኛል።'
-                    : 'Non-downloadable DRM material. Available directly inside your student studio with personalized watermark.'}
+              <div className="text-right">
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                  <Lock className="size-3" />
+                  {isAm ? 'የዕድሜ ልክ መዳረሻ' : 'Lifetime Access'}
                 </span>
               </div>
             </div>
 
-            <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPurchasingResource(null)}
-                className="rounded-xl text-xs"
-              >
-                {isAm ? 'ተመለስ' : 'Cancel'}
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleConfirmPurchase}
-                disabled={purchaseLoading}
-                className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-blue-500/20"
-              >
-                {purchaseLoading
-                  ? (isAm ? 'በማረጋገጥ ላይ...' : 'Activating...')
-                  : (isAm ? 'አረጋግጥ እና ስቱዲዮውን ክፈት →' : 'Confirm & Launch Studio →')}
-              </Button>
+            {/* Payment Selection Options */}
+            <div className="mt-5 space-y-3">
+              <p className="text-xs font-bold text-foreground">
+                {isAm ? 'የመክፈያ ዘዴ ይምረጡ (Choose Payment Method)፦' : 'Select Official Payment Gateway:'}
+              </p>
+
+              {purchasingResource.priceETB === 0 ? (
+                <Button
+                  onClick={() => handleFreeUnlock(purchasingResource)}
+                  disabled={freeUnlockLoading}
+                  className="w-full h-12 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20"
+                >
+                  {freeUnlockLoading
+                    ? (isAm ? 'በመክፈት ላይ...' : 'Activating...')
+                    : (isAm ? 'ነፃ ይዘቱን አሁኑኑ ክፈት →' : 'Unlock Free Resource Now →')}
+                </Button>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {/* Option 1: Chapa Instant Gateway */}
+                  <div
+                    onClick={() => handleOpenChapaModal(purchasingResource)}
+                    className="relative group p-4 rounded-2xl border-2 border-emerald-500/40 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500 transition-all cursor-pointer flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="size-8 rounded-lg bg-emerald-600 text-white font-black text-xs flex items-center justify-center">
+                          C
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full">
+                          {isAm ? 'ወዲያው የሚከፈት' : 'Instant Unlock'}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-black text-sm text-foreground">
+                          Chapa Online Gateway
+                        </h4>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
+                          Telebirr, CBEBirr & Visa / Mastercard. Instant verification.
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      className="mt-4 w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20"
+                    >
+                      {isAm ? 'በቻፓ ክፈል →' : 'Pay via Chapa →'}
+                    </Button>
+                  </div>
+
+                  {/* Option 2: Manual Bank Transfer */}
+                  <div
+                    onClick={() => handleOpenManualModal(purchasingResource)}
+                    className="relative group p-4 rounded-2xl border border-border/80 bg-muted/30 hover:bg-muted/50 hover:border-blue-500/40 transition-all cursor-pointer flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="size-8 rounded-lg bg-blue-600 text-white font-black text-xs flex items-center justify-center">
+                          <Building className="size-4" />
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-600 dark:text-sky-400 px-2 py-0.5 rounded-full">
+                          {isAm ? 'ባንክ / ደረሰኝ' : 'Bank Slip'}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-black text-sm text-foreground">
+                          Manual Bank Transfer
+                        </h4>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">
+                          Direct transfer to CBE, BOA or Telebirr with receipt submission.
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="mt-4 w-full rounded-xl text-xs font-bold border-blue-500/30 text-blue-600 dark:text-sky-400 hover:bg-blue-500/10"
+                    >
+                      {isAm ? 'በደረሰኝ አስገባ →' : 'Submit Bank Slip →'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Security watermark notice */}
+              <div className="mt-3 rounded-xl border border-border/70 bg-muted/30 p-3 text-[11px] text-muted-foreground flex items-center gap-2">
+                <ShieldCheck className="size-4 text-emerald-500 shrink-0" />
+                <span>
+                  {isAm
+                    ? 'ደህንነቱ የተጠበቀ ይዘት። በስምዎና በተማሪ መለያ ቁጥርዎ የሚታይ DRM ዋተርማርክ አለው።'
+                    : 'DRM secured digital material. Embedded with your personalized student ID watermark.'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* ─── DIGITAL LIBRARY CHAPA MODAL ─── */}
+      <ChapaInlineModal
+        resource={chapaResource}
+        isOpen={Boolean(chapaResource)}
+        onClose={() => setChapaResource(null)}
+        onSuccess={async () => {
+          const currentId = chapaResource?.id
+          setChapaResource(null)
+          await fetchStudentData()
+          if (currentId) {
+            const target = synchronizedResources.find((r) => r.id === currentId)
+            if (target) {
+              setActiveStudioResource(target)
+            }
+          }
+        }}
+      />
+
+      {/* ─── DIGITAL LIBRARY MANUAL PURCHASE MODAL ─── */}
+      <DigitalPurchaseModal
+        resource={manualPurchaseResource}
+        isOpen={Boolean(manualPurchaseResource)}
+        onClose={() => {
+          setManualPurchaseResource(null)
+          fetchStudentData()
+        }}
+      />
 
       {/* ─── MODAL 2: HOW IT WORKS / FAQ MODAL ("እንዴት?") ─── */}
       {helpModalOpen && (
