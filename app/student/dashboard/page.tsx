@@ -477,9 +477,6 @@ export default function StudentDashboardPage() {
     return list
   }, [digitalPurchases, registrations, catalogMap, synchronizedResources, isAm])
 
-  const totalEnrolledCount = enrolledCourses.filter((c) => c.status === 'Active').length
-  const totalCompletedLessons = enrolledCourses.reduce((sum, c) => sum + c.completedCount, 0)
-
   type NavTabId = 'overview'
 
   interface NavItem {
@@ -657,37 +654,6 @@ export default function StudentDashboardPage() {
               </ul>
             </div>
           ))}
-
-          {/* Student Status Card in Sidebar */}
-          <div className="rounded-2xl border border-blue-900/50 bg-white/5 p-3.5 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300/80">
-                {isAm ? 'የተማሪ ሁኔታ' : 'Student Status'}
-              </span>
-              <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                {isAm ? 'ንቁ' : 'Active'}
-              </span>
-            </div>
-            <div className="space-y-1 text-xs">
-              <div className="flex justify-between items-center text-blue-200/80">
-                <span>{isAm ? 'መለያ ቁጥር' : 'Student ID'}:</span>
-                <span className="font-mono font-bold text-white">{student.studentId}</span>
-              </div>
-              <div className="flex justify-between items-center text-blue-200/80">
-                <span>{isAm ? 'የትምህርት አይነት' : 'Learning Mode'}:</span>
-                <span className="font-medium text-white truncate max-w-[130px]">
-                  {isAm ? 'በራስ ፍጥነት' : '100% Self-Paced'}
-                </span>
-              </div>
-              <div className="flex justify-between items-center text-blue-200/80">
-                <span>{isAm ? 'መዳረሻ' : 'Access'}:</span>
-                <span className="font-bold text-emerald-400">
-                  {isAm ? 'ቋሚ (Lifetime)' : 'Lifetime Access'}
-                </span>
-              </div>
-            </div>
-          </div>
         </nav>
 
         {/* Bottom User Strip */}
@@ -816,183 +782,9 @@ export default function StudentDashboardPage() {
         </header>
 
         {/* Scrollable Main Area */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-8 py-6 space-y-6">
-          {/* ── TOP COMPACT 4-CARD METRIC STRIP ── */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {/* Card 1: Enrolled Courses */}
-            <div
-              onClick={() => handleScrollTo('enrolled-courses')}
-              className="rounded-2xl border border-border/80 bg-card p-4 hover:border-blue-500/40 hover:bg-muted/40 cursor-pointer transition-all"
-            >
-              <div className="flex items-center justify-between text-muted-foreground">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400">
-                  {isAm ? 'የተከፈቱ ስልጠናዎች' : 'Enrolled Courses'}
-                </span>
-                <BookOpen className="size-4 text-blue-600 dark:text-sky-400" />
-              </div>
-              <p className="mt-2 text-2xl font-black text-foreground">
-                {totalEnrolledCount}
-              </p>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {totalEnrolledCount > 0
-                  ? (isAm ? 'ቋሚ መዳረሻ አለዎት' : 'Lifetime access active')
-                  : (isAm ? 'ምንም ስልጠና አልተከፈተም' : 'No courses unlocked yet')}
-              </p>
-            </div>
-
-            {/* Card 2: Completed Lessons */}
-            <div
-              onClick={() => handleScrollTo('enrolled-courses')}
-              className="rounded-2xl border border-border/80 bg-card p-4 hover:border-blue-500/40 cursor-pointer transition-all"
-            >
-              <div className="flex items-center justify-between text-muted-foreground">
-                <span className="text-[11px] font-bold uppercase tracking-wider">
-                  {isAm ? 'የተጠናቀቁ ክፍሎች' : 'Completed Lessons'}
-                </span>
-                <CheckCircle2 className="size-4 text-emerald-500" />
-              </div>
-              <p className="mt-2 text-2xl font-black text-foreground">
-                {totalCompletedLessons}
-              </p>
-              <p className="mt-0.5 text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                <Sparkles className="size-3" /> {isAm ? 'በራስዎ ፍጥነት ይማሩ' : 'Self-Paced Progress'}
-              </p>
-            </div>
-
-            {/* Card 3: Learning Mode */}
-            <div
-              onClick={() => handleScrollTo('courses-catalog')}
-              className="rounded-2xl border border-border/80 bg-card p-4 hover:border-blue-500/40 cursor-pointer transition-all"
-            >
-              <div className="flex items-center justify-between text-muted-foreground">
-                <span className="text-[11px] font-bold uppercase tracking-wider">
-                  {isAm ? 'የትምህርት ዘይቤ' : 'Learning Mode'}
-                </span>
-                <Clock className="size-4 text-amber-500" />
-              </div>
-              <p className="mt-2 text-base font-bold text-foreground truncate">
-                {isAm ? '100% በራስ ፍጥነት' : '100% Self-Paced'}
-              </p>
-              <p className="mt-0.5 text-xs text-muted-foreground truncate">
-                {isAm ? 'በማንኛውም ሰዓትና ቦታ' : '24/7 on-demand access'}
-              </p>
-            </div>
-
-            {/* Card 4: Credentials */}
-            <div
-              onClick={() => handleScrollTo('credentials-section')}
-              className="rounded-2xl border border-border/80 bg-card p-4 hover:border-blue-500/40 hover:bg-muted/40 cursor-pointer transition-all group"
-            >
-              <div className="flex items-center justify-between text-muted-foreground">
-                <span className="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1">
-                  <span>{isAm ? 'ይፋዊ ሰነዶች' : 'Credentials'}</span>
-                </span>
-                <Award className="size-4 text-sky-500 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-              <p className="mt-2 text-base font-black text-blue-600 dark:text-sky-400">
-                {isAm ? 'ዕውቅና ያለው' : 'Accredited'}
-              </p>
-              <p className="mt-0.5 text-xs text-muted-foreground flex items-center gap-1">
-                <span>{isAm ? 'ምስክር ወረቀት እና ደረሰኝ' : 'Certificates & receipts'}</span>
-                <ChevronRight className="size-3 text-muted-foreground group-hover:text-blue-500" />
-              </p>
-            </div>
-          </div>
-
-          {/* ── NOTICE STRIP ── */}
-          {totalEnrolledCount > 0 ? (
-            <div className="rounded-2xl border border-blue-500/30 bg-blue-500/10 dark:bg-blue-950/40 p-3.5 sm:p-4 text-xs sm:text-sm text-foreground flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-              <div className="flex items-center gap-2.5">
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-blue-500 text-white font-bold text-xs shadow-xs">
-                  ℹ
-                </span>
-                <div>
-                  <span className="font-bold text-blue-700 dark:text-sky-300">
-                    {isAm ? 'የእርስዎ ትምህርት ቤት፦' : 'Your Learning Workspace:'}
-                  </span>{' '}
-                  <span className="text-muted-foreground">
-                    {isAm
-                      ? `በራስዎ ፍጥነት የሚማሩባቸው ${totalEnrolledCount} ስልጠናዎች ዝግጁ ናቸው። በፈለጉት ሰዓት መማር መቀጠል ይችላሉ።`
-                      : `You have ${totalEnrolledCount} self-paced course(s) unlocked on your account with 24/7 lifetime access.`}
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={() => handleScrollTo('enrolled-courses')}
-                className="shrink-0 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline underline-offset-4 self-end sm:self-center cursor-pointer"
-              >
-                {isAm ? 'ወደ ትምህርቶቼ ሂድ →' : 'Go to My Courses →'}
-              </button>
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-border/80 bg-card p-3.5 sm:p-4 text-xs sm:text-sm text-muted-foreground flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-              <div className="flex items-center gap-2.5">
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-muted text-foreground font-bold text-xs">
-                  ℹ
-                </span>
-                <div>
-                  <span className="font-bold text-foreground">
-                    {isAm ? 'በራስ ፍጥነት የሚሰጥ ትምህርት፦' : 'Self-Paced Learning:'}
-                  </span>{' '}
-                  <span>
-                    {isAm
-                      ? 'እንኳን ወደ ሄሎ ቴክኖሎጂ ተማሪ ፖርታል በደህና መጡ! የሚፈልጉትን የቪዲዮ ኮርስ ወይም ማንዋል በመክፈት ትምህርትዎን አሁኑኑ በራስዎ ፍጥነት ይጀምሩ።'
-                      : 'Welcome to Hello Technology Student Portal! Browse our self-paced mastercourses below to unlock instant 24/7 access.'}
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={() => handleScrollTo('courses-catalog')}
-                className="shrink-0 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline underline-offset-4 self-end sm:self-center cursor-pointer"
-              >
-                {isAm ? 'ስልጠናዎችን ይመልከቱ →' : 'Browse Courses →'}
-              </button>
-            </div>
-          )}
-
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-8 py-6 space-y-8">
           {/* ─── UNIFIED DASHBOARD HUB ─── */}
-          <div className="mt-4 space-y-8 animate-fade-in">
-            {/* Student Welcome & Quick Actions Hero */}
-            <div className="rounded-3xl border border-blue-500/25 bg-gradient-to-r from-blue-600/10 via-sky-500/10 to-transparent p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 shadow-sm">
-              <div className="space-y-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    {isAm ? 'ንቁ የተማሪ አካውንት' : 'Authenticated Student Workspace'}
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 border border-blue-500/25 px-2.5 py-0.5 text-[11px] font-mono font-bold text-blue-700 dark:text-sky-300">
-                    {student.studentId}
-                  </span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
-                  {isAm ? `እንኳን ደህና መጡ፣ ${student.fullName}!` : `Welcome back, ${student.fullName}!`}
-                </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
-                  {isAm
-                    ? `በሄሎ ቴክኖሎጂ ተማሪ ፖርታል አማካኝነት በራስዎ ፍጥነት የተዘጋጁ የቪዲዮ ማስተርክላሶችን እና የቴክኒክ ጥገና ማንዋሎችን በማንኛውም ሰዓት ይከታተሉ።`
-                    : `Study high-definition video masterclasses and practical technical repair manuals at your own pace with 24/7 on-demand access.`}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                <Button
-                  onClick={() => handleScrollTo('enrolled-courses')}
-                  className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs h-10 px-4 shadow-md shadow-blue-500/25 cursor-pointer"
-                >
-                  <BookOpen className="size-3.5 mr-1.5" />
-                  {isAm ? 'የእኔ ትምህርቶች' : 'My Enrolled Courses'}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleScrollTo('courses-catalog')}
-                  className="rounded-xl text-xs font-semibold h-10 px-4 cursor-pointer"
-                >
-                  <ShoppingBag className="size-3.5 mr-1.5 text-blue-600 dark:text-sky-400" />
-                  {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore Courses'}
-                </Button>
-              </div>
-            </div>
-
+          <div className="space-y-8 animate-fade-in">
             {/* SECTION: MY ENROLLED COURSES */}
             <div id="enrolled-courses" className="space-y-4 scroll-mt-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b">
