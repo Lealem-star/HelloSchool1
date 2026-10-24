@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef } from 'react'
 import { useLanguage } from '@/components/language-provider'
 import {
   ArrowRight,
@@ -21,12 +21,23 @@ import {
   Zap,
   Lock,
   Play,
+  Pause,
   ShoppingBag,
+  BarChart3,
+  ListChecks,
+  Tv,
+  Check,
+  Layers,
+  ChevronRight,
+  Maximize2,
+  Volume2,
+  VolumeX,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { PublicCourse, PublicLibraryItem } from '@/lib/content'
 import { CourseIcon, PageIntro, SearchField, SiteShell, CTASection } from '@/components/site'
 import { DigitalPurchaseModal } from '@/components/digital-purchase-modal'
+import { DIGITAL_CATALOG } from '@/lib/digital-catalog'
 
 /* ──────────────────────────────────────────────────────────────
    Courses Catalog Component
@@ -88,9 +99,9 @@ export function CoursesCatalog({
                   : 'Register for more than two courses and get one course completely free. All training tracks include hands-on practical lab training, COC exam alignment (Basic Electrical Electronics & Industrial Machines), and access to our technical digital library.'}
               </p>
             </div>
-            <Link href="/register" className="shrink-0">
+            <Link href="/library" className="shrink-0">
               <Button className="rounded-xl px-5 font-bold uppercase tracking-wider text-xs bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/25">
-                {isAm ? 'አሁኑኑ ይመዝገቡ' : 'Register for Cohort'} <ArrowRight className="ml-1.5 size-4" />
+                {isAm ? 'ዲጂታል ላይብረሪ' : 'Explore Courses'} <ArrowRight className="ml-1.5 size-4" />
               </Button>
             </Link>
           </div>
@@ -197,7 +208,7 @@ export function CoursesCatalog({
 }
 
 /* ──────────────────────────────────────────────────────────────
-   Resource Detail / Preview Modal
+   Enhanced Interactive Media / Preview Modal
    ────────────────────────────────────────────────────────────── */
 function ResourceModal({
   resource,
@@ -210,45 +221,75 @@ function ResourceModal({
 }) {
   const { language } = useLanguage()
   const isAm = language === 'am'
+  const [activeLessonIndex, setActiveLessonIndex] = useState(0)
+
   if (!resource) return null
 
+  const catalogMeta = DIGITAL_CATALOG[resource.id]
+  const isVideo =
+    resource.format.toLowerCase().includes('video') ||
+    (resource.pages && resource.pages.toLowerCase().includes('hour')) ||
+    (resource.pages && resource.pages.toLowerCase().includes('lesson'))
   const isAvailable = resource.status.toLowerCase() === 'available'
+
+  // Default sample lessons if not in catalogMeta
+  const lessons = catalogMeta?.lessons || [
+    {
+      id: 'l1',
+      title: isAm ? 'ክፍል 1፡ የላብራቶሪ መሣሪያዎች አጠቃቀምና ዝግጅት' : 'Lesson 1: Bench Safety, Meters & Optical Alignment',
+      duration: '14:35',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      summary: isAm ? 'የመልቲሜትር፣ የዲሲ ፓወር ሰፕላይ እና የስቴሪዮ ማይክሮስኮፕ ዝግጅት።' : 'Essential workstation setup, probe calibration, and ESD safety protocols.',
+    },
+    {
+      id: 'l2',
+      title: isAm ? 'ክፍል 2፡ የሰርኪዩት ንድፍና የመለኪያ መርሆዎች' : 'Lesson 2: Diode Mode Tracing & Power Rail Testing',
+      duration: '19:40',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+      summary: isAm ? 'በሰሌዳ ላይ የቮልቴጅ እና የሾርት ሰርኪውት ፍተሻ በዳዮድ ሞድ።' : 'Voltage drop readings, ground injections, and short-to-ground localization.',
+    },
+    {
+      id: 'l3',
+      title: isAm ? 'ክፍል 3፡ የላቁ የጥገና ቴክኒኮችና ማጠቃለያ' : 'Lesson 3: Component Replacement & Bench QA Checklist',
+      duration: '22:15',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+      summary: isAm ? 'የተጠገኑ መሳሪያዎችን የመጨረሻ ፍተሻ ማድረግና የጥራት ማረጋገጫ።' : 'Final functional verification, current draw profile analysis, and quality check.',
+    },
+  ]
+
+  const activeLesson = lessons[activeLessonIndex] || lessons[0]
+  const videoSrc = activeLesson?.videoUrl || resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/60 p-4 backdrop-blur-md animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/75 p-4 backdrop-blur-md animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="relative my-8 w-full max-w-2xl rounded-3xl border bg-card p-6 shadow-2xl dark:border-slate-800 md:p-8 animate-scale-in"
+        className="relative my-8 w-full max-w-4xl overflow-hidden rounded-3xl border border-border/80 bg-card shadow-2xl animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-4 border-b pb-5 dark:border-slate-800">
+        {/* Modal Top Header */}
+        <div className="flex items-center justify-between border-b border-border/60 bg-muted/30 px-6 py-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-sky-400">
-              {resource.format.includes('Video') ? (
-                <Video className="size-6" />
-              ) : resource.format.includes('Reference') ? (
-                <CircuitBoard className="size-6" />
-              ) : (
-                <FileText className="size-6" />
-              )}
+            <span className={`flex size-10 items-center justify-center rounded-xl text-white shadow-sm ${
+              isVideo ? 'bg-blue-600' : 'bg-indigo-600'
+            }`}>
+              {isVideo ? <Video className="size-5" /> : <BookOpen className="size-5" />}
             </span>
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-primary">
                   {resource.category}
                 </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${isAvailable
-                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
-                      : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
-                    }`}
-                >
-                  {isAvailable ? (isAm ? 'ይገኛል' : 'Available') : (isAm ? 'በቅርቡ' : 'Coming Soon')}
+                <span className="text-muted-foreground">·</span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {isVideo ? (isAm ? 'የቪዲዮ ኮርስ ማሳያ' : 'Video Masterclass Preview') : (isAm ? 'ቴክኒካል መጽሐፍ / ማኑዋል' : 'Technical Book / Manual')}
                 </span>
               </div>
-              <h3 className="mt-1 text-xl font-bold">{resource.title}</h3>
+              <h3 className="text-base sm:text-lg font-bold text-foreground leading-tight line-clamp-1">
+                {resource.title}
+              </h3>
             </div>
           </div>
           <button
@@ -260,55 +301,163 @@ function ResourceModal({
           </button>
         </div>
 
-        <div className="mt-6 space-y-6">
-          <p className="text-sm leading-7 text-muted-foreground">{resource.description}</p>
+        {/* Modal Body */}
+        <div className="max-h-[75vh] overflow-y-auto p-6 sm:p-8">
+          {isVideo ? (
+            /* ─── VIDEO PREVIEW PLAYER & LESSONS ─── */
+            <div className="space-y-6">
+              {/* Video Player */}
+              <div className="overflow-hidden rounded-2xl border border-slate-800 bg-black shadow-lg">
+                <div className="relative aspect-video w-full">
+                  <video
+                    key={videoSrc}
+                    src={videoSrc}
+                    controls
+                    poster={resource.thumbnailUrl || '/images/course-preview-hero.jpg'}
+                    className="size-full object-cover"
+                  />
+                </div>
+                <div className="flex items-center justify-between bg-slate-950 px-4 py-2.5 text-xs text-white">
+                  <span className="flex items-center gap-2 font-medium">
+                    <Play className="size-3.5 fill-red-500 text-red-500" />
+                    <span>{activeLesson?.title}</span>
+                  </span>
+                  <span className="text-slate-400 font-mono">{activeLesson?.duration}</span>
+                </div>
+              </div>
 
-          <div className="grid grid-cols-2 gap-3 rounded-2xl bg-muted/40 p-4 text-xs sm:grid-cols-4">
+              {/* Lesson Switcher */}
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+                  {isAm ? 'በኮርሱ ውስጥ የተካተቱ የቪዲዮ ክፍለ-ጊዜዎች' : 'Interactive Lesson Milestones'}
+                </p>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {lessons.map((lesson, idx) => (
+                    <button
+                      key={lesson.id}
+                      onClick={() => setActiveLessonIndex(idx)}
+                      className={`flex flex-col text-left p-3 rounded-xl border text-xs transition-all duration-200 ${
+                        activeLessonIndex === idx
+                          ? 'border-blue-600 bg-blue-600/10 text-foreground ring-1 ring-blue-500'
+                          : 'border-border/60 bg-card hover:border-primary/40 text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between font-bold text-foreground mb-1">
+                        <span className="line-clamp-1">{lesson.title}</span>
+                        <span className="font-mono text-[10px] text-primary">{lesson.duration}</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground line-clamp-2">
+                        {lesson.summary}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* ─── BOOK / MANUAL PREVIEW ─── */
+            <div className="space-y-6">
+              <div className="flex flex-col md:flex-row gap-6 items-start rounded-2xl border border-border/80 bg-muted/20 p-5">
+                <div className="w-full md:w-48 shrink-0 overflow-hidden rounded-xl border border-border/80 shadow-md">
+                  <img
+                    src={resource.thumbnailUrl || '/images/manual-book-cover.jpg'}
+                    alt={resource.title}
+                    className="w-full aspect-[4/5] object-cover"
+                  />
+                </div>
+                <div className="flex-1">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-2">
+                    <BookOpen className="size-3" /> {isAm ? 'የተረጋገጠ የጥገና መጽሐፍ' : 'Verified Technician Handbook'}
+                  </span>
+                  <h4 className="text-xl font-bold text-foreground">{resource.title}</h4>
+                  <p className="mt-1 text-xs text-muted-foreground font-medium">
+                    {isAm ? 'አዘጋጅ፦ ' : 'Author : '} <span className="font-semibold text-foreground">{resource.instructor || 'Hello Technology Academy'}</span>
+                  </p>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+                    {resource.description}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-lg bg-card border px-3 py-1 font-semibold text-foreground">
+                      📄 {resource.pages || '250 Pages'}
+                    </span>
+                    <span className="rounded-lg bg-card border px-3 py-1 font-semibold text-foreground">
+                      📊 {resource.level || 'All Skill Levels'}
+                    </span>
+                    <span className="rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-3 py-1 font-bold">
+                      {resource.priceETB === 0 ? (isAm ? 'ነፃ መዳረሻ' : 'Free Access') : `${resource.priceETB} ETB`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sample Chapters Table */}
+              <div className="rounded-2xl border border-border/80 overflow-hidden">
+                <div className="bg-muted/40 px-4 py-3 border-b border-border/60">
+                  <h5 className="text-xs font-bold uppercase tracking-wider text-foreground">
+                    {isAm ? 'የምዕራፎች ማውጫና የሰርኪዩት ንድፎች' : 'Chapter Table of Contents & Schematics'}
+                  </h5>
+                </div>
+                <div className="divide-y divide-border/60 text-xs">
+                  <div className="p-3.5 flex items-center justify-between hover:bg-muted/20">
+                    <div>
+                      <p className="font-bold text-foreground">Chapter 1: Power Rail Architectures & Voltage Injection</p>
+                      <p className="text-muted-foreground text-[11px]">Primary buck converters, VDD_MAIN drop testing, and short detection</p>
+                    </div>
+                    <span className="font-mono text-muted-foreground text-[11px]">pp. 1 - 42</span>
+                  </div>
+                  <div className="p-3.5 flex items-center justify-between hover:bg-muted/20">
+                    <div>
+                      <p className="font-bold text-foreground">Chapter 2: USB Fast Charging & Handshake Protocols</p>
+                      <p className="text-muted-foreground text-[11px]">Type-C CC orientation lines, OVP protection MOSFETs, and battery NTC logic</p>
+                    </div>
+                    <span className="font-mono text-muted-foreground text-[11px]">pp. 43 - 88</span>
+                  </div>
+                  <div className="p-3.5 flex items-center justify-between hover:bg-muted/20">
+                    <div>
+                      <p className="font-bold text-foreground">Chapter 3: Display Backlight Boost & T-CON Calibration</p>
+                      <p className="text-muted-foreground text-[11px]">Inductor boost ratios, high-voltage diode arrays, and cathode feedback rails</p>
+                    </div>
+                    <span className="font-mono text-muted-foreground text-[11px]">pp. 89 - 142</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Quick Specifications Grid */}
+          <div className="mt-6 grid grid-cols-2 gap-3 rounded-2xl bg-muted/40 p-4 text-xs sm:grid-cols-4">
             <div>
               <p className="text-muted-foreground">{isAm ? 'ፎርማት' : 'Format'}</p>
-              <p className="mt-1 font-semibold text-foreground">{resource.format || 'Document'}</p>
+              <p className="mt-1 font-semibold text-foreground">{resource.format || (isVideo ? 'Video Course' : 'Book / PDF')}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">{isAm ? 'የደረጃ ከፍታ' : 'Difficulty Level'}</p>
-              <p className="mt-1 font-semibold text-foreground">{resource.level || (isAm ? 'ሁሉም ደረጃዎች' : 'All Levels')}</p>
+              <p className="text-muted-foreground">{isAm ? 'የደረጃ ከፍታ' : 'Difficulty'}</p>
+              <p className="mt-1 font-semibold text-foreground">{resource.level || 'Everyone'}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">{isAm ? 'ገጾች / ቆይታ' : 'Pages / Duration'}</p>
+              <p className="text-muted-foreground">{isVideo ? (isAm ? 'የቪዲዮ ቆይታ' : 'Video Duration') : (isAm ? 'የገጽ ብዛት' : 'Page Count')}</p>
               <p className="mt-1 font-semibold text-foreground">{resource.pages || 'N/A'}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">{isAm ? 'የመዳረሻ ክፍያ' : 'Access Fee'}</p>
-              <p className="mt-1 font-semibold text-primary">{resource.price || (resource.priceETB ? `${resource.priceETB} ${isAm ? 'ብር' : 'ETB'}` : (isAm ? 'ነፃ' : 'Free'))}</p>
+              <p className="text-muted-foreground">{isAm ? 'ክፍያ' : 'Price'}</p>
+              <p className="mt-1 font-bold text-primary">
+                {resource.priceETB === 0
+                  ? (isAm ? 'ነፃ' : 'Free')
+                  : `${resource.priceETB} ETB`}
+              </p>
             </div>
-          </div>
-
-          <div className="rounded-2xl border p-4 text-xs dark:border-slate-800">
-            <p className="font-bold text-foreground">{isAm ? 'በዚህ ማቴሪያል ውስጥ የተካተቱ ነጥቦች፡' : 'Topics covered in this resource:'}</p>
-            <ul className="mt-2.5 space-y-1.5 text-muted-foreground">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
-                <span>{isAm ? 'የተደራጁ የዲያግኖስቲክስ ሂደቶችና የሰርኪዩት ንድፍ ንባብ' : 'Systematic diagnostic procedures & schematic navigation'}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
-                <span>{isAm ? 'የኤሌክትሮኒክስ አካላት ፍተሻ በመልቲሜትር ዳዮድ ሞድ' : 'Component-level testing with multimeter diode mode drop values'}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
-                <span>{isAm ? 'የተግባራዊ ወርክሾፕ የደህንነት እና የብልሽት መለያ ደረጃዎች' : 'Practical workshop safety and fault isolation steps'}</span>
-              </li>
-            </ul>
           </div>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t pt-5 dark:border-slate-800">
+        {/* Modal Footer Actions */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 bg-muted/30 px-6 py-4">
           <Button variant="outline" size="sm" onClick={onClose} className="rounded-xl">
             {isAm ? 'ዝጋ' : 'Close preview'}
           </Button>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
             <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-              <Lock className="size-3" /> {isAm ? 'የተጠበቀ DRM የትምህርት ማቴሪያል' : 'Protected DRM Material (No Downloads)'}
+              <Lock className="size-3" /> {isAm ? 'የተጠበቀ ዲጂታል ትምህርት' : 'Protected Digital Curriculum'}
             </span>
             <Button
               size="sm"
@@ -319,14 +468,14 @@ function ResourceModal({
                   onBuy(resToBuy)
                 }
               }}
-              className="rounded-xl gap-1.5 bg-[#155DFC] hover:bg-blue-600 text-white font-bold text-xs shadow-md shadow-blue-500/20"
+              className="rounded-xl gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/25 px-5"
             >
               <ShoppingBag className="size-3.5" />
               {resource.priceETB === 0
-                ? (isAm ? 'በነፃ ይመልከቱ' : 'Claim Free Access')
+                ? (isAm ? 'በነፃ ይመልከቱ' : 'Access For Free')
                 : (isAm
-                  ? `አሁኑኑ ይግዙ · ${resource.price || `${resource.priceETB} ብር`}`
-                  : `Buy Now · ${resource.price || `${resource.priceETB} ETB`}`)}
+                  ? `አሁኑኑ ይግዙ · ${resource.priceETB} ብር`
+                  : `Get Started · ${resource.priceETB} ETB`)}
             </Button>
           </div>
         </div>
@@ -347,102 +496,251 @@ export function LibraryCatalog({
 }) {
   const { language } = useLanguage()
   const isAm = language === 'am'
+
+  // Primary filters
+  const [formatFilter, setFormatFilter] = useState<'All' | 'Video' | 'Book'>('All')
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All resources')
-  const [statusFilter, setStatusFilter] = useState<'All' | 'Available' | 'Coming Soon'>('All')
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Available' | 'Free'>('All')
+
+  // Modals & player state
   const [selectedResource, setSelectedResource] = useState<PublicLibraryItem | null>(null)
   const [purchasingResource, setPurchasingResource] = useState<PublicLibraryItem | null>(null)
+  const [heroVideoPlaying, setHeroVideoPlaying] = useState(false)
+
+  // Counts
+  const videoCount = useMemo(
+    () =>
+      resources.filter(
+        (r) =>
+          r.format.toLowerCase().includes('video') ||
+          (r.pages && r.pages.toLowerCase().includes('hour')) ||
+          (r.pages && r.pages.toLowerCase().includes('lesson'))
+      ).length,
+    [resources]
+  )
+
+  const bookCount = useMemo(
+    () =>
+      resources.filter(
+        (r) =>
+          !r.format.toLowerCase().includes('video') &&
+          !(r.pages && r.pages.toLowerCase().includes('hour'))
+      ).length,
+    [resources]
+  )
 
   const availableCount = useMemo(
     () => resources.filter((r) => r.status.toLowerCase() === 'available').length,
     [resources]
   )
 
+  // Filtered items
   const filtered = useMemo(() => {
     return resources.filter((r) => {
-      const matchesCategory = category === 'All resources' || r.category === category
-      const matchesStatus =
-        statusFilter === 'All' ||
-        (statusFilter === 'Available' && r.status.toLowerCase() === 'available') ||
-        (statusFilter === 'Coming Soon' && r.status.toLowerCase() === 'coming soon')
-      const matchesQuery =
-        `${r.title} ${r.description} ${r.category} ${r.format}`
-          .toLowerCase()
-          .includes(query.toLowerCase())
+      const isVideo =
+        r.format.toLowerCase().includes('video') ||
+        (r.pages && r.pages.toLowerCase().includes('hour')) ||
+        (r.pages && r.pages.toLowerCase().includes('lesson'))
 
-      return matchesCategory && matchesStatus && matchesQuery
+      // Format filter
+      if (formatFilter === 'Video' && !isVideo) return false
+      if (formatFilter === 'Book' && isVideo) return false
+
+      // Category filter
+      if (category !== 'All resources' && r.category !== category) return false
+
+      // Status filter
+      if (statusFilter === 'Available' && r.status.toLowerCase() !== 'available') return false
+      if (statusFilter === 'Free' && (r.priceETB ?? 0) > 0) return false
+
+      // Search query
+      const searchTarget = `${r.title} ${r.description} ${r.category} ${r.format} ${r.instructor ?? ''}`.toLowerCase()
+      if (query && !searchTarget.includes(query.toLowerCase())) return false
+
+      return true
     })
-  }, [resources, category, statusFilter, query])
+  }, [resources, formatFilter, category, statusFilter, query])
 
   return (
     <SiteShell>
-      <PageIntro
-        eyebrow={isAm ? 'ዲጂታል ቴክኒካል ቤተ-መጽሐፍት' : 'Digital Technical Library'}
-        title={isAm ? 'ከተግባራዊ ክፍለ-ጊዜው ባሻገር ዕውቀትዎን ያዳብሩ' : 'Keep learning beyond the workshop.'}
-        description={
-          isAm
-            ? 'በሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል መምህራን የተዘጋጁ የጥገና ማኑዋሎች፣ መልቲሜትር ዲያግኖስቲክስ ቺት ሺቶች፣ የሰርኪዩት ንድፎች (Schematics) እና ማይክሮ-ሶልደሪንግ ሪፈረንሶችን ያግኙ።'
-            : 'Access verified repair manuals, multimeter diagnostic cheat sheets, power rail schematics, and micro-soldering references crafted by Hello Technology Training Center faculty.'
-        }
-      />
-
       <main className="container mx-auto max-w-7xl px-5 py-12 lg:px-8">
-        {/* ── METRICS & STATS BAR ── */}
-        <div className="mb-8 grid grid-cols-2 gap-4 rounded-3xl border bg-card p-5 sm:grid-cols-4">
-          <div className="p-3 rounded-2xl bg-muted/30 card-hover-lift">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-              {isAm ? 'አጠቃላይ ማኑዋሎች' : 'Total Resources'}
-            </p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{resources.length}</p>
+        {/* ── HERO: WATCH COURSE PREVIEW (EXACT STYLE FROM SCREENSHOT 1) ── */}
+        <section className="mb-14 text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-sky-500/25 bg-sky-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-4 shadow-sm">
+            <Play className="size-3.5 fill-sky-600 dark:fill-sky-400" />
+            <span>{isAm ? 'ልዩ የኮርስ ማሳያ ቪዲዮ' : 'Featured Course Preview'}</span>
+          </span>
+          <h2 className="text-3xl font-extrabold tracking-tight text-foreground md:text-5xl">
+            {isAm ? 'የስልጠና ማሳያ ቪዲዮ ይመልከቱ' : 'Watch Course Preview'}
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm md:text-base text-muted-foreground">
+            {isAm
+              ? 'በተግባራዊ የቪዲዮ ትምህርቶቻችን እና የጥገና መመሪያዎቻችን ምን እንደሚማሩ የቀጥታ ማሳያ ይመልከቱ።'
+              : "Get a taste of what you'll learn in our comprehensive practical video lessons and technical manuals"}
+          </p>
+
+          {/* Video Player Card */}
+          <div className="mx-auto mt-8 max-w-4xl overflow-hidden rounded-3xl border border-border/80 bg-slate-950 shadow-2xl relative group text-left">
+            {/* Top Bar matching Screenshot 1 */}
+            <div className="flex items-center justify-between px-5 py-3.5 bg-slate-900/90 border-b border-white/10 text-white backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <div className="size-9 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold ring-2 ring-white/20">
+                  HT
+                </div>
+                <div>
+                  <p className="text-xs font-bold leading-tight">
+                    {isAm ? 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል' : 'Hello Technology Academy'}
+                  </p>
+                  <p className="text-[10px] text-slate-300">
+                    {isAm ? 'የተግባራዊ ወርክሾፕ ማሳያ' : 'Practical Workshop Preview'}
+                  </p>
+                </div>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-red-600/20 border border-red-500/30 px-3 py-1 text-[11px] font-bold text-red-400">
+                <span className="size-2 rounded-full bg-red-500 animate-pulse" />
+                HD 1080p
+              </span>
+            </div>
+
+            {/* Video Container / Thumbnail with Big YouTube-Style Play Button */}
+            <div className="relative aspect-video w-full overflow-hidden bg-black flex items-center justify-center">
+              {heroVideoPlaying ? (
+                <video
+                  src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                  controls
+                  autoPlay
+                  className="size-full object-cover"
+                />
+              ) : (
+                <>
+                  <img
+                    src="/images/course-preview-hero.jpg"
+                    alt="Course Preview"
+                    className="size-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+
+                  {/* Centered YouTube-style Red Play Button */}
+                  <button
+                    onClick={() => setHeroVideoPlaying(true)}
+                    className="absolute z-10 flex size-20 md:size-24 items-center justify-center rounded-2xl bg-red-600 text-white shadow-2xl transition-all duration-300 hover:scale-110 hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-500/40"
+                    aria-label="Play course preview"
+                  >
+                    <Play className="size-10 fill-white ml-1" />
+                  </button>
+
+                  {/* Bottom Overlay info inside video frame */}
+                  <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-3 text-white pointer-events-none">
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <span className="rounded-lg bg-black/60 backdrop-blur-md px-2.5 py-1 font-semibold border border-white/10">
+                        ⏱ 14:35 Min
+                      </span>
+                      <span className="rounded-lg bg-black/60 backdrop-blur-md px-2.5 py-1 font-semibold border border-white/10">
+                        🔬 Stereo Microscope Board Tracing
+                      </span>
+                    </div>
+                    <span className="rounded-lg bg-blue-600/90 backdrop-blur-md px-3 py-1 text-xs font-bold text-white shadow-md">
+                      {isAm ? 'አሁኑኑ ይመልከቱ' : 'Click to Watch'}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-          <div className="p-3 rounded-2xl bg-muted/30 card-hover-lift">
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wider font-semibold">
-              {isAm ? 'አሁን የሚገኙ' : 'Available Now'}
-            </p>
-            <p className="mt-1 text-2xl font-bold text-emerald-600 dark:text-emerald-400">{availableCount}</p>
-          </div>
-          <div className="p-3 rounded-2xl bg-muted/30 card-hover-lift">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-              {isAm ? 'የፋይል አይነቶች' : 'Formats'}
-            </p>
-            <p className="mt-1 text-2xl font-bold text-foreground">{isAm ? 'ፒዲኤፍ እና ቪዲዮ' : 'PDFs & Videos'}</p>
-          </div>
-          <div className="p-3 rounded-2xl bg-muted/30 card-hover-lift">
-            <p className="text-xs text-blue-600 dark:text-sky-400 uppercase tracking-wider font-semibold">
-              {isAm ? 'የመዳረሻ ፈቃድ' : 'Access'}
-            </p>
-            <p className="mt-1 text-2xl font-bold text-blue-600 dark:text-sky-400">{isAm ? 'ነፃ / ለተመዘገቡ' : 'Free / Enrolled'}</p>
+        </section>
+
+        {/* ── PRIMARY FORMAT SWITCHER: BOTH VIDEO AND BOOK ── */}
+        <div className="mb-8 flex flex-col items-center justify-center gap-3">
+          <div className="inline-flex rounded-2xl border border-border/80 bg-muted/40 p-1.5 shadow-sm">
+            <button
+              onClick={() => setFormatFilter('All')}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold transition-all duration-200 ${
+                formatFilter === 'All'
+                  ? 'bg-background text-foreground shadow-sm shadow-black/10 scale-[1.02]'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Layers className="size-4" />
+              <span>{isAm ? 'ሁሉንም ማቴሪያሎች' : 'All Materials'}</span>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                {resources.length}
+              </span>
+            </button>
+            <button
+              onClick={() => setFormatFilter('Video')}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold transition-all duration-200 ${
+                formatFilter === 'Video'
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 scale-[1.02]'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Video className="size-4" />
+              <span>{isAm ? '📹 የቪዲዮ ኮርሶች' : '📹 Video Courses'}</span>
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  formatFilter === 'Video' ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                {videoCount}
+              </span>
+            </button>
+            <button
+              onClick={() => setFormatFilter('Book')}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs sm:text-sm font-bold transition-all duration-200 ${
+                formatFilter === 'Book'
+                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25 scale-[1.02]'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <BookOpen className="size-4" />
+              <span>{isAm ? '📚 መጻሕፍትና ማኑዋሎች' : '📚 Books & Manuals'}</span>
+              <span
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  formatFilter === 'Book' ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                {bookCount}
+              </span>
+            </button>
           </div>
         </div>
 
-        {/* ── SEARCH & FILTER CONTROLS ── */}
+        {/* ── SEARCH & TOPIC FILTERS ── */}
         <div className="mb-10 flex flex-col gap-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="w-full sm:max-w-md">
               <SearchField
                 value={query}
                 onChange={setQuery}
-                placeholder={isAm ? 'በርዕስ፣ በሰርኪዩት ንድፍ ወይም በመሳሪያ ይፈልጉ...' : 'Search by topic, schematic, or device...'}
+                placeholder={
+                  formatFilter === 'Video'
+                    ? (isAm ? 'በቪዲዮ ርዕስ ወይም በመምህር ስም ይፈልጉ...' : 'Search video courses by topic or instructor...')
+                    : formatFilter === 'Book'
+                    ? (isAm ? 'በመጽሐፍ፣ በሰርኪዩት ንድፍ ወይም ማኑዋል ይፈልጉ...' : 'Search books, schematics, or manuals...')
+                    : (isAm ? 'በቪዲዮ፣ በመጽሐፍ ወይም በሰርኪዩት ንድፍ ይፈልጉ...' : 'Search by video, book, or schematic...')
+                }
               />
             </div>
 
             {/* Status Segmented Buttons */}
             <div className="flex items-center gap-1.5 rounded-2xl border bg-muted/30 p-1 text-xs">
-              {(['All', 'Available', 'Coming Soon'] as const).map((st) => {
+              {(['All', 'Available', 'Free'] as const).map((st) => {
                 const label =
                   st === 'All'
-                    ? (isAm ? 'ሁሉም መመሪያዎች' : 'All Guides')
+                    ? (isAm ? 'ሁሉም' : 'All')
                     : st === 'Available'
                     ? (isAm ? 'የሚገኙ' : 'Available')
-                    : (isAm ? 'በቅርቡ' : 'Coming Soon')
+                    : (isAm ? 'ነፃ ብቻ' : 'Free Only')
                 return (
                   <button
                     key={st}
                     onClick={() => setStatusFilter(st)}
-                    className={`rounded-xl px-3.5 py-1.5 font-semibold transition-all duration-200 ${statusFilter === st
+                    className={`rounded-xl px-3.5 py-1.5 font-semibold transition-all duration-200 ${
+                      statusFilter === st
                         ? 'bg-background text-foreground shadow-sm shadow-black/5 scale-[1.02]'
                         : 'text-muted-foreground hover:text-foreground'
-                      }`}
+                    }`}
                   >
                     {label}
                   </button>
@@ -458,10 +756,11 @@ export function LibraryCatalog({
             </span>
             <button
               onClick={() => setCategory('All resources')}
-              className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${category === 'All resources'
+              className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                category === 'All resources'
                   ? 'border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-500/25 scale-[1.02]'
                   : 'bg-background text-muted-foreground hover:border-blue-500/40 hover:text-foreground'
-                }`}
+              }`}
             >
               {isAm ? 'ሁሉም ርዕሶች' : 'All topics'}
             </button>
@@ -469,10 +768,11 @@ export function LibraryCatalog({
               <button
                 key={item}
                 onClick={() => setCategory(item)}
-                className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${category === item
+                className={`rounded-xl border px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                  category === item
                     ? 'border-blue-600 bg-blue-600 text-white shadow-sm shadow-blue-500/25 scale-[1.02]'
                     : 'bg-background text-muted-foreground hover:border-blue-500/40 hover:text-foreground'
-                  }`}
+                }`}
               >
                 {item}
               </button>
@@ -480,94 +780,159 @@ export function LibraryCatalog({
           </div>
         </div>
 
-        {/* ── RESOURCE CARDS GRID ── */}
+        {/* ── RESOURCE CARDS GRID (EXACT DONKEY ACADEMY STYLE FROM SCREENSHOT 2 & 3) ── */}
         {filtered.length ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((resource) => {
-              const isAvailable = resource.status.toLowerCase() === 'available'
-              const isVideo = resource.format.toLowerCase().includes('video')
-              const isReference = resource.format.toLowerCase().includes('reference')
+              const isVideo =
+                resource.format.toLowerCase().includes('video') ||
+                (resource.pages && resource.pages.toLowerCase().includes('hour')) ||
+                (resource.pages && resource.pages.toLowerCase().includes('lesson'))
+
+              // Extract duration / page count & activity count
+              let durationOrPages = resource.pages || (isVideo ? '6:00' : '180 Pages')
+              let activityCount = isVideo ? '18 Lessons' : '8 Chapters'
+
+              if (resource.pages && resource.pages.includes('·')) {
+                const parts = resource.pages.split('·')
+                durationOrPages = parts[0].trim().replace(/Hours?/i, '').trim()
+                activityCount = parts[1].trim()
+              } else if (isVideo) {
+                activityCount = '15 Activities'
+              } else {
+                activityCount = '6 Chapters'
+              }
+
+              const thumbImage =
+                resource.thumbnailUrl ||
+                (isVideo ? '/images/course-preview-hero.jpg' : '/images/manual-book-cover.jpg')
 
               return (
                 <article
                   key={resource.id}
-                  className="group flex flex-col justify-between rounded-3xl border bg-card p-6 card-hover-lift"
+                  className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl"
                 >
                   <div>
-                    {/* Header Row */}
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                        {isVideo ? (
-                          <Video className="size-5" />
-                        ) : isReference ? (
-                          <CircuitBoard className="size-5" />
-                        ) : (
-                          <FileText className="size-5" />
-                        )}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        {resource.level ? (
-                          <span className="rounded-md border bg-muted/60 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
-                            {resource.level}
-                          </span>
-                        ) : null}
+                    {/* Media Thumbnail Container with Circular Play Button Overlay */}
+                    <Link
+                      href={`/library/${resource.id}`}
+                      className="relative block aspect-[16/10] overflow-hidden bg-slate-900 cursor-pointer"
+                    >
+                      <img
+                        src={thumbImage}
+                        alt={resource.title}
+                        className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+
+                      {/* Top-Left Format Pill */}
+                      <div className="absolute top-3 left-3 flex items-center gap-1.5">
                         <span
-                          className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${isAvailable
-                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
-                              : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
-                            }`}
+                          className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold text-white shadow-md backdrop-blur-md ${
+                            isVideo ? 'bg-blue-600/90' : 'bg-indigo-600/90'
+                          }`}
                         >
-                          {isAvailable ? (isAm ? 'ይገኛል' : 'Available') : (isAm ? 'በቅርቡ' : 'Coming Soon')}
+                          {isVideo ? <Video className="size-3" /> : <BookOpen className="size-3" />}
+                          {isVideo
+                            ? (isAm ? 'ቪዲዮ ኮርስ' : 'Video Course')
+                            : (isAm ? 'ቴክኒካል መጽሐፍ' : 'Book / Manual')}
                         </span>
                       </div>
-                    </div>
 
-                    {/* Category & Title */}
-                    <p className="mt-5 text-xs font-bold uppercase tracking-wider text-primary">
-                      {resource.category}
-                    </p>
-                    <h2 className="mt-2 text-lg font-bold text-foreground leading-snug">
-                      {resource.title}
-                    </h2>
-                    <p className="mt-3 text-sm leading-6 text-muted-foreground line-clamp-3">
-                      {resource.description}
-                    </p>
-                  </div>
+                      {/* Top-Right Price Tag */}
+                      <div className="absolute top-3 right-3">
+                        <span
+                          className={`inline-flex items-center rounded-lg px-2.5 py-1 text-[11px] font-bold shadow-md backdrop-blur-md ${
+                            resource.priceETB === 0
+                              ? 'bg-emerald-600/90 text-white'
+                              : 'bg-black/75 text-white border border-white/20'
+                          }`}
+                        >
+                          {resource.priceETB === 0
+                            ? (isAm ? 'ነፃ' : 'Free')
+                            : `${resource.priceETB} ETB`}
+                        </span>
+                      </div>
 
-                  {/* Footer & Actions */}
-                  <div className="mt-6 border-t pt-4">
-                    <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
-                      <span className="font-medium text-foreground">
-                        {resource.format}
-                        {resource.pages ? ` · ${resource.pages}` : ''}
-                      </span>
-                      <span className="text-[11px] font-semibold text-primary">
-                        {resource.price || (isAm ? 'ነፃ' : 'Free')}
-                      </span>
-                    </div>
+                      {/* Centered Circular Dark Play Button (exact style from Screenshots 2 & 3!) */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="flex size-12 items-center justify-center rounded-full bg-slate-950/70 backdrop-blur-md text-white shadow-xl border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:border-primary">
+                          {isVideo ? (
+                            <Play className="size-5 fill-white ml-0.5" />
+                          ) : (
+                            <BookOpen className="size-5 text-white" />
+                          )}
+                        </div>
+                      </div>
+                    </Link>
 
-                    <div className="flex items-center justify-between gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedResource(resource)}
-                        className="rounded-lg text-xs gap-1.5"
-                      >
-                        <Eye className="size-3.5" /> {isAm ? 'ዝርዝር እይ' : 'Details'}
-                      </Button>
+                    {/* Card Body */}
+                    <div className="p-5">
+                      {/* Title */}
+                      <Link href={`/library/${resource.id}`} className="block">
+                        <h3 className="text-lg font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2 cursor-pointer">
+                          {resource.title}
+                        </h3>
+                      </Link>
 
-                      <Button
-                        size="sm"
-                        onClick={() => setPurchasingResource(resource)}
-                        className="rounded-lg text-xs gap-1.5 bg-[#155DFC] hover:bg-blue-600 text-white font-bold shadow-sm"
-                      >
-                        <ShoppingBag className="size-3.5" />
-                        {resource.priceETB === 0
-                          ? (isAm ? 'በነፃ ውሰድ' : 'Get Free')
-                          : (isAm
-                            ? `አሁኑኑ ይግዙ · ${resource.priceETB} ብር`
-                            : `Buy Now · ${resource.priceETB} ETB`)}
-                      </Button>
+                      {/* Instructor / Author byline (exact syntax from screenshot: A Course By : Eshetu Melese) */}
+                      <p className="mt-1.5 text-xs text-muted-foreground font-medium">
+                        {isVideo ? (isAm ? 'መምህር፦ ' : 'A Course By : ') : (isAm ? 'አዘጋጅ፦ ' : 'Author : ')}
+                        <span className="font-semibold text-foreground">
+                          {resource.instructor || 'Hello Technology Academy'}
+                        </span>
+                      </p>
+
+                      {/* Description */}
+                      <p className="mt-2.5 text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-3 min-h-[3.6rem]">
+                        {resource.description}
+                      </p>
+
+                      {/* 3-Column Metadata Row (exact visual from screenshot 2 & 3) */}
+                      <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-3 gap-2 text-xs">
+                        {/* Column 1: Level */}
+                        <div className="flex flex-col">
+                          <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                            <BarChart3 className="size-3 text-sky-500" />
+                            {isAm ? 'ደረጃ' : 'Level'}
+                          </span>
+                          <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
+                            {resource.level || (isAm ? 'ለሁሉም' : 'Everyone')}
+                          </span>
+                        </div>
+
+                        {/* Column 2: Duration / Pages */}
+                        <div className="flex flex-col">
+                          <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                            <Clock className="size-3 text-amber-500" />
+                            {isVideo ? (isAm ? 'ቆይታ' : 'Duration') : (isAm ? 'ገጾች' : 'Pages')}
+                          </span>
+                          <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
+                            {durationOrPages}
+                          </span>
+                        </div>
+
+                        {/* Column 3: Activity */}
+                        <div className="flex flex-col">
+                          <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                            <ListChecks className="size-3 text-emerald-500" />
+                            {isAm ? 'ክፍል' : 'Activity'}
+                          </span>
+                          <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
+                            {activityCount}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Full-Width Action Button linking to /library/[id] */}
+                      <Link href={`/library/${resource.id}`} className="block w-full mt-4">
+                        <Button
+                          variant="outline"
+                          className="w-full rounded-xl border-sky-500/40 text-sky-600 dark:text-sky-400 font-bold hover:bg-sky-500 hover:text-white transition-all duration-200"
+                        >
+                          {isAm ? 'ጀምር (Get started)' : 'Get started'}
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </article>
@@ -578,12 +943,12 @@ export function LibraryCatalog({
           <div className="rounded-3xl border border-dashed p-16 text-center">
             <Search className="mx-auto size-10 text-muted-foreground" />
             <h2 className="mt-4 text-lg font-bold">
-              {isAm ? 'ምንም መረጃ አልተገኘም' : 'No resources match your filters'}
+              {isAm ? 'ምንም ማቴሪያል አልተገኘም' : 'No materials match your filters'}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               {isAm
                 ? 'የፍለጋ ቃልዎን ይቀይሩ ወይም ፊልተሩን ያጥፉ።'
-                : 'Try adjusting your search terms or reset the status and topic filters.'}
+                : 'Try adjusting your search terms or switch between Video and Book tabs.'}
             </p>
             <Button
               variant="outline"
@@ -592,6 +957,7 @@ export function LibraryCatalog({
                 setQuery('')
                 setCategory('All resources')
                 setStatusFilter('All')
+                setFormatFilter('All')
               }}
               className="mt-6 rounded-lg"
             >

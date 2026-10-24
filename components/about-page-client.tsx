@@ -317,9 +317,9 @@ export function AboutPageClient({ instructors }: AboutPageClientProps) {
                       : 'Technical repair is one of the fastest-growing trade sectors in East Africa. By mastering circuit diagnostics, our alumni enter high-demand roles or launch profitable businesses.'}
                   </p>
                   <div className="mt-8">
-                    <Link href="/register">
+                    <Link href="/library">
                       <Button className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]">
-                        {isAm ? 'በቀጣዩ ዙር ይመዝገቡ' : 'Enroll in upcoming cohort'} <ArrowRight data-icon="inline-end" />
+                        {isAm ? 'ስልጠናዎችን በኦንላይን ይጀምሩ' : 'Explore Online Courses'} <ArrowRight data-icon="inline-end" />
                       </Button>
                     </Link>
                   </div>

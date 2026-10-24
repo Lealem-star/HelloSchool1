@@ -52,7 +52,7 @@ model Course {
 model TrainingGallery {
   id          String   @id @default(cuid())
   title       String
-  description String?
+  description String?  @db.Text
   image       String
   published   Boolean  @default(true)
   sortOrder   Int      @default(0)
@@ -288,7 +288,7 @@ model TrustedPartner {
   category    String?  // "Hospital", "University", "Industry", "Telecom / IT", "Enterprise"
   logoUrl     String   @db.Text
   websiteUrl  String?
-  description String?
+  description String?  @db.Text
   published   Boolean  @default(true)
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())

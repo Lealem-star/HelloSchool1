@@ -40,12 +40,12 @@ export function CourseDetailClient({ course, allCourseTitles }: CourseDetailClie
                 </h1>
                 <p className="mt-6 max-w-2xl text-lg leading-8 text-blue-50">{course.description}</p>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
-                  <Link href={`/register?course=${course.slug}`}>
+                  <Link href={`/cart?course=${course.slug}`}>
                     <Button
                       size="lg"
                       className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]"
                     >
-                      {isAm ? 'በዚህ ስልጠና ይመዝገቡ' : 'Register for this course'} <ArrowRight data-icon="inline-end" />
+                      {isAm ? 'አሁኑኑ በኦንላይን ይጀምሩ' : 'Enroll Online Now'} <ArrowRight data-icon="inline-end" />
                     </Button>
                   </Link>
                   <a href="#inquire">

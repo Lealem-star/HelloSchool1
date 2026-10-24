@@ -394,11 +394,11 @@ export function ChatBot() {
               </a>
             </div>
             <Link
-              href="/register"
+              href="/library"
               onClick={() => setIsOpen(false)}
               className="font-bold text-[#155DFC] dark:text-sky-400 hover:underline inline-flex items-center gap-1"
             >
-              <GraduationCap className="size-3" /> Register
+              <GraduationCap className="size-3" /> Digital Academy
             </Link>
           </div>
 

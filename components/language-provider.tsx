@@ -9,18 +9,17 @@ export const translations = {
     // Navigation
     navHome: 'Home',
     navCourses: 'Courses',
-    navTraining: 'Practical Training',
     navLibrary: 'Digital Library',
     navAbout: 'About',
     navContact: 'Contact',
-    registerNow: 'Register Now',
+    registerNow: 'Create Account',
 
     // Announcement Ticker
-    tickerIntake: 'Upcoming Intakes:',
-    tickerMessage: 'Bahir Dar Practical Batch Intake Enrollment · All Courses Open',
-    tickerAction: 'Enroll in Batch →',
-    tickerOpeningSoon: 'Opening Soon',
-    tickerOpeningSoonMessage: 'Bahir Dar Practical Vocational Training · Next Batch Opening Soon',
+    tickerIntake: 'Digital Academy:',
+    tickerMessage: 'Online Video Masterclasses & Technical Schematics Available',
+    tickerAction: 'Explore Courses →',
+    tickerOpeningSoon: 'Digital Academy',
+    tickerOpeningSoonMessage: 'Online Video Masterclasses & Technical Schematics Available',
 
     // Theme tooltips
     switchToDark: 'Switch to Dark Mode',
@@ -40,18 +39,17 @@ export const translations = {
     // Navigation
     navHome: 'መነሻ',
     navCourses: 'ስልጠናዎች',
-    navTraining: 'ተግባራዊ ስልጠና',
     navLibrary: 'ዲጂታል ቤተ-መጽሐፍት',
     navAbout: 'ስለ እኛ',
     navContact: 'አግኙን',
-    registerNow: 'አሁኑኑ ይመዝገቡ',
+    registerNow: 'አካውንት ይክፈቱ',
 
     // Announcement Ticker
-    tickerIntake: 'ቀጣይ ዙር ምዝገባ፡',
-    tickerMessage: 'የባህር ዳር ተግባራዊ ስልጠና ዙር ምዝገባ ተጀምሯል · ሁሉም የትምህርት ክፍሎች ክፍት ናቸው',
-    tickerAction: 'ይመዝገቡ →',
-    tickerOpeningSoon: 'በቅርቡ ይከፈታል',
-    tickerOpeningSoonMessage: 'የባህር ዳር ተግባራዊ ስልጠና ክፍለ-ጊዜዎች · ቀጣይ ዙር በቅርቡ ይከፈታል',
+    tickerIntake: 'ዲጂታል አካዳሚ፡',
+    tickerMessage: 'የቪዲዮ ኮርሶች እና ቴክኒካል ማኑዋሎች በኦንላይን ይገኛሉ',
+    tickerAction: 'ኮርሶችን ይመልከቱ →',
+    tickerOpeningSoon: 'ዲጂታል አካዳሚ',
+    tickerOpeningSoonMessage: 'የቪዲዮ ኮርሶች እና ቴክኒካል ማኑዋሎች በኦንላይን ይገኛሉ',
 
     // Theme tooltips
     switchToDark: 'ወደ ጨለማ ገጽታ ቀይር',

@@ -55,7 +55,7 @@ export function Logo() {
       <img
         src="/images/helloschool.jpg"
         alt="ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል"
-        className="h-11 sm:h-12 w-auto object-contain drop-shadow-sm transition-transform duration-300 hover:scale-105"
+        className="h-9 sm:h-10 w-auto object-contain drop-shadow-sm transition-transform duration-300 hover:scale-105"
       />
       <div className="flex flex-col">
         <span className="font-bold text-foreground text-sm sm:text-base leading-tight tracking-tight">
@@ -74,7 +74,6 @@ export function Logo() {
 const navItems = [
   { href: '/', labelEn: 'Home', labelAm: 'መነሻ' },
   { href: '/courses', labelEn: 'Courses', labelAm: 'ስልጠናዎች' },
-  { href: '/training', labelEn: 'Practical Training', labelAm: 'ተግባራዊ ስልጠና' },
   { href: '/library', labelEn: 'Digital Library', labelAm: 'ዲጂታል ቤተ-መጽሐፍት' },
   { href: '/about', labelEn: 'About', labelAm: 'ስለ እኛ' },
   { href: '/contact', labelEn: 'Contact', labelAm: 'አግኙን' },
@@ -133,7 +132,6 @@ export function BackToTopButton() {
 export function Header() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [hasAvailableBatches, setHasAvailableBatches] = useState<boolean>(true)
   const pathname = usePathname()
   const { language, t } = useLanguage()
 
@@ -146,66 +144,8 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  useEffect(() => {
-    let mounted = true
-    async function fetchBatchAvailability() {
-      try {
-        const res = await fetch('/api/batches/status', { cache: 'no-store' })
-        if (res.ok) {
-          const data = await res.json()
-          if (mounted && typeof data.hasOpenBatch === 'boolean') {
-            setHasAvailableBatches(data.hasOpenBatch)
-          }
-        }
-      } catch {
-        // Fallback to true if network error
-      }
-    }
-    fetchBatchAvailability()
-    return () => {
-      mounted = false
-    }
-  }, [])
-
   return (
     <header className="sticky top-0 z-50">
-      {/* ── Top Announcement Ticker ── */}
-      {hasAvailableBatches ? (
-        <div className="border-b border-blue-400/30 bg-[#155DFC] px-4 py-2 text-center text-xs text-white shadow-sm">
-          <div className="container mx-auto flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-7xl">
-            <span className="relative flex size-2 shrink-0">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex size-2 rounded-full bg-white"></span>
-            </span>
-            <span className="font-bold text-white">{t('tickerIntake')}</span>
-            <span className="text-blue-100 font-medium">{t('tickerMessage')}</span>
-            <Link
-              href="/register"
-              className="ml-1 font-extrabold text-white underline underline-offset-2 transition-colors hover:text-blue-100 inline-flex items-center gap-0.5"
-            >
-              {t('tickerAction')}
-            </Link>
-          </div>
-        </div>
-      ) : (
-        <div className="border-b border-blue-400/30 bg-[#155DFC] px-4 py-2 text-center text-xs text-white shadow-sm">
-          <div className="container mx-auto flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-7xl">
-            <span className="relative flex size-2 shrink-0">
-              <span className="relative inline-flex size-2 rounded-full bg-amber-300"></span>
-            </span>
-            <span className="font-bold text-white">{t('tickerIntake')}</span>
-            <span className="text-blue-100 font-medium">
-              {language === 'am'
-                ? 'የባህር ዳር ተግባራዊ ስልጠና ክፍለ-ጊዜዎች · ቀጣይ ዙር በቅርቡ ይከፈታል'
-                : 'Bahir Dar Practical Vocational Training · Next Batch Opening Soon'}
-            </span>
-            <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-white/20 border border-white/30 px-2.5 py-0.5 text-[11px] font-bold text-white">
-              {t('tickerOpeningSoon')}
-            </span>
-          </div>
-        </div>
-      )}
-
       {/* ── Main Glassmorphism Navbar ── */}
       <div
         className={`border-b transition-all duration-300 ${
@@ -214,7 +154,7 @@ export function Header() {
             : 'border-border/50 bg-background/80 backdrop-blur-md'
         }`}
       >
-        <div className="container mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 lg:px-8">
+        <div className="container mx-auto flex h-[62px] max-w-7xl items-center justify-between px-5 lg:px-8">
           <Logo />
 
           <nav className="hidden items-center gap-6 xl:gap-7 lg:flex" aria-label="Main navigation">
@@ -389,20 +329,14 @@ export function Footer() {
             <Link href="/courses" className="hover:text-white transition-colors">
               {language === 'am' ? 'ስልጠናዎቻችን' : 'Our Courses'}
             </Link>
-            <Link href="/training" className="hover:text-white transition-colors">
-              {language === 'am' ? 'ተግባራዊ ስልጠና' : 'Practical Training'}
-            </Link>
             <Link href="/library" className="hover:text-white transition-colors">
               {language === 'am' ? 'ዲጂታል ቤተ-መጽሐፍት' : 'Digital Library'}
             </Link>
-            <Link href="/student/login" className="hover:text-white transition-colors font-medium">
-              {language === 'am' ? 'የተማሪ ፖርታል (Student Portal)' : 'Student Portal'}
-            </Link>
-            <Link href="/verify/certificate" className="hover:text-white transition-colors font-medium text-sky-300">
-              {language === 'am' ? 'ሰርተፊኬት ማረጋገጫ (Verify Certificate)' : 'Verify Certificate'}
-            </Link>
             <Link href="/about" className="hover:text-white transition-colors">
               {language === 'am' ? 'ስለ እኛ' : 'About Us'}
+            </Link>
+            <Link href="/contact" className="hover:text-white transition-colors">
+              {language === 'am' ? 'አግኙን' : 'Contact Us'}
             </Link>
           </div>
         </div>
@@ -489,7 +423,7 @@ export function Footer() {
 
 export function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
   return (
-    <section className="relative overflow-hidden border-b bg-muted/30 px-5 py-16 lg:px-8 lg:py-20 tech-dot-bg">
+    <section className="relative overflow-hidden border-b bg-muted/30 px-5 py-8 lg:px-8 lg:py-12 tech-dot-bg">
       <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background/80 pointer-events-none" />
       <div className="container relative mx-auto max-w-7xl animate-fade-in-up">
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-primary mb-4 shadow-sm">

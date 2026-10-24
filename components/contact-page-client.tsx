@@ -221,7 +221,20 @@ export function ContactPageClient({ courseTitles }: ContactPageClientProps) {
                     : 'Response guarantee: We reply to all inquiries within 24 hours.'}
                 </span>
               </div>
+              <div className="mt-5 overflow-hidden rounded-2xl border">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3908.4945674935707!2d37.38570897356455!3d11.588046443702263!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1644d18394e94c53%3A0x8d1e38bd4dc4f170!2sSignal%20mall!5e0!3m2!1sen!2set!4v1792820623975!5m2!1sen!2set"
+                  width="100%"
+                  height="250"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  title={isAm ? 'ሲግናል ሞል - ባህር ዳር' : 'Signal Mall - Bahir Dar'}
+                />
+              </div>
             </div>
+
           </aside>
 
           {/* Inquiry Form */}
@@ -242,6 +255,38 @@ export function ContactPageClient({ courseTitles }: ContactPageClientProps) {
               <InquiryForm coursesList={courseTitles} />
             </div>
           </section>
+        </section>
+
+        {/* ── GOOGLE MAPS SECTION ── */}
+        <section className="border-t bg-muted/30 px-5 py-16 lg:px-8">
+          <div className="container mx-auto max-w-7xl">
+            <div className="mb-8 text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary">
+                <MapPin className="size-3.5" />
+                <span>{isAm ? 'ካርታ' : 'Map'}</span>
+              </span>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+                {isAm ? 'የማዕከሉን ቦታ ይመልከቱ' : 'Find Us on the Map'}
+              </h2>
+              <p className="mt-3 text-sm text-muted-foreground">
+                {isAm
+                  ? 'ሲግናል ሞል ህንፃ 4ኛ ፎቅ ቢሮ ቁጥር 409 — ፓፒረስ ሆቴል ፊት ለፊት፣ ባህር ዳር'
+                  : 'Signal Mall Building, 4th Floor, Office 409 — Directly in front of Papyrus Hotel, Bahir Dar'}
+              </p>
+            </div>
+            <div className="rounded-3xl border bg-card p-2 shadow-sm overflow-hidden">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3908.4945674935707!2d37.38570897356455!3d11.588046443702263!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1644d18394e94c53%3A0x8d1e38bd4dc4f170!2sSignal%20mall!5e0!3m2!1sen!2set!4v1792820623975!5m2!1sen!2set"
+                width="100%"
+                height="450"
+                style={{ border: 0, borderRadius: '1.25rem' }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="strict-origin-when-cross-origin"
+                title={isAm ? 'ሲግናል ሞል - ባህር ዳር' : 'Signal Mall - Bahir Dar'}
+              />
+            </div>
+          </div>
         </section>
 
         {/* ── FREQUENTLY ASKED QUESTIONS ── */}

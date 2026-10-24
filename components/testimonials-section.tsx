@@ -178,12 +178,12 @@ export function TestimonialsSection() {
             </p>
           </div>
 
-          <Link href="/register" className="shrink-0">
+          <Link href="/library" className="shrink-0">
             <Button
               size="lg"
               className="rounded-xl bg-primary px-7 font-bold text-primary-foreground shadow-lg hover:bg-primary/90 hover:scale-[1.02] transition-all"
             >
-              {language === 'am' ? 'አሁኑኑ ይመዝገቡ' : 'Enroll in Next Batch'}
+              {language === 'am' ? 'ኮርሶችን ይጀምሩ' : 'Explore Courses'}
               <ArrowRight className="size-4 ml-2" />
             </Button>
           </Link>
@@ -346,8 +346,8 @@ export function TestimonialsSection() {
               </h4>
               <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                 {language === 'am'
-                  ? 'የቀጣይ ዙር ምዝገባ በባሕር ዳር ክፍት ነው። አሁኑኑ ቦታዎን ያስይዙ።'
-                  : 'Upcoming cohort enrollment is actively open in Bahir Dar campus. Reserve your bench seat today.'}
+                  ? 'የኦንላይን ቪዲዮ ኮርሶች እና ዲጂታል ማኑዋሎች በይፋ ክፍት ናቸው። አሁኑኑ መማር ይጀምሩ።'
+                  : 'Online Video Courses & Technical Manuals are available now. Start learning today.'}
               </p>
             </div>
           </div>
@@ -361,9 +361,9 @@ export function TestimonialsSection() {
                 {language === 'am' ? 'ስልጠናዎችን ይመልከቱ' : 'Explore Courses'}
               </Button>
             </Link>
-            <Link href="/register">
+            <Link href="/library">
               <Button className="rounded-xl bg-primary px-6 font-bold text-primary-foreground hover:bg-primary/90 shadow-md">
-                {language === 'am' ? 'ይመዝገቡ' : 'Enroll Now'}
+                {language === 'am' ? 'ዲጂታል ላይብረሪ' : 'Digital Academy'}
                 <ArrowRight className="size-4 ml-1.5" />
               </Button>
             </Link>

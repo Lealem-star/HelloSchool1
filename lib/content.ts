@@ -64,7 +64,11 @@ export type PublicLibraryItem = {
   priceETB?: number
   pages: string
   fileUrl?: string | null
+  thumbnailUrl?: string | null
   instructor?: string
+  instructorRole?: string
+  rating?: number
+  reviewCount?: number
   badgeText?: string
 }
 
@@ -148,9 +152,40 @@ export async function getPublishedLibrary(): Promise<PublicLibraryItem[]> {
     priceETB: item.priceETB ?? 0,
     pages: item.pages ?? '',
     fileUrl: item.fileUrl ?? null,
+    thumbnailUrl: item.thumbnailUrl ?? null,
     instructor: item.instructor ?? '',
+    instructorRole: item.instructorRole ?? '',
+    rating: item.rating ?? 4.9,
+    reviewCount: item.reviewCount ?? 120,
     badgeText: item.badgeText ?? '',
   }))
+}
+
+export async function getPublishedLibraryItem(id: string): Promise<PublicLibraryItem | null> {
+  const item = await prisma.libraryResource.findFirst({
+    where: { id, published: true },
+  })
+  if (!item) return null
+  return {
+    id: item.id,
+    title: item.title,
+    subtitle: item.subtitle ?? '',
+    category: item.category,
+    description: item.description ?? '',
+    format: item.format ?? 'Technical Repair Manual',
+    level: item.level ?? '',
+    status: item.status,
+    price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
+    priceETB: item.priceETB ?? 0,
+    pages: item.pages ?? '',
+    fileUrl: item.fileUrl ?? null,
+    thumbnailUrl: item.thumbnailUrl ?? null,
+    instructor: item.instructor ?? '',
+    instructorRole: item.instructorRole ?? '',
+    rating: item.rating ?? 4.9,
+    reviewCount: item.reviewCount ?? 120,
+    badgeText: item.badgeText ?? '',
+  }
 }
 
 export async function getCategoryNames(type: 'course' | 'library'): Promise<string[]> {

@@ -153,9 +153,8 @@ export default function StudentDashboardPage() {
   const [courses, setCourses] = useState<CourseItem[]>([])
   const [libraryResources, setLibraryResources] = useState<LibraryResource[]>([])
   const [digitalPurchases, setDigitalPurchases] = useState<DigitalPurchaseItem[]>([])
-  const [activeTab, setActiveTab] = useState<'overview' | 'selflearning' | 'courses' | 'batch' | 'resources' | 'tuition' | 'community'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'selflearning' | 'courses' | 'batch'>('overview')
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
-  const [resourceSearch, setResourceSearch] = useState('')
 
   // Studio and Purchase Modal States
   const [activeStudioResource, setActiveStudioResource] = useState<DigitalResourceMeta | null>(null)
@@ -168,7 +167,7 @@ export default function StudentDashboardPage() {
   const [activeCertificate, setActiveCertificate] = useState<CertificateData | null>(null)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
-  const handleSelectTab = (tab: 'overview' | 'selflearning' | 'courses' | 'batch' | 'resources' | 'tuition' | 'community') => {
+  const handleSelectTab = (tab: 'overview' | 'selflearning' | 'courses' | 'batch') => {
     setActiveTab(tab)
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href)
@@ -184,7 +183,7 @@ export default function StudentDashboardPage() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       const tabParam = params.get('tab')
-      const validTabs = ['overview', 'selflearning', 'courses', 'batch', 'resources', 'tuition', 'community']
+      const validTabs = ['overview', 'selflearning', 'courses', 'batch']
       if (tabParam && validTabs.includes(tabParam)) {
         setActiveTab(tabParam as any)
       }
@@ -358,19 +357,10 @@ export default function StudentDashboardPage() {
 
   const latestRegistration = registrations[0]
 
-  const filteredResources = libraryResources.filter((res) => {
-    const q = resourceSearch.toLowerCase()
-    return (
-      res.title.toLowerCase().includes(q) ||
-      res.category.toLowerCase().includes(q) ||
-      (res.description && res.description.toLowerCase().includes(q))
-    )
-  })
-
   // Live popular master courses synced from database
   const popularMasterCourses = synchronizedResources
 
-  type NavTabId = 'overview' | 'selflearning' | 'courses' | 'batch' | 'resources' | 'tuition' | 'community'
+  type NavTabId = 'overview' | 'selflearning' | 'courses' | 'batch'
 
   interface NavItem {
     id: NavTabId
@@ -421,40 +411,6 @@ export default function StudentDashboardPage() {
           icon: Layers,
           count: 0,
           badge: latestRegistration?.batch?.batchNumber || (isAm ? 'ዙር 01' : 'Batch 01'),
-        },
-      ],
-    },
-    {
-      label: isAm ? 'ላይብረሪ እና መመሪያዎች' : 'Technical Library',
-      items: [
-        {
-          id: 'resources',
-          label: isAm ? 'የቴክኒክ ላይብረሪ & ማኑዋሎች' : 'Technical Library & Schematics',
-          shortLabel: isAm ? 'ላይብረሪ' : 'Library',
-          icon: FileText,
-          count: libraryResources.length,
-          badge: null,
-        },
-      ],
-    },
-    {
-      label: isAm ? 'ክፍያ እና ማህበረሰብ' : 'Tuition & Support',
-      items: [
-        {
-          id: 'tuition',
-          label: isAm ? 'ክፍያዎች & ደረሰኞች' : 'Tuition & Receipts',
-          shortLabel: isAm ? 'ደረሰኞች' : 'Tuition',
-          icon: CreditCard,
-          count: registrations.length,
-          badge: null,
-        },
-        {
-          id: 'community',
-          label: isAm ? 'ማህበረሰብ & እገዛ' : 'Help Desk & Support',
-          shortLabel: isAm ? 'እገዛ' : 'Help Desk',
-          icon: Send,
-          count: 0,
-          badge: null,
         },
       ],
     },
@@ -602,11 +558,13 @@ export default function StudentDashboardPage() {
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-white">{student.fullName}</p>
               <div className="flex items-center gap-1 text-[10px] text-blue-200">
-                <span className="truncate max-w-[120px] font-mono">{student.institutionalEmail}</span>
+                <span className="truncate max-w-[120px] font-mono">
+                  {student.personalEmail || student.phone || student.institutionalEmail}
+                </span>
                 <button
-                  onClick={() => handleCopy(student.institutionalEmail, 'sidebar-email')}
+                  onClick={() => handleCopy(student.personalEmail || student.phone || student.institutionalEmail, 'sidebar-email')}
                   className="hover:text-white transition"
-                  title={isAm ? 'ኢሜይል ቅዳ' : 'Copy email'}
+                  title={isAm ? 'ኢሜይል/ስልክ ቅዳ' : 'Copy contact'}
                 >
                   {copiedKey === 'sidebar-email' ? (
                     <Check className="size-3 text-emerald-400" />
@@ -872,18 +830,18 @@ export default function StudentDashboardPage() {
                           ? `ንቁ የስልጠና ዙር — ${latestRegistration.courseTitle} (${latestRegistration.shift}) በ${latestRegistration.batch?.batchNumber || 'ዙር 01'} ተመድበዋል።`
                           : `Active Batch Cohort — ${latestRegistration.courseTitle} (${latestRegistration.shift}) allocated to ${latestRegistration.batch?.batchNumber || 'Batch 01'}.`)
                       : (isAm
-                          ? 'እስካሁን ምንም ንቁ ምዝገባ የለም... በባህር ዳር ለሚጀመሩ የተግባር ስልጠናዎች መቀመጫዎን ያስይዙ።'
-                          : 'No active TVET registration yet. Reserve your hands-on hardware workbench in Bahir Dar.')}
+                          ? 'እስካሁን ምንም ንቁ ኮርስ የለም... በዲጂታል ላይብረሪያችን ውስጥ የሚፈልጉትን ኮርስ ይምረጡ።'
+                          : 'No active course enrollment yet. Explore our digital library to unlock video courses and manuals.')}
                   </span>
                 </div>
               </div>
               <Link
-                href="/register"
+                href="/library"
                 className="shrink-0 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline underline-offset-4 self-end sm:self-center"
               >
                 {latestRegistration
-                  ? (isAm ? 'የዙር መረጃ ይመልከቱ →' : 'View Batch Info →')
-                  : (isAm ? 'የላብ መቀመጫ ያስይዙ →' : 'Reserve Bench Seat →')}
+                  ? (isAm ? 'ኮርሶችን ይመልከቱ →' : 'View Courses →')
+                  : (isAm ? 'ዲጂታል ላይብረሪ ይጎብኙ →' : 'Explore Library →')}
               </Link>
             </div>
           )}
@@ -908,8 +866,8 @@ export default function StudentDashboardPage() {
                 </h2>
                 <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
                   {isAm
-                    ? `በሄሎ ቴክኖሎጂ ተማሪ ፖርታል አማካኝነት የተከፈቱ የቪዲዮ ትምህርቶችዎን በDRM ስቱዲዮ መከታተል፣ የተመደቡበትን የስልጠና ዙር ማየት እና ይፋዊ ደረሰኞችዎን ማውረድ ይችላሉ።`
-                    : `Monitor your hands-on TVET intake schedule, study unlocked course manuals in the zero-download DRM Studio, and access official tuition receipts.`}
+                    ? `በሄሎ ቴክኖሎጂ ተማሪ ፖርታል አማካኝነት የተከፈቱ የቪዲዮ ትምህርቶችዎን በDRM ስቱዲዮ መከታተል እና የተመደቡበትን የስልጠና ዙር ማየት ይችላሉ።`
+                    : `Monitor your hands-on TVET intake schedule and study unlocked course masterclasses in the zero-download DRM Studio.`}
                 </p>
               </div>
 
@@ -923,11 +881,11 @@ export default function StudentDashboardPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => handleSelectTab('tuition')}
+                  onClick={() => handleSelectTab('courses')}
                   className="rounded-xl text-xs font-semibold h-10 px-4 cursor-pointer"
                 >
-                  <CreditCard className="size-3.5 mr-1.5 text-blue-600 dark:text-sky-400" />
-                  {isAm ? 'ደረሰኞች ይመልከቱ' : 'View Receipts'}
+                  <BookOpen className="size-3.5 mr-1.5 text-blue-600 dark:text-sky-400" />
+                  {isAm ? 'የተመዘገቡ ስልጠናዎች' : 'My Enrolled Courses'}
                 </Button>
               </div>
             </div>
@@ -1190,12 +1148,12 @@ export default function StudentDashboardPage() {
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground max-w-md mx-auto">
                   {isAm
-                    ? 'እስካሁን ለተግባር ስልጠና አልተመዘገቡም። በሞባይል ጥገና፣ በኮምፒውተር ጥገና እና ኤሌክትሮኒክስ ዕውቅና ያላቸውን ስልጠናዎቻችንን ይመልከቱ።'
-                    : "You haven't registered for a practical cohort yet. Browse our accredited vocational courses in mobile diagnostics, computer maintenance, and electronics."}
+                    ? 'እስካሁን ምንም ኮርስ አልገዙም። በሞባይል ጥገና፣ በኮምፒውተር ጥገና እና ኤሌክትሮኒክስ ያሉ ዲጂታል ኮርሶቻችንን ይመልከቱ።'
+                    : "You haven't enrolled in any courses yet. Browse our digital courses in mobile diagnostics, computer maintenance, and electronics."}
                 </p>
-                <Link href="/register" className="mt-5 inline-block">
+                <Link href="/library" className="mt-5 inline-block">
                   <Button className="rounded-xl">
-                    {isAm ? 'ለስልጠና ይመዝገቡ' : 'Register for a Course'}
+                    {isAm ? 'ዲጂታል ኮርሶችን ይመልከቱ' : 'Explore Courses'}
                   </Button>
                 </Link>
               </div>
@@ -1375,253 +1333,15 @@ export default function StudentDashboardPage() {
             ) : (
               <div className="rounded-3xl border border-dashed p-12 text-center bg-card">
                 <Layers className="size-12 mx-auto text-muted-foreground opacity-50 mb-3" />
-                <h3 className="text-lg font-bold">{isAm ? 'ንቁ የዙር ምደባ የለም' : 'No Active Batch Intake'}</h3>
+                <h3 className="text-lg font-bold">{isAm ? 'ንቁ ኮርስ የለም' : 'No Active Courses'}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {isAm ? 'በአሁኑ የስልጠና ዙር ውስጥ ለመመደብ በኦንላይን ይመዝገቡ።' : 'Register online to be placed into the active TVET batch.'}
+                  {isAm ? 'የቪዲዮ ኮርሶችን እና ቴክኒካል ማኑዋሎችን ለመጀመር በኦንላይን ይመልከቱ።' : 'Explore online video masterclasses and technical schematics in our library.'}
                 </p>
-                <Link href="/register" className="mt-4 inline-block">
-                  <Button className="rounded-xl">{isAm ? 'ለስልጠናው ይመዝገቡ →' : 'Register for Batch →'}</Button>
+                <Link href="/library" className="mt-4 inline-block">
+                  <Button className="rounded-xl">{isAm ? 'ኮርሶችን ይመልከቱ →' : 'Explore Courses →'}</Button>
                 </Link>
               </div>
             )}
-          </div>
-        )}
-
-        {/* ─── TAB: GENERAL TECHNICAL LIBRARY ─── */}
-        {activeTab === 'resources' && (
-          <div className="mt-6 space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h3 className="text-lg font-bold">
-                  {isAm ? 'አጠቃላይ የጥገና መመሪያዎችና ንድፎች' : 'General Repair Guides & Schematics'}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {isAm
-                    ? 'ለተማሪዎች የተዘጋጁ የቺፕ ፒን እና የሰርኪውት መረጃዎች።'
-                    : 'Reference chip pinouts and circuit sheets included for students.'}
-                </p>
-              </div>
-              <div className="relative w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={resourceSearch}
-                  onChange={(e) => setResourceSearch(e.target.value)}
-                  placeholder={isAm ? 'ግብዓቶችን፣ ርዕሶችን ይፈልጉ...' : 'Search resources, topics...'}
-                  className="h-10 w-full rounded-xl border border-input bg-card pl-9 pr-3 text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredResources.map((res) => (
-                <div
-                  key={res.id}
-                  className="rounded-2xl border border-border/80 bg-card p-5 shadow-sm hover:border-blue-500/40 hover:shadow-md transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="rounded-lg bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold uppercase text-blue-600 dark:text-sky-400">
-                        {res.category}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground font-mono">
-                        {res.format || 'PDF Guide'}
-                      </span>
-                    </div>
-
-                    <h4 className="font-bold text-foreground text-sm line-clamp-2">
-                      {res.title}
-                    </h4>
-                    {res.description && (
-                      <p className="mt-1.5 text-xs text-muted-foreground line-clamp-3">
-                        {res.description}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                      {isAm ? 'ለሁሉም ተማሪ ነፃ' : 'Enrolled Free'}
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        const matched = catalogMap[res.id] || DIGITAL_CATALOG[res.id] || formatResourceToMeta(res)
-                        setActiveStudioResource(matched)
-                      }}
-                      className="h-8 rounded-lg text-xs gap-1.5"
-                    >
-                      <Play className="size-3 text-blue-600" /> {isAm ? 'በDRM ስቱዲዮ አጥና' : 'Study in DRM Studio'}
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ─── TAB: TUITION & STATEMENTS ─── */}
-        {activeTab === 'tuition' && (
-          <div className="mt-6 space-y-6 animate-fade-in max-w-3xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b">
-              <div>
-                <h3 className="text-lg font-bold">
-                  {isAm ? 'የክፍያ መግለጫዎች እና የባንክ ማረጋገጫዎች' : 'Tuition Statements & Bank Confirmations'}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {isAm
-                    ? 'የተከፈሉ የስልጠና ክፍያዎች ዝርዝር እና ይፋዊ የትምህርት ማዕከሉ ደረሰኞች።'
-                    : 'Verified tuition settlement statements and official printable institutional receipts.'}
-                </p>
-              </div>
-            </div>
-
-            {registrations.length === 0 ? (
-              <div className="rounded-3xl border border-dashed p-12 text-center bg-card">
-                <CreditCard className="size-12 mx-auto text-muted-foreground opacity-40 mb-3" />
-                <h4 className="text-base font-bold text-foreground">
-                  {isAm ? 'ምንም የተመዘገበ ክፍያ የለም' : 'No Tuition Statements Yet'}
-                </h4>
-                <p className="mt-1 text-xs text-muted-foreground max-w-sm mx-auto">
-                  {isAm
-                    ? 'ለስልጠና ሲመዘገቡ ይፋዊ የክፍያ ደረሰኝዎ እዚህ ይቀመጣል።'
-                    : 'Once you enroll in a vocational cohort, your verified tuition statements and official printable receipts will appear here.'}
-                </p>
-                <Link href="/register" className="mt-4 inline-block">
-                  <Button className="rounded-xl text-xs">
-                    {isAm ? 'ለስልጠና ይመዝገቡ' : 'Enroll Now'}
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {registrations.map((reg) => (
-                  <div
-                    key={reg.id}
-                    className="rounded-3xl border border-border/80 bg-card p-6 md:p-8 shadow-md space-y-4 hover:border-blue-500/40 transition-all"
-                  >
-                    <div className="flex justify-between items-center pb-3 border-b">
-                      <div>
-                        <span className="font-mono text-xs text-muted-foreground">
-                          {isAm ? 'የደረሰኝ ማመሳከሪያ፦' : 'Receipt Ref:'} {reg.registrationNumber}
-                        </span>
-                        <h4 className="font-bold text-base text-foreground mt-0.5">
-                          {reg.courseTitle}
-                        </h4>
-                      </div>
-                      <span className="text-lg font-black text-blue-600 dark:text-sky-400">
-                        {reg.finalPrice} Birr
-                      </span>
-                    </div>
-
-                    <div className="grid gap-3 sm:grid-cols-2 text-xs">
-                      <div>
-                        <span className="text-muted-foreground">{isAm ? 'የክፍያ ዘዴ፦' : 'Payment Method:'}</span>
-                        <p className="font-semibold text-foreground mt-0.5">{reg.paymentMethod}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">{isAm ? 'የክፍያ ዕቅድ፦' : 'Payment Plan:'}</span>
-                        <p className="font-semibold text-foreground mt-0.5">{reg.paymentPlan}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">{isAm ? 'የግብይት ማመሳከሪያ፦' : 'Transaction Reference:'}</span>
-                        <p className="font-mono font-semibold text-foreground mt-0.5">{reg.transactionRef || (isAm ? 'የተረጋገጠ' : 'Verified')}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">{isAm ? 'ቀን፦' : 'Date:'}</span>
-                        <p className="font-semibold text-foreground mt-0.5">{new Date(reg.createdAt).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-
-                    {/* Official Receipt Action Footer */}
-                    <div className="mt-4 pt-4 border-t flex flex-wrap items-center justify-between gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() =>
-                          setActiveReceipt({
-                            receiptNumber: reg.registrationNumber,
-                            studentName: student.fullName,
-                            studentId: student.studentId,
-                            courseTitle: reg.courseTitle,
-                            shift: reg.shift,
-                            batchNumber: reg.batch?.batchNumber || (isAm ? 'ዙር 01' : 'Batch 01'),
-                            amountPaid: reg.finalPrice,
-                            paymentMethod: reg.paymentMethod,
-                            paymentPlan: reg.paymentPlan,
-                            transactionRef: reg.transactionRef,
-                            receiptUrl: reg.receiptUrl,
-                            createdAt: reg.createdAt,
-                          })
-                        }
-                        className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5 shadow-sm shadow-blue-500/20"
-                      >
-                        <Printer className="size-3.5" />
-                        {isAm ? 'ይፋዊ ደረሰኝ አትም / አውርድ' : 'View & Print Official Receipt'}
-                      </Button>
-
-                      {reg.receiptUrl && (
-                        <a href={reg.receiptUrl} target="_blank" rel="noreferrer">
-                          <Button variant="outline" size="sm" className="rounded-xl text-xs gap-1.5">
-                            <ExternalLink className="size-3.5" />
-                            {isAm ? 'የባንክ ደረሰኝ ቅጅ' : 'View Uploaded Slip'}
-                          </Button>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ─── TAB: COMMUNITY & HELP ─── */}
-        {activeTab === 'community' && (
-          <div className="mt-6 grid gap-6 md:grid-cols-2 animate-fade-in">
-            <div className="rounded-3xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-card p-6 md:p-8 flex flex-col justify-between">
-              <div>
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-blue-600 text-white font-bold mb-4 shadow-md shadow-blue-500/25">
-                  <Send className="size-6" />
-                </div>
-                <h3 className="text-xl font-bold">
-                  {isAm ? 'የሄሎ ቴክኖሎጂ ይፋዊ ቴሌግራም' : 'Hello Technology Official Telegram'}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  {isAm
-                    ? 'ንቁ የተማሪዎች የጥገና ማህበረሰባችንን በቴሌግራም ይቀላቀሉ። የዙር ፕሮግራሞችን፣ የዲያግኖስቲክስ ንድፎችን እና የአሰልጣኞች ድጋፍ ያግኙ።'
-                    : 'Join our active student repair community on Telegram. Get batch schedules, diagnostic schematics, and instructor support.'}
-                </p>
-              </div>
-              <div className="mt-6">
-                <a href={schoolConfig.telegram} target="_blank" rel="noreferrer">
-                  <Button className="w-full rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 gap-2">
-                    <Send className="size-4" /> {isAm ? 'ቴሌግራም ቻናል ክፈት' : 'Open Telegram Channel'}
-                  </Button>
-                </a>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border bg-card p-6 md:p-8 flex flex-col justify-between">
-              <div>
-                <div className="flex size-12 items-center justify-center rounded-2xl bg-muted text-foreground font-bold mb-4">
-                  <PhoneCall className="size-6 text-blue-600 dark:text-sky-400" />
-                </div>
-                <h3 className="text-xl font-bold">
-                  {isAm ? 'የተማሪዎች ሬጅስትራር ቢሮ' : 'Student Registrar Desk'}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  {isAm
-                    ? 'ስለ ስልጠና ዙርዎ ወይም ክፍያ ጥያቄ አለዎት? ባህር ዳር የሚገኘውን ቢሮአችንን ያነጋግሩ።'
-                    : 'Questions regarding your intake batch or tuition? Contact our office in Bahir Dar.'}
-                </p>
-                <div className="mt-4 space-y-2 text-xs">
-                  <p><strong>{isAm ? 'ስልክ፦' : 'Phone:'}</strong> {schoolConfig.phone} / {schoolConfig.alternatePhone}</p>
-                  <p><strong>{isAm ? 'ኢሜይል፦' : 'Email:'}</strong> {schoolConfig.email}</p>
-                  <p><strong>{isAm ? 'አድራሻ፦' : 'Location:'}</strong> {isAm ? schoolConfig.address : schoolConfig.englishAddress}</p>
-                </div>
-              </div>
-            </div>
           </div>
         )}
         </main>

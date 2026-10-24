@@ -561,10 +561,10 @@ export function HomePageClient({
                 </p>
               </div>
               <Link
-                href="/training"
+                href="/courses"
                 className="inline-flex items-center gap-2 text-sm font-bold text-primary group hover:underline shrink-0 mb-2"
               >
-                {isAm ? 'ሁሉንም የተግባር ስልጠናዎች ይመልከቱ' : 'Explore all workshop programs'}{' '}
+                {isAm ? 'ሁሉንም ስልጠናዎች ይመልከቱ' : 'Explore all courses'}{' '}
                 <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </div>

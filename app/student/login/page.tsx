@@ -71,46 +71,46 @@ export default function StudentLoginPage() {
     <div className="min-h-screen bg-transparent text-foreground flex flex-col justify-between">
       <Header />
 
-      <main className="flex-1 flex items-center justify-center px-4 py-12 md:py-20 relative overflow-hidden">
+      <main className="flex-1 flex items-center justify-center px-4 py-4 sm:py-6 relative overflow-hidden">
         {/* Subtle background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-blue-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
 
         <div className="w-full max-w-md">
           {/* Top Brand Box */}
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 mb-4 group">
+          <div className="text-center mb-3">
+            <Link href="/" className="inline-flex items-center gap-2 mb-2 group">
               <img
                 src="/images/helloschool.jpg"
                 alt="Hello Technology Training Center"
-                className="h-12 w-auto rounded-xl object-contain bg-white/95 p-1 shadow-md transition-transform group-hover:scale-105"
+                className="h-10 w-auto rounded-xl object-contain bg-white/95 p-1 shadow-sm transition-transform group-hover:scale-105"
               />
             </Link>
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-600 dark:text-sky-400 border border-blue-500/20 mb-2">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-500/10 px-3 py-0.5 text-[11px] font-bold text-blue-600 dark:text-sky-400 border border-blue-500/20 mb-1">
               <GraduationCap className="size-3.5" />
               {isAm ? 'የሄሎ ቴክኖሎጂ የተማሪ ፖርታል' : 'Hello Technology Student Portal'}
             </div>
-            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground">
               {isAm ? 'ይግቡ' : 'Log In'}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-0.5 text-xs text-muted-foreground">
               {isAm
-                ? 'የተመዘገቡበትን የስልጠና መርሃግብር፣ ሲላበስ እና የቴክኒክ ማቴሪያሎችን ለማግኘት ይግቡ።'
-                : 'Access your enrolled cohort courses, syllabus, and technical learning resources.'}
+                ? 'የተመዘገቡበትን የስልጠና መርሃግብር እና ማቴሪያሎች ለማግኘት ይግቡ።'
+                : 'Access your enrolled courses, syllabus, and learning resources.'}
             </p>
           </div>
 
           {/* Form Card */}
-          <div className="rounded-3xl border border-border/80 bg-card/90 p-7 md:p-9 shadow-2xl backdrop-blur-xl">
+          <div className="rounded-2xl border border-border/80 bg-card/95 p-6 sm:p-7 shadow-xl backdrop-blur-xl">
             {error && (
-              <div className="mb-6 flex items-start gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive animate-shake">
-                <AlertCircle className="size-5 shrink-0 mt-0.5" />
+              <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive animate-shake">
+                <AlertCircle className="size-4 shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <label className="flex flex-col gap-2 text-sm font-medium">
-                {isAm ? 'የተማሪ ኢሜይል ወይም ስልክ ቁጥር' : 'Student Email or Phone Number'}
+            <form onSubmit={handleSubmit} className="space-y-3.5">
+              <label className="flex flex-col gap-1.5 text-xs font-semibold text-foreground/90">
+                <span>{isAm ? 'ኢሜይል ወይም ስልክ ቁጥር' : 'Email or phone number'}</span>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <input
@@ -119,18 +119,18 @@ export default function StudentLoginPage() {
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder={
                       isAm
-                        ? 'ለምሳሌ፡ lealem.meseret@hellotechnology.edu.et ወይም 09...'
-                        : 'e.g. lealem.meseret@hellotechnology.edu.et or 0911...'
+                        ? 'ለምሳሌ፡ 09... ወይም youremail@gmail.com'
+                        : 'e.g. 0911... or youremail@gmail.com'
                     }
-                    className="h-11 w-full rounded-xl border border-input bg-background/80 pl-10 pr-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    className="h-10 w-full rounded-xl border border-input bg-background/80 pl-10 pr-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                     autoFocus
                   />
                 </div>
               </label>
 
-              <label className="flex flex-col gap-2 text-sm font-medium">
-                {isAm ? 'የፖርታል ይለፍ ቃል' : 'Portal Password'}
+              <label className="flex flex-col gap-1.5 text-xs font-semibold text-foreground/90">
+                <span>{isAm ? 'የይለፍ ቃል' : 'Password'}</span>
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <input
@@ -138,7 +138,7 @@ export default function StudentLoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="h-11 w-full rounded-xl border border-input bg-background/80 pl-10 pr-10 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    className="h-10 w-full rounded-xl border border-input bg-background/80 pl-10 pr-10 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     required
                   />
                   <button
@@ -156,7 +156,7 @@ export default function StudentLoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-lg shadow-blue-500/25"
+                className="w-full h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition shadow-md shadow-blue-500/25 mt-1"
               >
                 {loading ? (
                   <>
@@ -165,46 +165,21 @@ export default function StudentLoginPage() {
                   </>
                 ) : (
                   <>
-                    {isAm ? 'ወደ ፖርታል ይግቡ' : 'Sign In to Portal'}{' '}
+                    {isAm ? 'ይግቡ' : 'Sign In'}{' '}
                     <ArrowRight className="ml-2 size-4" />
                   </>
                 )}
               </Button>
             </form>
 
-            {/* Institutional Email Info Tip */}
-            <div className="mt-6 pt-5 border-t border-border/60">
-              <div className="rounded-2xl border border-blue-500/25 bg-blue-500/5 p-3.5 flex items-start gap-3">
-                <Sparkles className="size-4 text-sky-500 shrink-0 mt-0.5" />
-                <div className="text-xs text-muted-foreground leading-relaxed">
-                  <span className="font-semibold text-foreground">
-                    {isAm ? 'የተማሪ ኢሜይል አሰራር፡' : 'How your email is formatted:'}
-                  </span>
-                  <br />
-                  {isAm
-                    ? 'የእርስዎ ይፋዊ መለያ በስምዎ እና በአባትዎ ስም የተዋቀረ ነው፦'
-                    : 'Your institutional login is automatically generated from your name and father\'s name:'}{' '}
-                  <span className="font-mono text-blue-600 dark:text-sky-400 font-bold">
-                    firstname.fathername@hellotechnology.edu.et
-                  </span>
-                  <br />
-                  ({isAm ? 'ለምሳሌ፡' : 'e.g.'}{' '}
-                  <span className="font-mono text-foreground font-semibold">
-                    lealem.meseret@hellotechnology.edu.et
-                  </span>
-                  )
-                </div>
-              </div>
-            </div>
-
             {/* Registration CTA */}
-            <div className="mt-6 text-center text-xs text-muted-foreground">
-              {isAm ? 'እስካሁን የተመዘገበ የተማሪ አካውንት የለዎትም?' : 'Don\'t have an enrolled student account yet?'}{' '}
+            <div className="mt-4 text-center text-xs text-muted-foreground">
+              {isAm ? 'እስካሁን የተመዘገበ አካውንት የለዎትም?' : 'Don\'t have an account yet?'}{' '}
               <Link
                 href="/register"
                 className="font-bold text-blue-600 dark:text-sky-400 hover:underline inline-flex items-center gap-1"
               >
-                {isAm ? 'ለስልጠና ይመዝገቡ' : 'Register for a Course'} <ArrowRight className="size-3" />
+                {isAm ? 'አዲስ አካውንት ይክፈቱ' : 'Create an Account'} <ArrowRight className="size-3" />
               </Link>
             </div>
           </div>

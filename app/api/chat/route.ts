@@ -103,18 +103,17 @@ ${batchesSummary || '• Current intake is actively open for new applicants. Nex
 OFFICIAL ACCREDITED COURSES:
 ${coursesSummary}
 
-REGISTRATION INSTRUCTIONS:
-- Online Registration: Students can register 24/7 on the website at /register.
-- Registration creates an official student portal account (@hellotechnology.edu.et) with login password (default: Hello@2026).
-- In-person Registration: Visit our office at Signal Mall 4th Floor, Office 409, Bahir Dar.
-- Required documents: Copy of Kebele ID / Passport, 2 passport size photos, and minimum 10th grade completion (or equivalent practical interest).
+COURSE & DIGITAL ACCESS ENROLLMENT:
+- Online Library & Courses: Students can browse all courses, video masterclasses, and technical schematics at /library.
+- Instant Online Payment: Powered by Chapa (Telebirr, CBEBirr, Cards) for immediate instant unlocking.
+- Creating an Account: Students can register their online student account at /auth/signup.
 
 BEHAVIOR & GUIDELINES:
 1. Always respond in the language the user speaks: if they write in Amharic (አማርኛ), respond fluently in polite, natural Amharic. If they write in English, respond in professional English.
 2. Be warm, encouraging, respectful, and concise. Format responses with neat bullet points, bold highlights, and readable structure.
 3. If asked "Who is Hello Technology Training Center?" or "What is the goal of Hello Technology?", give an inspiring, comprehensive overview of our institution, our practical hands-on mission, and the key fields we train in.
-4. If recommending courses, mention relevant shift options, hands-on lab equipment, and invite them to register at the link: /register.
-5. If asked about prices or discounts, provide the figures from the catalog and note that payment plans (half / full) and cash or telebirr payments are supported.
+4. If recommending courses, mention practical modules, high-res schematics, and invite them to explore the digital library at: /library.
+5. If asked about prices or discounts, provide the figures from the catalog and note that online payment via Chapa is supported with instant activation.
 6. If user asks for direct contact or calls, provide: ${schoolConfig.phone} and Telegram: ${schoolConfig.telegram}.`
 
     // 4. Check for LLM API keys: Gemini first, then OpenAI
@@ -244,8 +243,8 @@ function generateFallbackResponse(query: string, courses: any[], batches: any[])
     q.includes('ስለ ተቋሙ')
   ) {
     return isAmharic
-      ? `🏛️ **ስለ ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center):**\n\n**ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል** በባሕር ዳር ከተማ የሚገኝ፣ ወጣቶችና ሰልጣኞች በገበያው ውስጥ ተፈላጊ በሆኑ የቴክኖሎጂና ጥገና ሙያዎች ላይ የላቀ ተግባራዊ ክህሎት እንዲጨብጡ የተቋቋመ ግንባር ቀደም የስልጠና ማዕከል ነው።\n\n🎯 **የተቋማችን ዋና ዓላማ:**\nመሪ ቃላችን **"ተግባራዊ ክህሎት ይገንቡ፤ በእርግጠኝነት ይጠግኑ!" (Build Practical Skills. Repair with Confidence.)** እንደሚለው፤ ዋና ግባችን ሰልጣኞችን በ 90%+ ተግባራዊ የላቦራቶሪ ስልጠና አብቅተን በራሳቸው ስራ ፈጣሪ ወይም በተለያዩ ድርጅቶች ውስጥ ተወዳዳሪ ባለሙያ ማድረግ ነው።\n\n🛠️ **ተቋሙ በዋናነት ምን ይሰራል?**\n1. **የሞባይል ስልክ ጥገና ስልጠና** (Hardware, Software, Micro-soldering)\n2. **የኮምፒውተርና ላፕቶፕ ጥገና** (Motherboard, OS, Hardware troubleshooting)\n3. **የኤሌክትሮኒክስና ቴሌቪዥን ጥገና** (Smart TV, LED/LCD, Refrigeration)\n4. **የሶፍትዌር ኮዲንግና ፕሮግራሚንግ**\n5. **የቪዲዮ ኤዲቲንግና ግራፊክስ ዲዛይን**\n\n📍 **አድራሻ:** ባሕር ዳር፣ ፓፒረስ ሆቴል ፊት ለፊት፣ ሲግናል ሞል 4ኛ ፎቅ ቢሮ ቁ.409\n📞 **ስልክ:** ${schoolConfig.phone} | 💬 **ቴሌግራም:** [${schoolConfig.telegramHandle}](${schoolConfig.telegram})\n\n👉 [ስልጠና ለመጀመር አሁኑኑ ይመዝገቡ](/register)!`
-      : `🏛️ **About Hello Technology Training Center & Our Mission:**\n\n**Hello Technology Training Center** is a premier accredited practical skills institute located in **Bahir Dar, Ethiopia**.\n\n🎯 **Our Goal & Mission:**\nOur motto is **"Build Practical Skills. Repair with Confidence."** Our core goal is to empower youth and professionals with hands-on, market-ready technical skills (90%+ practical workshop training) so they can start their own profitable repair businesses or secure high-paying technical jobs.\n\n🛠️ **What Does Hello Technology Training Center Do?**\nWe specialize in intensive, practical vocational training across two major branches:\n1. **Hardware & Electronics Repair:**\n   • Smartphone Repair (Hardware, Software, Micro-soldering)\n   • Computer & Laptop Maintenance\n   • Television & Electronics Diagnostics\n   • Refrigerator & Cooling System Repair\n2. **Digital Technologies:**\n   • Coding & Software Programming\n   • Video Editing & Digital Content Production\n\n📍 **Campus Location:** Signal Mall 4th Floor (In front of Papyrus Hotel), Bahir Dar\n📞 **Phone:** ${schoolConfig.phone} | 💬 **Telegram:** [${schoolConfig.telegramHandle}](${schoolConfig.telegram})\n\n👉 [Click here to enroll online today](/register)!`
+      ? `🏛️ **ስለ ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል (Hello Technology Training Center):**\n\n**ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል** በገበያው ውስጥ ተፈላጊ በሆኑ የቴክኖሎጂና ጥገና ሙያዎች ላይ የላቀ ተግባራዊ ክህሎት እንዲጨብጡ የተቋቋመ ግንባር ቀደም የስልጠና ማዕከል ነው።\n\n🎯 **የተቋማችን ዋና ዓላማ:**\nመሪ ቃላችን **"ተግባራዊ ክህሎት ይገንቡ፤ በእርግጠኝነት ይጠግኑ!" (Build Practical Skills. Repair with Confidence.)** እንደሚለው፤ ዋና ግባችን ሰልጣኞችን በተግባር የተደገፈ ጥራት ባለው ዲጂታል ስልጠና አብቅተን በራሳቸው ስራ ፈጣሪ ወይም በተለያዩ ድርጅቶች ውስጥ ተወዳዳሪ ባለሙያ ማድረግ ነው።\n\n🛠️ **ተቋሙ በዋናነት ምን ይሰራል?**\n1. **የሞባይል ስልክ ጥገና ስልጠና** (Hardware, Software, Micro-soldering)\n2. **የኮምፒውተርና ላፕቶፕ ጥገና** (Motherboard, OS, Hardware troubleshooting)\n3. **የኤሌክትሮኒክስና ቴሌቪዥን ጥገና** (Smart TV, LED/LCD, Refrigeration)\n4. **የሶፍትዌር ኮዲንግና ፕሮግራሚንግ**\n5. **የቪዲዮ ኤዲቲንግና ግራፊክስ ዲዛይን**\n\n📍 **አድራሻ:** ባሕር ዳር፣ ፓፒረስ ሆቴል ፊት ለፊት፣ ሲግናል ሞል 4ኛ ፎቅ ቢሮ ቁ.409\n📞 **ስልክ:** ${schoolConfig.phone} | 💬 **ቴሌግራም:** [${schoolConfig.telegramHandle}](${schoolConfig.telegram})\n\n👉 [ስልጠናዎችን በዲጂታል ላይብረሪ ለመጀመር እዚህ ይጫኑ](/library)!`
+      : `🏛️ **About Hello Technology Training Center & Our Mission:**\n\n**Hello Technology Training Center** is a premier practical skills institute.\n\n🎯 **Our Goal & Mission:**\nOur motto is **"Build Practical Skills. Repair with Confidence."** Our core goal is to empower youth and professionals with hands-on, market-ready technical skills so they can start their own profitable repair businesses or secure high-paying technical jobs.\n\n🛠️ **What Does Hello Technology Training Center Do?**\nWe specialize in intensive practical vocational education across two major branches:\n1. **Hardware & Electronics Repair:**\n   • Smartphone Repair (Hardware, Software, Micro-soldering)\n   • Computer & Laptop Maintenance\n   • Television & Electronics Diagnostics\n   • Refrigerator & Cooling System Repair\n2. **Digital Technologies:**\n   • Coding & Software Programming\n   • Video Editing & Digital Content Production\n\n📍 **Campus Location:** Signal Mall 4th Floor (In front of Papyrus Hotel), Bahir Dar\n📞 **Phone:** ${schoolConfig.phone} | 💬 **Telegram:** [${schoolConfig.telegramHandle}](${schoolConfig.telegram})\n\n👉 [Click here to explore our Digital Academy & courses](/library)!`
   }
 
   // 2. Batch / Intake Questions
@@ -260,24 +259,24 @@ function generateFallbackResponse(query: string, courses: any[], batches: any[])
   ) {
     const b = batches[0]
     return isAmharic
-      ? `📅 **የቀጣይ ዙር (Batch) ምዝገባ መረጃ:**\n\nበአሁኑ ወቅት **${b ? `${b.batchNumber} (${b.title})` : 'አዲስ ዙር'}** ምዝገባ በይፋ ክፍት ነው!\n\n• **የምዝገባ ሁኔታ:** ${b?.status || 'ክፍት ነው'}\n• **የመመዝገቢያ ማብቂያ:** ${b?.registrationDeadline || 'ይህ ሳምንት'}\n• **የስልጠና ፈረቃዎች:**\n  - ጠዋት (2:30 - 6:30)\n  - ከሰዓት (8:00 - 11:30)\n  - ማታ (12:00 - 2:30)\n  - ቅዳሜና እሁድ (ሙሉ ቀን)\n\n👉 [በኦንላይን ለመመዝገብ እዚህ ይጫኑ](/register) ወይም በ **${schoolConfig.phone}** ይደውሉልን!`
-      : `📅 **Upcoming Intake Batch Information:**\n\nAdmissions for **${b ? `${b.batchNumber} (${b.title})` : 'the next batch intake'}** are officially active and welcoming applicants!\n\n• **Status:** ${b?.status || 'Open'}\n• **Deadline:** ${b?.registrationDeadline || 'Ongoing this week'}\n• **Class Shifts Available:**\n  - Morning (8:30 AM - 12:30 PM)\n  - Afternoon (2:00 PM - 5:30 PM)\n  - Evening (6:00 PM - 8:30 PM)\n  - Weekend (Saturday & Sunday Full Day)\n\n👉 [Enroll online here](/register) or call us at **${schoolConfig.phone}**!`
+      ? `📅 **የዲጂታል ኮርሶችና ማኑዋሎች መረጃ:**\n\nበአሁኑ ወቅት ሁሉም የቪዲዮ ኮርሶች እና የቴክኒክ ሰርኪውት መመሪያዎች በኦንላይን ክፍት ናቸው!\n\n• **ሁኔታ:** ክፍት ነው\n• **የመማሪያ መንገድ:** በስልክ ወይም በኮምፒውተር 24/7 በራስዎ ፍጥነት\n• **ክፍያ:** በቻፓ (Chapa) አማካኝነት በቴሌብር፣ በሲቢኢ ብር ወይም በባንክ ካርድ በቅጽበት ይከፈታል\n\n👉 [ኮርሶችን ለመመልከት እዚህ ይጫኑ](/library) ወይም በ **${schoolConfig.phone}** ይደውሉልን!`
+      : `📅 **Digital Academy Courses & Manuals:**\n\nAll practical video masterclasses and high-resolution schematics are open and accessible 24/7!\n\n• **Format:** 100% Online, self-paced on your mobile phone or laptop\n• **Activation:** Instant automatic unlocking via Chapa (Telebirr, CBEBirr, Cards)\n\n👉 [Browse courses in Digital Library](/library) or call us at **${schoolConfig.phone}**!`
   }
 
   // 3. Mobile Repair Course
   if (q.includes('mobile') || q.includes('phone') || q.includes('ሞባይል') || q.includes('ስልክ')) {
     const mobileCourse = courses.find((c) => c.slug.includes('mobile') || c.title.includes('ሞባይል'))
     return isAmharic
-      ? `📱 **የሞባይል ስልክ ጥገና ስልጠና (Smartphone Repair Training):**\n\nይህ ስልጠና ከጀማሪ እስከ ከፍተኛ ደረጃ የሃርድዌርና የሶፍትዌር ጥገናን፣ ማይክሮ-ሶልደሪንግን (Micro-soldering) እና የስክሪን ቅየራን በተሟላ ተግባራዊ ላብ ያካትታል።\n\n• **የሚሸፈኑ ርዕሶች:** የቦርድ ዲያግኖስቲክስ፣ አይሲ (IC) ማንሳትና መትከል፣ ፍላሽ ማድረግ፣ ኔትወርክና ባትሪ ጥገና\n• **ቆይታ:** ${mobileCourse?.duration || '2 - 3 ወራት'}\n• **ፈረቃዎች:** ጠዋት፣ ከሰዓት፣ ማታ እና ቅዳሜ/እሁድ\n• **ክፍያ:** ${mobileCourse?.price || 'ተመጣጣኝ (በግማሽ ከፍለው መጀመር ይችላሉ)'} ETB\n\n👉 [ስልጠናውን ለመጀመር አሁን ይመዝገቡ](/register)!`
-      : `📱 **Mobile Phone Repair Training Track:**\n\nComprehensive practical training covering hardware diagnostics, software troubleshooting, micro-soldering, and screen replacement in our dedicated hardware lab.\n\n• **Topics:** Board-level troubleshooting, IC rework, flashing, unlocking, power circuits\n• **Duration:** ${mobileCourse?.duration || '2 - 3 Months'}\n• **Shifts:** Morning, Afternoon, Evening, Weekend\n• **Tuition:** ${mobileCourse?.price || 'Affordable with installment plans'} ETB\n\n👉 [Register online now](/register)!`
+      ? `📱 **የሞባይል ስልክ ጥገና ስልጠና (Smartphone Repair Training):**\n\nይህ ስልጠና ከጀማሪ እስከ ከፍተኛ ደረጃ የሃርድዌርና የሶፍትዌር ጥገናን፣ ማይክሮ-ሶልደሪንግን (Micro-soldering) እና የስክሪን ቅየራን በተሟላ የቪዲዮ ትምህርት ያካትታል።\n\n• **የሚሸፈኑ ርዕሶች:** የቦርድ ዲያግኖስቲክስ፣ አይሲ (IC) ማንሳትና መትከል፣ ፍላሽ ማድረግ፣ ኔትወርክና ባትሪ ጥገና\n• **ቆይታ:** ${mobileCourse?.duration || 'በራስዎ ፍጥነት'}\n• **ክፍያ:** ${mobileCourse?.price || 'ተመጣጣኝ'} ETB\n\n👉 [ኮርሱን በዲጂታል ላይብረሪ ለመጀመር እዚህ ይጫኑ](/library)!`
+      : `📱 **Mobile Phone Repair Training Track:**\n\nComprehensive practical training covering hardware diagnostics, software troubleshooting, micro-soldering, and screen replacement.\n\n• **Topics:** Board-level troubleshooting, IC rework, flashing, unlocking, power circuits\n• **Duration:** ${mobileCourse?.duration || 'Self-paced'}\n• **Tuition:** ${mobileCourse?.price || 'Affordable'} ETB\n\n👉 [Start learning in the Digital Library](/library)!`
   }
 
   // 4. Computer / Laptop Course
   if (q.includes('computer') || q.includes('laptop') || q.includes('ኮምፒውተር') || q.includes('ላፕቶፕ')) {
     const pcCourse = courses.find((c) => c.slug.includes('computer') || c.title.includes('ኮምፒውተር'))
     return isAmharic
-      ? `💻 **የኮምፒውተርና ላፕቶፕ ጥገና ስልጠና:**\n\nስለ ዴስክቶፕና ላፕቶፕ ኮምፒውተሮች ሃርድዌርና ሶፍትዌር ጥገና፣ ዊንዶውስ መጫን፣ የማዘርቦርድ ጥገናና የኔትወርክ መስመር ዝርጋታ በጥልቀት የሚያስተምር ተግባራዊ ስልጠና ነው።\n\n• **ቆይታ:** ${pcCourse?.duration || '2 ወራት'}\n• **ፈረቃዎች:** ጠዋት፣ ከሰዓት፣ ማታ፣ የሳምንት መጨረሻ\n\n👉 [ለመመዝገብ እዚህ ይጫኑ](/register)!`
-      : `💻 **Computer & Laptop Maintenance Training Track:**\n\nFull hands-on training covering PC & laptop hardware repair, motherboard diagnostics, operating system installation, virus removal, and network cable configuration.\n\n• **Duration:** ${pcCourse?.duration || '2 Months'}\n• **Shifts:** Morning, Afternoon, Evening, Weekend\n\n👉 [Click here to enroll](/register)!`
+      ? `💻 **የኮምፒውተርና ላፕቶፕ ጥገና ስልጠና:**\n\nስለ ዴስክቶፕና ላፕቶፕ ኮምፒውተሮች ሃርድዌርና ሶፍትዌር ጥገና፣ ዊንዶውስ መጫን፣ የማዘርቦርድ ጥገናና የኔትወርክ መስመር ዝርጋታ በጥልቀት የሚያስተምር ተግባራዊ ስልጠና ነው።\n\n• **ቆይታ:** ${pcCourse?.duration || 'በራስዎ ፍጥነት'}\n\n👉 [ኮርሱን በኦንላይን ለመጀመር እዚህ ይጫኑ](/library)!`
+      : `💻 **Computer & Laptop Maintenance Training Track:**\n\nFull training covering PC & laptop hardware repair, motherboard diagnostics, operating system installation, virus removal, and network cable configuration.\n\n• **Duration:** ${pcCourse?.duration || 'Self-paced'}\n\n👉 [Click here to access online course](/library)!`
   }
 
   // 5. Location / Address / Directions
@@ -306,8 +305,8 @@ function generateFallbackResponse(query: string, courses: any[], batches: any[])
     q.includes('መስፈርት')
   ) {
     return isAmharic
-      ? `📝 **እንዴት መመዝገብ ይቻላል? (How to Register):**\n\n1. **በድረ-ገፃችን (Online 24/7):** በ [የምዝገባ ገጽ](/register) ላይ በመግባት ስምዎንና ስልክዎን ሞልተው በ 2 ደቂቃ ውስጥ ይመዝገቡ። ወዲያውኑ የተማሪ ፖርታል አካውንት ይፈጠርልዎታል።\n2. **በአካል (In-Person):** ባሕር ዳር ፓፒረስ ሆቴል ፊት ለፊት ሲግናል ሞል 4ኛ ፎቅ ቢሮ ቁ.409 በመምጣት።\n\n📋 **አስፈላጊ መስፈርቶች:**\n• የቀበሌ መታወቂያ / ፓስፖርት ኮፒ\n• 2 ጉርድ ፎቶግራፍ\n• ለመማርና ተግባራዊ ክህሎት ለመቅሰም ፍላጎት\n\n👉 [አሁኑኑ በኦንላይን ለመመዝገብ እዚህ ይጫኑ](/register)!`
-      : `📝 **How to Register for Courses:**\n\n1. **Online (24/7):** Visit our [Online Registration Portal](/register) to secure your seat. An official student portal account is generated immediately!\n2. **In Person:** Visit our admissions office at Signal Mall 4th Floor, Office 409, Bahir Dar.\n\n📋 **Requirements:**\n• Kebele ID / Passport copy\n• 2 Passport photos\n• Passion to build practical technical skills\n\n👉 [Click here to register online](/register)!`
+      ? `📝 **እንዴት መመዝገብና መማር ይቻላል? (How to Enroll):**\n\n1. **በድረ-ገፃችን (Online 24/7):** በ [ዲጂታል ላይብረሪ](/library) ገጽ ላይ የሚፈልጉትን ኮርስ ይምረጡ።\n2. **ክፍያ መፈጸም:** በቻፓ (Chapa) በቴሌብር፣ በሲቢኢ ብር ወይም በባንክ ካርድ ይክፈሉ። ወዲያውኑ የቪዲዮ ትምህርቶች እና ማኑዋሎች ይከፈቱልዎታል!\n3. **አካውንት መክፈት:** እስካሁን ካልተመዘገቡ በ [አካውንት መፍጠሪያ](/auth/signup) ላይ በ 1 ደቂቃ ውስጥ መመዝገብ ይችላሉ።\n\n👉 [አሁኑኑ ኮርሶችን ለመመልከት እዚህ ይጫኑ](/library)!`
+      : `📝 **How to Enroll & Access Courses:**\n\n1. **Browse Digital Library (24/7):** Visit our [Digital Library](/library) to select your desired course or technical manual.\n2. **Instant Payment:** Pay securely via Chapa with Telebirr, CBEBirr, or Bank Cards. Access is unlocked immediately!\n3. **Create Account:** If you don't have an account yet, sign up at [Create Account](/auth/signup).\n\n👉 [Click here to browse courses](/library)!`
   }
 
   // 7. General Course Catalog Question
