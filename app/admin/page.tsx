@@ -80,12 +80,6 @@ import {
   CompanyOverview,
   AdminTrustedPartner,
 } from '@/components/admin-company-views'
-import {
-  AdminBatchView,
-  BatchItem,
-  BatchOverview,
-  CandidateStudent,
-} from '@/components/admin-batch-view'
 import { AdminLibraryView } from '@/components/admin-library-view'
 
 /* ──────────────────────────────────────────────────────────────
@@ -264,7 +258,6 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('')
   const [tab, setTab] = useState<
     | 'registrations'
-    | 'batches'
     | 'inquiries'
     | 'company-inquiries'
     | 'trusted-partners'
@@ -296,20 +289,6 @@ export default function AdminPage() {
 
   // Trusted Partners state
   const [trustedPartners, setTrustedPartners] = useState<AdminTrustedPartner[]>([])
-
-  // Batches (ዙሮች / Cohort Intakes) state
-  const [batches, setBatches] = useState<BatchItem[]>([])
-  const [batchOverview, setBatchOverview] = useState<BatchOverview>({
-    totalBatches: 0,
-    openBatches: 0,
-    activeBatches: 0,
-    completedBatches: 0,
-    upcomingBatches: 0,
-    totalEnrolledTrainees: 0,
-  })
-  const [batchCourses, setBatchCourses] = useState<string[]>([])
-  const [batchCandidates, setBatchCandidates] = useState<any[]>([])
-  const [batchesLoading, setBatchesLoading] = useState(false)
 
   // Registrations state
   const [registrations, setRegistrations] = useState<AdminRegistration[]>([])
@@ -384,12 +363,10 @@ export default function AdminPage() {
     if (!user) return
     loadCategories()
     loadRegistrations()
-    loadBatches()
     loadInquiries()
     loadCompanyInquiries()
     loadTrustedPartners()
     if (tab === 'registrations') loadRegistrations()
-    if (tab === 'batches') loadBatches()
     if (tab === 'inquiries') loadInquiries()
     if (tab === 'company-inquiries') loadCompanyInquiries()
     if (tab === 'trusted-partners') loadTrustedPartners()
@@ -407,31 +384,6 @@ export default function AdminPage() {
   }, [user, tab, statusFilter, regStatusFilter, companyStatusFilter])
 
   /* ─── Loaders ─── */
-  async function loadBatches() {
-    setBatchesLoading(true)
-    try {
-      const res = await fetch('/api/admin/batches')
-      const d = await res.json()
-      if (res.ok) {
-        setBatches(d.batches || [])
-        setBatchOverview(
-          d.overview || {
-            totalBatches: 0,
-            openBatches: 0,
-            activeBatches: 0,
-            completedBatches: 0,
-            upcomingBatches: 0,
-            totalEnrolledTrainees: 0,
-          }
-        )
-        setBatchCourses(d.courses || [])
-        setBatchCandidates(d.candidateStudents || [])
-      }
-    } finally {
-      setBatchesLoading(false)
-    }
-  }
-
   async function loadRegistrations() {
     setLoading(true)
     try {
@@ -581,120 +533,6 @@ export default function AdminPage() {
       setEmail('')
       setPassword('')
     })
-  }
-
-  /* ─── Batch (ዙር / Cohort Intake) operations ─── */
-  async function createBatch(formData: Partial<BatchItem>): Promise<boolean> {
-    try {
-      const res = await fetch('/api/admin/batches', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
-      const d = await res.json()
-      if (!res.ok) throw new Error(d.error || 'Failed to create batch')
-      loadBatches()
-      return true
-    } catch (e: any) {
-      await alert({
-        title: 'Batch Creation Failed',
-        message: e.message || 'Failed to create batch',
-        variant: 'danger',
-      })
-      return false
-    }
-  }
-
-  async function updateBatch(formData: Partial<BatchItem> & { id: string }): Promise<boolean> {
-    try {
-      const res = await fetch('/api/admin/batches', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
-      const d = await res.json()
-      if (!res.ok) throw new Error(d.error || 'Failed to update batch')
-      loadBatches()
-      return true
-    } catch (e: any) {
-      await alert({
-        title: 'Batch Update Failed',
-        message: e.message || 'Failed to update batch',
-        variant: 'danger',
-      })
-      return false
-    }
-  }
-
-  async function deleteBatch(id: string): Promise<boolean> {
-    try {
-      const res = await fetch(`/api/admin/batches?id=${id}`, { method: 'DELETE' })
-      const d = await res.json()
-      if (!res.ok) throw new Error(d.error || 'Failed to delete batch')
-      loadBatches()
-      return true
-    } catch (e: any) {
-      await alert({
-        title: 'Delete Failed',
-        message: e.message || 'Failed to delete batch',
-        variant: 'danger',
-      })
-      return false
-    }
-  }
-
-  async function assignStudentToBatch(data: {
-    batchId: string
-    registrationId?: string
-    studentName?: string
-    phone?: string
-    email?: string
-    city?: string
-    telegramUsername?: string
-    password?: string
-    courseTitle: string
-    shift: string
-    status?: string
-  }): Promise<boolean> {
-    try {
-      const res = await fetch('/api/admin/batches/assign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      const d = await res.json()
-      if (!res.ok) throw new Error(d.error || 'Failed to assign student to batch')
-      loadBatches()
-      loadRegistrations()
-      return true
-    } catch (e: any) {
-      await alert({
-        title: 'Assignment Failed',
-        message: e.message || 'Failed to assign student to batch',
-        variant: 'danger',
-      })
-      return false
-    }
-  }
-
-  async function removeStudentFromBatch(registrationId: string): Promise<boolean> {
-    try {
-      const res = await fetch(`/api/admin/batches/assign?registrationId=${registrationId}`, {
-        method: 'DELETE',
-      })
-      const d = await res.json()
-      if (!res.ok) throw new Error(d.error || 'Failed to remove from batch')
-      loadBatches()
-      loadRegistrations()
-      return true
-    } catch (e: any) {
-      await alert({
-        title: 'Removal Failed',
-        message: e.message || 'Failed to remove student from batch',
-        variant: 'danger',
-      })
-      return false
-    }
   }
 
   /* ─── Registration operations ─── */
@@ -1467,7 +1305,6 @@ export default function AdminPage() {
   /* ─── Shared refresh per tab ─── */
   function refreshCurrent() {
     if (tab === 'registrations') loadRegistrations()
-    if (tab === 'batches') loadBatches()
     if (tab === 'inquiries') loadInquiries()
     if (tab === 'company-inquiries') loadCompanyInquiries()
     if (tab === 'trusted-partners') loadTrustedPartners()
@@ -1510,7 +1347,7 @@ export default function AdminPage() {
             </span>
             <h1 className="mt-4 text-xl font-extrabold text-slate-900">Staff Login</h1>
             <p className="mt-1 text-sm text-slate-500">
-              Sign in to manage admissions, batches, and curriculum.
+              Sign in to manage self-paced learners, enrollments, and curriculum.
             </p>
           </div>
           <form onSubmit={handleLogin} className="mt-7 flex flex-col gap-4">
@@ -1562,7 +1399,6 @@ export default function AdminPage() {
      ────────────────────────────────────────────────────────── */
   type AdminTabId =
     | 'registrations'
-    | 'batches'
     | 'inquiries'
     | 'company-inquiries'
     | 'trusted-partners'
@@ -1594,24 +1430,16 @@ export default function AdminPage() {
   const adminNavGroups: AdminNavGroup[] = [
     {
       id: 'admissions',
-      title: 'Admissions & Cohorts',
+      title: 'Learners & Enrollments',
       icon: Users,
       items: [
         {
           id: 'registrations',
-          label: 'Registrations',
-          shortLabel: 'Registrations',
-          icon: FileText,
+          label: 'Self-Paced Enrollments',
+          shortLabel: 'Enrollments',
+          icon: GraduationCap,
           count: registrations.length,
           badge: regOverview.pending > 0 ? `${regOverview.pending} New` : null,
-        },
-        {
-          id: 'batches',
-          label: 'Batches (ዙሮች)',
-          shortLabel: 'Batches',
-          icon: Layers,
-          count: batches.length,
-          badge: batchOverview.openBatches > 0 ? `${batchOverview.openBatches} Open` : null,
         },
         {
           id: 'inquiries',
@@ -1749,12 +1577,12 @@ export default function AdminPage() {
                 <span className="font-semibold text-white">{overview.total}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-blue-200/70">Pending Admissions</span>
+                <span className="text-blue-200/70">Pending Activation</span>
                 <span className="font-semibold text-amber-300">{regOverview.pending}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-blue-200/70">Active Batches</span>
-                <span className="font-semibold text-emerald-300">{batchOverview.openBatches}</span>
+                <span className="text-blue-200/70">Active Learners</span>
+                <span className="font-semibold text-emerald-300">{regOverview.approved + regOverview.enrolled}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-blue-200/70">Company Training</span>
@@ -1881,12 +1709,11 @@ export default function AdminPage() {
         {/* Scrollable content */}
         <main className="flex-1 overflow-y-auto px-6 py-7">
 
-          {/* ─── TAB: REGISTRATIONS ─── */}
+          {/* ─── TAB: REGISTRATIONS / ENROLLMENTS ─── */}
           {tab === 'registrations' && (
             <RegistrationsView
               items={registrations}
               overview={regOverview}
-              batches={batches}
               loading={loading}
               search={search}
               setSearch={setSearch}
@@ -1898,27 +1725,6 @@ export default function AdminPage() {
               onDelete={deleteRegistration}
               onBulkDelete={bulkDeleteRegistrations}
               onSaveNotes={saveRegistrationNotes}
-              onAssignToBatch={assignStudentToBatch}
-              onRemoveFromBatch={removeStudentFromBatch}
-              onNavigateToBatches={() => setTab('batches')}
-            />
-          )}
-
-          {/* ─── TAB: BATCHES (ዙር) ─── */}
-          {tab === 'batches' && (
-            <AdminBatchView
-              batches={batches}
-              overview={batchOverview}
-              courses={batchCourses}
-              coursesList={courses}
-              candidateStudents={batchCandidates}
-              loading={batchesLoading}
-              refresh={loadBatches}
-              onCreateBatch={createBatch}
-              onUpdateBatch={updateBatch}
-              onDeleteBatch={deleteBatch}
-              onAssignToBatch={assignStudentToBatch}
-              onRemoveFromBatch={removeStudentFromBatch}
             />
           )}
 

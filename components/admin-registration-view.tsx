@@ -29,7 +29,6 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/components/ui/dialog-modal'
-import type { BatchItem } from './admin-batch-view'
 
 export type AdminRegistration = {
   id: string
@@ -59,12 +58,6 @@ export type AdminRegistration = {
   createdAt: string
   updatedAt?: string
   batchId?: string | null
-  batch?: {
-    id: string
-    batchNumber: string
-    title: string
-    status: string
-  } | null
 }
 
 export type RegistrationOverview = {
@@ -108,7 +101,6 @@ const STATUS_CONFIG: Record<
 export function RegistrationsView({
   items,
   overview,
-  batches = [],
   loading,
   search,
   setSearch,
@@ -120,13 +112,9 @@ export function RegistrationsView({
   onDelete,
   onBulkDelete,
   onSaveNotes,
-  onAssignToBatch,
-  onRemoveFromBatch,
-  onNavigateToBatches,
 }: {
   items: AdminRegistration[]
   overview: RegistrationOverview
-  batches?: BatchItem[]
   loading: boolean
   search: string
   setSearch: (v: string) => void
@@ -138,22 +126,10 @@ export function RegistrationsView({
   onDelete: (id: string) => Promise<void>
   onBulkDelete: (ids: string[]) => Promise<void>
   onSaveNotes: (id: string, notes: string) => Promise<void>
-  onAssignToBatch?: (data: {
-    batchId: string
-    registrationId?: string
-    studentName?: string
-    phone?: string
-    courseTitle: string
-    shift: string
-    status?: string
-  }) => Promise<boolean>
-  onRemoveFromBatch?: (registrationId: string) => Promise<boolean>
-  onNavigateToBatches?: () => void
 }) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [inspectItem, setInspectItem] = useState<AdminRegistration | null>(null)
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
-  const [batchFilter, setBatchFilter] = useState<string>('All')
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text)
@@ -185,14 +161,7 @@ export function RegistrationsView({
         ? r.status === 'Rejected'
         : true
 
-    const matchesBatch =
-      batchFilter === 'All'
-        ? true
-        : batchFilter === 'unassigned'
-        ? !r.batchId && !r.batch
-        : r.batchId === batchFilter || r.batch?.id === batchFilter
-
-    return matchesQuery && matchesStatus && matchesBatch
+    return matchesQuery && matchesStatus
   })
 
   const allSelected = filtered.length > 0 && selectedIds.length === filtered.length
@@ -216,11 +185,11 @@ export function RegistrationsView({
           }`}
         >
           <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            <span>Total Applications</span>
+            <span>Total Enrollments</span>
             <FileText className="size-4 text-blue-600 dark:text-sky-400" />
           </div>
           <p className="mt-2 text-2xl font-black text-foreground">{overview.total}</p>
-          <p className="mt-1 text-xs text-muted-foreground">All course applicants</p>
+          <p className="mt-1 text-xs text-muted-foreground">All self-paced learners</p>
         </div>
 
         <div
@@ -230,7 +199,7 @@ export function RegistrationsView({
           }`}
         >
           <div className="flex items-center justify-between text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-            <span>Pending Approval</span>
+            <span>Pending Activation</span>
             <Clock className="size-4 text-amber-500" />
           </div>
           <div className="mt-2 flex items-baseline gap-2">
@@ -241,7 +210,7 @@ export function RegistrationsView({
               </span>
             )}
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">Awaiting admission review</p>
+          <p className="mt-1 text-xs text-muted-foreground">Awaiting activation / review</p>
         </div>
 
         <div
@@ -257,7 +226,7 @@ export function RegistrationsView({
           <p className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">
             {overview.approved}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">Confirmed & verified</p>
+          <p className="mt-1 text-xs text-muted-foreground">Access granted & verified</p>
         </div>
 
         <div
@@ -267,13 +236,13 @@ export function RegistrationsView({
           }`}
         >
           <div className="flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
-            <span>Enrolled Students</span>
+            <span>Active Learners</span>
             <GraduationCap className="size-4 text-blue-500" />
           </div>
           <p className="mt-2 text-2xl font-black text-blue-600 dark:text-blue-400">
             {overview.enrolled}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">Fully attending cohort</p>
+          <p className="mt-1 text-xs text-muted-foreground">Lifetime self-paced access</p>
         </div>
       </div>
 
@@ -303,27 +272,6 @@ export function RegistrationsView({
 
         {/* Right actions */}
         <div className="flex flex-wrap items-center gap-2">
-          {/* Batch (ዙር) Filter */}
-          {batches.length > 0 && (
-            <div className="flex items-center gap-1.5 rounded-xl border bg-card px-2.5 py-1.5 text-xs shadow-xs">
-              <Layers className="size-3.5 text-blue-600 dark:text-sky-400 shrink-0" />
-              <span className="font-semibold text-muted-foreground text-[11px]">Batch:</span>
-              <select
-                value={batchFilter}
-                onChange={(e) => setBatchFilter(e.target.value)}
-                className="bg-transparent font-bold text-foreground outline-none cursor-pointer text-xs"
-              >
-                <option value="All">All Batches (ሁሉም ዙሮች)</option>
-                <option value="unassigned">Unassigned (No Batch)</option>
-                {batches.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.batchNumber} · {b.status} ({b.enrolledCount || 0} students)
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
           <div className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -398,7 +346,7 @@ export function RegistrationsView({
                   </button>
                 </th>
                 <th className="px-4 py-3.5">Applicant & Contact</th>
-                <th className="px-4 py-3.5">Course & Shift</th>
+                <th className="px-4 py-3.5">Course & Learning Mode</th>
                 <th className="px-4 py-3.5">Payment & Proof</th>
                 <th className="px-4 py-3.5">Workflow Status</th>
                 <th className="px-4 py-3.5 text-right">Approval Actions</th>
@@ -490,37 +438,15 @@ export function RegistrationsView({
                         </div>
                       </td>
 
-                      {/* Course & Shift */}
+                      {/* Course & Learning Mode */}
                       <td className="px-4 py-4">
                         <div className="flex flex-col gap-1 max-w-[240px]">
                           <span className="font-semibold text-foreground line-clamp-1">
                             {item.courseTitle}
                           </span>
-                          <span className="inline-flex items-center gap-1 text-[11px] text-blue-700 dark:text-sky-300 font-medium">
-                            <Clock className="size-3 shrink-0" /> {item.shift}
+                          <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold">
+                            <Sparkles className="size-3 shrink-0" /> 100% Self-Paced (24/7 Access)
                           </span>
-
-                          <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                            {/* Academic Batch (ዙር) Badge */}
-                            {item.batch ? (
-                              <span
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  if (onNavigateToBatches) onNavigateToBatches()
-                                }}
-                                className="inline-flex items-center gap-1 rounded bg-blue-500/10 border border-blue-500/25 px-1.5 py-0.5 text-[10px] font-bold text-blue-700 dark:text-sky-300 w-fit cursor-pointer hover:bg-blue-500/20"
-                                title={`Batch: ${item.batch.batchNumber} - ${item.batch.title}`}
-                              >
-                                <Layers className="size-2.5 text-blue-600 dark:text-sky-400 shrink-0" />
-                                {item.batch.batchNumber}
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/70">
-                                <Layers className="size-2.5 text-muted-foreground/60 shrink-0" />
-                                No Batch
-                              </span>
-                            )}
-                          </div>
                           {item.education && (
                             <span className="text-[10px] text-muted-foreground">
                               Edu: {item.education}
@@ -658,10 +584,6 @@ export function RegistrationsView({
           open={!!inspectItem}
           onClose={() => setInspectItem(null)}
           item={inspectItem}
-          batches={batches}
-          onAssignToBatch={onAssignToBatch}
-          onRemoveFromBatch={onRemoveFromBatch}
-          onNavigateToBatches={onNavigateToBatches}
           onUpdateStatus={async (status) => {
             await onUpdateStatus(inspectItem.id, status)
             setInspectItem((prev) => (prev ? { ...prev, status } : null))
@@ -680,41 +602,19 @@ function RegistrationDetailsModal({
   open,
   onClose,
   item,
-  batches = [],
   onUpdateStatus,
   onSaveNotes,
-  onAssignToBatch,
-  onRemoveFromBatch,
-  onNavigateToBatches,
 }: {
   open: boolean
   onClose: () => void
   item: AdminRegistration
-  batches?: BatchItem[]
   onUpdateStatus: (status: string) => Promise<void>
   onSaveNotes: (notes: string) => Promise<void>
-  onAssignToBatch?: (data: {
-    batchId: string
-    registrationId?: string
-    studentName?: string
-    phone?: string
-    courseTitle: string
-    shift: string
-    status?: string
-  }) => Promise<boolean>
-  onRemoveFromBatch?: (registrationId: string) => Promise<boolean>
-  onNavigateToBatches?: () => void
 }) {
   const [notes, setNotes] = useState(item.adminNotes || '')
   const [savingNotes, setSavingNotes] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
-
-  const currentBatch = batches.find((b) => b.id === (item.batchId || item.batch?.id))
-  const [selectedBatchId, setSelectedBatchId] = useState(
-    currentBatch ? currentBatch.id : batches.length > 0 ? batches[0].id : ''
-  )
-  const [assigningBatch, setAssigningBatch] = useState(false)
-  const { confirm, alert } = useConfirm()
+  const { alert } = useConfirm()
 
   if (!open) return null
 
@@ -778,7 +678,7 @@ function RegistrationDetailsModal({
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 bg-muted/20">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
-                Current Admission Status
+                Enrollment & Access Status
               </span>
               <span
                 className={`mt-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
@@ -802,7 +702,7 @@ function RegistrationDetailsModal({
                   onClick={() => handleStatusChange('Approved')}
                   className="bg-emerald-600 text-white hover:bg-emerald-500 font-semibold text-xs"
                 >
-                  <CheckCircle2 className="size-3.5 mr-1" /> Approve Admission
+                  <CheckCircle2 className="size-3.5 mr-1" /> Approve & Unlock Access
                 </Button>
               )}
               {item.status !== 'Rejected' && (
@@ -824,7 +724,7 @@ function RegistrationDetailsModal({
                   onClick={() => handleStatusChange('Enrolled')}
                   className="border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-900 text-xs"
                 >
-                  <GraduationCap className="size-3.5 mr-1" /> Mark Enrolled
+                  <GraduationCap className="size-3.5 mr-1" /> Mark Active Learner
                 </Button>
               )}
             </div>
@@ -871,7 +771,7 @@ function RegistrationDetailsModal({
 
             <div className="rounded-2xl border p-4">
               <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Course & Shift Selection
+                Course & Enrollment Track
               </h4>
               <div className="mt-3 space-y-2 text-xs">
                 <div>
@@ -879,8 +779,8 @@ function RegistrationDetailsModal({
                   <span className="font-bold text-foreground text-sm">{item.courseTitle}</span>
                 </div>
                 <div className="flex justify-between pt-1">
-                  <span className="text-muted-foreground">Shift:</span>
-                  <span className="font-semibold text-blue-600 dark:text-sky-400">{item.shift}</span>
+                  <span className="text-muted-foreground">Learning Mode:</span>
+                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">100% Self-Paced Online (24/7 Access)</span>
                 </div>
                 {item.education && (
                   <div className="flex justify-between">
@@ -898,139 +798,36 @@ function RegistrationDetailsModal({
             </div>
           </div>
 
-          {/* Academic Batch (ዙር / Cohort Intake) Card */}
+          {/* Self-Paced Learning Program & Access Delivery Card */}
           <div className="rounded-2xl border border-blue-500/30 bg-blue-500/5 p-4 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div className="flex items-center gap-2.5">
-                <div className="size-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                  <Layers className="size-4" />
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 block">
-                    Academic Batch (ዙር / Cohort Intake)
-                  </span>
-                  <p className="text-xs font-semibold text-foreground">
-                    {item.batch ? (
-                      <>
-                        Enrolled in <strong className="text-blue-600 dark:text-sky-400">{item.batch.batchNumber}</strong>: {item.batch.title}
-                        <span className="ml-2 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 text-[10px] font-bold border border-emerald-500/30">
-                          {item.batch.status}
-                        </span>
-                      </>
-                    ) : (
-                      'No batch intake allocated yet'
-                    )}
-                  </p>
-                </div>
+            <div className="flex items-center gap-2.5">
+              <div className="size-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                <Sparkles className="size-4" />
               </div>
-
-              {onNavigateToBatches && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose()
-                    onNavigateToBatches()
-                  }}
-                  className="text-[11px] font-bold text-blue-600 hover:underline inline-flex items-center gap-1"
-                >
-                  Manage all batches <ExternalLink className="size-3" />
-                </button>
-              )}
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 block">
+                  Learning Mode & Access Delivery
+                </span>
+                <p className="text-xs font-semibold text-foreground">
+                  100% Self-Paced Online Technical Education · 24/7 Lifetime Access
+                </p>
+              </div>
             </div>
 
-            {batches.length > 0 && onAssignToBatch && (
-              <div className="rounded-xl bg-background/80 border p-3 flex flex-col sm:flex-row sm:items-center gap-2 text-xs">
-                <div className="flex-1">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase block mb-1">
-                    Assign / Switch Academic Batch
-                  </label>
-                  <select
-                    value={selectedBatchId}
-                    onChange={(e) => setSelectedBatchId(e.target.value)}
-                    className="w-full h-9 rounded-lg border bg-background px-2.5 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {batches.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.batchNumber} · {b.title} ({b.status})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-2 sm:self-end pt-1 sm:pt-0">
-                  <Button
-                    size="sm"
-                    disabled={assigningBatch || !selectedBatchId || selectedBatchId === item.batch?.id}
-                    onClick={async () => {
-                      setAssigningBatch(true)
-                      try {
-                        const ok = await onAssignToBatch({
-                          batchId: selectedBatchId,
-                          registrationId: item.id,
-                          studentName: item.fullName,
-                          phone: item.phone,
-                          courseTitle: item.courseTitle,
-                          shift: item.shift,
-                          status: item.status,
-                        })
-                        if (ok) {
-                          const found = batches.find((b) => b.id === selectedBatchId)
-                          if (found) {
-                            item.batch = {
-                              id: found.id,
-                              batchNumber: found.batchNumber,
-                              title: found.title,
-                              status: found.status,
-                            }
-                            item.batchId = found.id
-                          }
-                        }
-                      } finally {
-                        setAssigningBatch(false)
-                      }
-                    }}
-                    className="h-9 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm"
-                  >
-                    {assigningBatch ? (
-                      <Loader2 className="size-3.5 animate-spin mr-1" />
-                    ) : (
-                      <Sparkles className="size-3.5 mr-1" />
-                    )}
-                    {item.batch ? 'Switch Batch' : 'Assign to Batch'}
-                  </Button>
-
-                  {item.batch && onRemoveFromBatch && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={assigningBatch}
-                      onClick={async () => {
-                        const ok = await confirm({
-                          title: 'Remove Student from Batch',
-                          message: `Are you sure you want to remove ${item.fullName} from ${item.batch?.batchNumber}?`,
-                          confirmText: 'Remove',
-                          variant: 'danger',
-                        })
-                        if (!ok) return
-                        setAssigningBatch(true)
-                        try {
-                          const resOk = await onRemoveFromBatch(item.id)
-                          if (resOk) {
-                            item.batch = null
-                            item.batchId = null
-                          }
-                        } finally {
-                          setAssigningBatch(false)
-                        }
-                      }}
-                      className="h-9 text-rose-600 border-rose-300 hover:bg-rose-50 text-xs"
-                    >
-                      Remove
-                    </Button>
-                  )}
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 text-xs">
+              <div className="rounded-xl border bg-background/80 p-2.5">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase block">Study Schedule</span>
+                <span className="font-semibold text-foreground text-xs">Flexible 24/7 (Own Pace)</span>
               </div>
-            )}
+              <div className="rounded-xl border bg-background/80 p-2.5">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase block">Student Portal</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400 text-xs">DRM Player & DRM Studio</span>
+              </div>
+              <div className="rounded-xl border bg-background/80 p-2.5">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase block">Certification</span>
+                <span className="font-semibold text-foreground text-xs">Accredited QR Certificate</span>
+              </div>
+            </div>
           </div>
 
           {/* Payment Proof & Ref Inspection */}
