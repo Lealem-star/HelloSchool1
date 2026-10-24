@@ -257,8 +257,8 @@ export function DigitalPurchaseModal({
               </h2>
               <p className="mt-2 text-xs sm:text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
                 {isFree
-                  ? 'Your digital learning material is permanently available in your DRM Studio.'
-                  : 'Your payment verification has been forwarded to our admissions desk. Once approved, the secure DRM Studio will unlock immediately.'}
+                  ? 'Your digital learning material is permanently available in your student portal.'
+                  : 'Your payment verification has been forwarded to our admissions desk. Once approved, your course will unlock immediately.'}
               </p>
             </div>
 
@@ -341,7 +341,7 @@ export function DigitalPurchaseModal({
                   </span>
                   <span className="text-muted-foreground">•</span>
                   <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                    <Lock className="size-3" /> In-Platform DRM Studio
+                    <Lock className="size-3" /> In-Platform Learning Studio
                   </span>
                 </div>
               </div>

@@ -100,7 +100,7 @@ export const faqs = [
     a: 'Absolutely. Many alumni launch independent device repair shops or work as specialized hardware technicians. We include practical guidance on sourcing parts, shop tooling, and customer quotation.',
   },
   {
-    q: 'What are the class schedules and intake dates?',
-    a: 'We run weekday morning (8:30 AM – 12:00 PM), afternoon (1:30 PM – 5:00 PM), and Saturday intensive (9:00 AM – 4:30 PM) cohorts. Cohorts start every month with limited seats of 10 students.',
+    q: 'How does self-paced learning work? (ትምህርቱ እንዴት ይሰጣል?)',
+    a: 'All courses are 100% self-paced online education. Once enrolled, you receive 24/7 lifetime access to watch video masterclasses, study repair manuals, and complete practical lessons at your own pace anytime, anywhere.',
   },
 ]

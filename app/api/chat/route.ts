@@ -48,15 +48,7 @@ export async function POST(request: Request) {
     const coursesSummary = courses
       .map(
         (c) =>
-          `• ${c.title} (Slug: ${c.slug}, Category: ${c.category}, Duration: ${c.duration || 'Flexible'}, Price: ${c.price || 'Contact for fee'} ETB). Description: ${c.description}. Prerequisites: ${c.prerequisites || 'None'}. Shift options: Morning, Afternoon, Evening, Weekend.`
-      )
-      .join('\n')
-
-    // Format active batches
-    const batchesSummary = (openBatches || [])
-      .map(
-        (b: any) =>
-          `• ${b.batchNumber}: ${b.title} (Status: ${b.status}, Start Date: ${b.startDate || 'Announced soon'}, Registration Deadline: ${b.registrationDeadline || 'Ongoing'}, Capacity: ${b.capacity} seats, Campus: ${b.campus || 'Main Campus'}).`
+          `• ${c.title} (Slug: ${c.slug}, Category: ${c.category}, Duration: ${c.duration || 'Flexible'}, Price: ${c.price || 'Contact for fee'} ETB). Description: ${c.description}. Prerequisites: ${c.prerequisites || 'None'}. Learning Mode: 100% Self-Paced Online (24/7 Lifetime Access).`
       )
       .join('\n')
 
@@ -90,15 +82,12 @@ ABOUT THE CENTER:
 - Institution Name: ${schoolConfig.name} (${schoolConfig.englishName} - ${schoolConfig.brandSubtitle})
 - Motto / Tagline: ${schoolConfig.tagline} ("Build Practical Skills. Repair with Confidence.")
 - Mission & Goal: To empower youth, students, and technicians with high-demand practical vocational skills (90%+ hands-on practical lab training) so they can become confident technicians, secure good employment, or start their own successful businesses in electronics and tech.
+- Education Mode: 100% Self-Paced Online Technical Education. No fixed shifts or physical batch deadlines; students enroll online, learn anytime 24/7 at their own pace, get lifetime access, and receive official accredited certification upon completion.
 - City & Address: ${schoolConfig.address} (በተለይ: ባሕር ዳር፣ ፓፒረስ ሆቴል ፊት ለፊት፣ ሲግናል ሞል ህንፃ 4ኛ ፎቅ ቢሮ ቁ.409)
 - Phone Numbers: ${schoolConfig.phone} or ${schoolConfig.alternatePhone}
 - Official Email: ${schoolConfig.email}
 - Telegram Channel: ${schoolConfig.telegram} (Handle: ${schoolConfig.telegramHandle})
 - WhatsApp: +${schoolConfig.whatsappPhone}
-- Shifts Available: Morning (8:30 AM - 12:30 PM), Afternoon (2:00 PM - 5:30 PM), Evening (6:00 PM - 8:30 PM), Weekend (Saturday & Sunday Full Day)
-
-ACTIVE INTAKE BATCHES (የቅርብ ጊዜ ዙሮች):
-${batchesSummary || '• Current intake is actively open for new applicants. Next batch orientation starting soon.'}
 
 OFFICIAL ACCREDITED COURSES:
 ${coursesSummary}

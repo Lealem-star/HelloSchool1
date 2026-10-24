@@ -29,11 +29,11 @@ interface Message {
 }
 
 const QUICK_PROMPTS = [
-  { labelAm: '📅 የቀጣይ ዙር ምዝገባ', labelEn: 'Next Batch Dates', query: 'የቀጣይ ዙር (Batch) ምዝገባ መቼ ነው?' },
+  { labelAm: '⏱️ የትምህርት አሰጣጥ (Self-Paced)', labelEn: 'Self-Paced Learning', query: 'የትምህርት አሰጣጡና የጊዜ ሰሌዳው (Self-Paced) እንዴት ነው?' },
   { labelAm: '📱 የሞባይል ጥገና', labelEn: 'Mobile Repair', query: 'ስለ ሞባይል ጥገና ስልጠና እና ዋጋ ንገረኝ' },
   { labelAm: '💻 የኮምፒውተር ጥገና', labelEn: 'Computer Course', query: 'ስለ ኮምፒውተርና ላፕቶፕ ጥገና ስልጠና ማወቅ እፈልጋለሁ' },
   { labelAm: '📍 አድራሻና ስልክ', labelEn: 'Location & Phone', query: 'የትምህርት ቤቱ አድራሻ እና ስልክ ቁጥር የት ነው?' },
-  { labelAm: '📝 እንዴት መመዝገብ እችላለሁ?', labelEn: 'How to Register', query: 'እንዴት በኦንላይን መመዝገብ እችላለሁ? መስፈርቱ ምንድን ነው?' },
+  { labelAm: '📝 እንዴት መመዝገብ እችላለሁ?', labelEn: 'How to Register', query: 'እንዴት በኦንላይን ተመዝግቤ ኮርሶችን መጀመር እችላለሁ?' },
 ]
 
 export function ChatBot() {
@@ -55,7 +55,7 @@ export function ChatBot() {
           id: 'welcome-1',
           role: 'assistant',
           content:
-            'ሰላም! እንኳን ወደ **ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል** (Hello Technology Training Center) በደህና መጡ! 👋\n\nእኔ የእርስዎ ብልህ የትምህርት አማካሪ ነኝ። ስለ ስልጠና ዓይነቶች፣ የቀጣይ ዙር (Batch) ምዝገባ፣ ክፍያ፣ የስልጠና ፈረቃዎች እና አድራሻ በደስታ እመልስልዎታለሁ።\n\nHow can I help you today?',
+            'ሰላም! እንኳን ወደ **ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል** (Hello Technology Training Center) በደህና መጡ! 👋\n\nእኔ የእርስዎ ብልህ የትምህርት አማካሪ ነኝ። ስለ 100% የራስ-አገዝ (Self-Paced) ስልጠና ዓይነቶች፣ ኦንላይን ክፍያ፣ 24/7 የመማሪያ መዳረሻ እና ሰርተፍኬት አሰጣጥ በደስታ እመልስልዎታለሁ።\n\nHow can I help you today?',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ])
@@ -139,7 +139,7 @@ export function ChatBot() {
         id: 'welcome-reset',
         role: 'assistant',
         content:
-          'ሰላም! ውይይቱ እንደ አዲስ ተጀምሯል። ስለ ምን ስልጠና ወይም የቀጣይ ዙር ምዝገባ ማወቅ ይፈልጋሉ?',
+          'ሰላም! ውይይቱ እንደ አዲስ ተጀምሯል። ስለ ምን የራስ-አገዝ (Self-Paced) ስልጠና ወይም የመማሪያ ሂደት ማወቅ ይፈልጋሉ?',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
     ])

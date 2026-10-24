@@ -746,7 +746,7 @@ export function HomePageClient({
                   <Lock className="size-4 text-emerald-300 shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold text-white">
-                      {isAm ? 'የተጠበቀ DRM የቪዲዮ ስቱዲዮ' : 'In-Platform DRM Studio'}
+                      {isAm ? 'የተጠበቀ የቪዲዮ ትምህርት ስቱዲዮ' : 'In-Platform Learning Studio'}
                     </p>
                     <p className="text-blue-100/80 mt-0.5 text-[11px] leading-relaxed">
                       {isAm ? 'ለስልክና ለኮምፒውተር ምቹ የሆነ ጥራት ያለው መድረክ።' : 'Zero piracy risk with crystal-clear streaming on phone or laptop.'}

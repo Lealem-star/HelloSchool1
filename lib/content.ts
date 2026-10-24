@@ -107,93 +107,123 @@ function toPublicCourse(course: {
 }
 
 export async function getPublishedCourses(): Promise<PublicCourse[]> {
-  const courses = await prisma.course.findMany({
-    where: { published: true },
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-  })
-  return courses.map(toPublicCourse)
+  try {
+    const courses = await prisma.course.findMany({
+      where: { published: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+    })
+    return courses.map(toPublicCourse)
+  } catch (err) {
+    console.error('getPublishedCourses error:', err)
+    return []
+  }
 }
 
 export async function getPublishedCourseBySlug(slug: string): Promise<PublicCourse | null> {
-  const course = await prisma.course.findFirst({
-    where: { slug, published: true },
-  })
-  return course ? toPublicCourse(course) : null
+  try {
+    const course = await prisma.course.findFirst({
+      where: { slug, published: true },
+    })
+    return course ? toPublicCourse(course) : null
+  } catch (err) {
+    console.error('getPublishedCourseBySlug error:', err)
+    return null
+  }
 }
 
 export async function getPublishedGallery(): Promise<PublicGalleryItem[]> {
-  const items = await prisma.trainingGallery.findMany({
-    where: { published: true },
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-  })
-  return items.map((item) => ({
-    id: item.id,
-    title: item.title,
-    description: item.description ?? '',
-    image: item.image,
-  }))
+  try {
+    const items = await prisma.trainingGallery.findMany({
+      where: { published: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+    })
+    return items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      description: item.description ?? '',
+      image: item.image,
+    }))
+  } catch (err) {
+    console.error('getPublishedGallery error:', err)
+    return []
+  }
 }
 
 export async function getPublishedLibrary(): Promise<PublicLibraryItem[]> {
-  const items = await prisma.libraryResource.findMany({
-    where: { published: true },
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-  })
-  return items.map((item: any) => ({
-    id: item.id,
-    title: item.title,
-    subtitle: item.subtitle ?? '',
-    category: item.category,
-    description: item.description ?? '',
-    format: item.format ?? 'Technical Repair Manual',
-    level: item.level ?? '',
-    status: item.status,
-    price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
-    priceETB: item.priceETB ?? 0,
-    pages: item.pages ?? '',
-    fileUrl: item.fileUrl ?? null,
-    thumbnailUrl: item.thumbnailUrl ?? null,
-    instructor: item.instructor ?? '',
-    instructorRole: item.instructorRole ?? '',
-    rating: item.rating ?? 4.9,
-    reviewCount: item.reviewCount ?? 120,
-    badgeText: item.badgeText ?? '',
-  }))
+  try {
+    const items = await prisma.libraryResource.findMany({
+      where: { published: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+    })
+    return items.map((item: any) => ({
+      id: item.id,
+      title: item.title,
+      subtitle: item.subtitle ?? '',
+      category: item.category,
+      description: item.description ?? '',
+      format: item.format ?? 'Technical Repair Manual',
+      level: item.level ?? '',
+      status: item.status,
+      price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
+      priceETB: item.priceETB ?? 0,
+      pages: item.pages ?? '',
+      fileUrl: item.fileUrl ?? null,
+      thumbnailUrl: item.thumbnailUrl ?? null,
+      instructor: item.instructor ?? '',
+      instructorRole: item.instructorRole ?? '',
+      rating: item.rating ?? 4.9,
+      reviewCount: item.reviewCount ?? 120,
+      badgeText: item.badgeText ?? '',
+    }))
+  } catch (err) {
+    console.error('getPublishedLibrary error:', err)
+    return []
+  }
 }
 
 export async function getPublishedLibraryItem(id: string): Promise<PublicLibraryItem | null> {
-  const item = await prisma.libraryResource.findFirst({
-    where: { id, published: true },
-  })
-  if (!item) return null
-  return {
-    id: item.id,
-    title: item.title,
-    subtitle: item.subtitle ?? '',
-    category: item.category,
-    description: item.description ?? '',
-    format: item.format ?? 'Technical Repair Manual',
-    level: item.level ?? '',
-    status: item.status,
-    price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
-    priceETB: item.priceETB ?? 0,
-    pages: item.pages ?? '',
-    fileUrl: item.fileUrl ?? null,
-    thumbnailUrl: item.thumbnailUrl ?? null,
-    instructor: item.instructor ?? '',
-    instructorRole: item.instructorRole ?? '',
-    rating: item.rating ?? 4.9,
-    reviewCount: item.reviewCount ?? 120,
-    badgeText: item.badgeText ?? '',
+  try {
+    const item = await prisma.libraryResource.findFirst({
+      where: { id, published: true },
+    })
+    if (!item) return null
+    return {
+      id: item.id,
+      title: item.title,
+      subtitle: item.subtitle ?? '',
+      category: item.category,
+      description: item.description ?? '',
+      format: item.format ?? 'Technical Repair Manual',
+      level: item.level ?? '',
+      status: item.status,
+      price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
+      priceETB: item.priceETB ?? 0,
+      pages: item.pages ?? '',
+      fileUrl: item.fileUrl ?? null,
+      thumbnailUrl: item.thumbnailUrl ?? null,
+      instructor: item.instructor ?? '',
+      instructorRole: item.instructorRole ?? '',
+      rating: item.rating ?? 4.9,
+      reviewCount: item.reviewCount ?? 120,
+      badgeText: item.badgeText ?? '',
+    }
+  } catch (err) {
+    console.error('getPublishedLibraryItem error:', err)
+    return null
   }
 }
 
 export async function getCategoryNames(type: 'course' | 'library'): Promise<string[]> {
-  const items = await prisma.category.findMany({
-    where: { type },
-    orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-  })
-  return items.map((item) => item.name)
+  try {
+    const items = await prisma.category.findMany({
+      where: { type },
+      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+    })
+    return items.map((item) => item.name)
+  } catch (err) {
+    console.error('getCategoryNames error:', err)
+    return []
+  }
 }
 
 export type PublicInstructor = {
@@ -309,7 +339,7 @@ const DEFAULT_PARTNERS: PublicTrustedPartner[] = [
     name: 'Bahir Dar University (BDU)',
     category: 'Universities & Higher Ed',
     logoUrl: '/images/helloschool.jpg',
-    description: 'Electronics lab technicians & hardware repair practical batches.',
+    description: 'Electronics lab technicians & hardware repair practical programs.',
   },
   {
     id: 'default-3',

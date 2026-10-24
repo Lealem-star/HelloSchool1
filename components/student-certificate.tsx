@@ -219,11 +219,9 @@ export function StudentCertificate({ isOpen, onClose, data }: StudentCertificate
                 <h3 className="text-xl sm:text-2xl font-black text-foreground print:text-black mt-0.5">
                   {data.courseTitle}
                 </h3>
-                {data.batchNumber && (
-                  <p className="text-xs text-muted-foreground print:text-neutral-600 mt-1">
-                    Academic Cohort: <strong>{data.batchNumber}</strong> · Grade: <strong>{data.grade || 'Excellence (Distinction)'}</strong>
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground print:text-neutral-600 mt-1">
+                  Learning Mode: 100% Self-Paced Technical Mastery · Grade: {data.grade || 'Excellence (Distinction)'}
+                </p>
               </div>
             </div>
 

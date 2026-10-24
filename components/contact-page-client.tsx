@@ -72,11 +72,11 @@ export function ContactPageClient({ courseTitles }: ContactPageClientProps) {
     },
     {
       q: isAm
-        ? 'የስልጠና ክፍለ-ጊዜዎች እና የሰዓት አማራጮች እንዴት ናቸው?'
-        : 'What are the class schedules and intake dates?',
+        ? 'ትምህርቱ እንዴት ይሰጣል? የሰዓት ወይም የፈረቃ ገደብ አለ?'
+        : 'How do class schedules work? Is it self-paced?',
       a: isAm
-        ? 'የጠዋት (2:30 – 6:00)፣ የከሰዓት (7:30 – 11:00) እና የቅዳሜ የተጠናከረ (3:00 – 10:30) ፈረቃዎች አሉን። አዲስ ዙር በየወሩ የሚጀምር ሲሆን፤ ጥራቱን ለመጠበቅ በእያንዳንዱ ክፍል ከ10 ሰልጣኞች በላይ አንቀበልም።'
-        : 'We run weekday morning (8:30 AM – 12:00 PM), afternoon (1:30 PM – 5:00 PM), and Saturday intensive (9:00 AM – 4:30 PM) cohorts. Cohorts start every month with limited seats of 10 students.',
+        ? 'ሁሉም ስልጠናዎቻችን 100% በራስ ፍጥነት (Self-Paced) የሚሰጡ ናቸው። ከተመዘገቡ በኋላ የቪዲዮ ማስተርክላሶችን እና የቴክኒክ ማንዋሎችን 24/7 በማንኛውም ሰዓትና ቦታ መከታተል ይችላሉ፤ ምንም አይነት የፈረቃ ወይም የሰዓት ገደብ የለም።'
+        : 'All courses are 100% self-paced online education. Once enrolled, you receive instant 24/7 lifetime access to all video lessons and technical manuals to learn whenever fits your schedule with zero shift restrictions.',
     },
   ]
 
@@ -248,8 +248,8 @@ export function ContactPageClient({ courseTitles }: ContactPageClientProps) {
             </h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {isAm
-                ? 'የስልጠና ግብዎን ከዚህ በታች ባለው ቅጽ ይሙሉልን። የቅበላ ክፍላችን ስለ ቀጣይ ዙር ቀናት፣ ካሪኩለም እና የምዝገባ ሂደቶች ያነጋግርዎታል።'
-                : 'Fill out the form below with your training goals. Our admissions staff will reach out with cohort dates, syllabus details, and registration procedures.'}
+                ? 'የስልጠና ግብዎን ከዚህ በታች ባለው ቅጽ ይሙሉልን። የድጋፍ ክፍላችን ስለ በራስ ፍጥነት ስለሚሰጡ ስልጠናዎቻችን፣ ካሪኩለም እና ምዝገባ ዝርዝር መረጃ ይሰጥዎታል።'
+                : 'Fill out the form below with your training goals. Our support team will reach out with self-paced syllabus details and enrollment guidance.'}
             </p>
             <div className="mt-8">
               <InquiryForm coursesList={courseTitles} />

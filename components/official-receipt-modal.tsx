@@ -18,7 +18,7 @@ export type ReceiptData = {
   studentName: string
   studentId: string
   courseTitle: string
-  shift: string
+  shift?: string
   batchNumber?: string
   amountPaid: number
   paymentMethod: string
@@ -143,13 +143,13 @@ export function OfficialReceiptModal({ isOpen, onClose, data }: OfficialReceiptM
 
             <div className="rounded-2xl border bg-muted/20 p-4 print:border-neutral-300 print:bg-neutral-50">
               <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground print:text-neutral-500">
-                {isAm ? 'የተመዘገቡበት ስልጠና' : 'Enrolled Training Track'}
+                {isAm ? 'የተመዘገቡበት ስልጠና' : 'Enrolled Course'}
               </span>
               <h4 className="mt-1 text-base font-bold text-foreground print:text-black">
                 {data.courseTitle}
               </h4>
               <p className="mt-0.5 text-muted-foreground print:text-neutral-600">
-                {isAm ? 'ፈረቃ፦' : 'Shift:'} <strong>{data.shift}</strong> {data.batchNumber ? `· (${data.batchNumber})` : ''}
+                {isAm ? 'የትምህርት አሰጣጥ፦' : 'Learning Mode:'} <strong>{isAm ? '100% በራስ ፍጥነት የሚጠና (Self-Paced)' : '100% Self-Paced Online'}</strong>
               </p>
             </div>
           </div>
@@ -174,12 +174,12 @@ export function OfficialReceiptModal({ isOpen, onClose, data }: OfficialReceiptM
                 <tr>
                   <td className="p-3.5">
                     <p className="font-bold text-foreground print:text-black">
-                      {data.courseTitle} — {isAm ? 'ተግባራዊ የላብራቶሪ ስልጠና' : 'Accredited Practical Training'}
+                      {data.courseTitle} — {isAm ? '100% በራስ ፍጥነት የሚጠና ስልጠና' : '100% Self-Paced Technical Training'}
                     </p>
                     <p className="text-[11px] text-muted-foreground print:text-neutral-500 mt-0.5">
                       {isAm
-                        ? 'የመሳሪያዎችና የሙከራ ላብራቶሪ አገልግሎት፣ የCOC ማዘጋጃ ፈተና እና ዲጂታል ላይብረሪ ጨምሮ'
-                        : 'Includes hardware diagnostic tools, workshop workbench, COC readiness preparation & digital library access'}
+                        ? 'የቪዲዮ ማስተርክላስ፣ የሰርኪውት ስኪማቲክስ፣ የCOC ማዘጋጃ እና 24/7 የዕድሜ ልክ መዳረሻ ጨምሮ'
+                        : 'Includes video masterclasses, technical schematics, COC preparation & 24/7 lifetime access'}
                     </p>
                   </td>
                   <td className="p-3.5 text-muted-foreground print:text-neutral-700">
@@ -243,7 +243,7 @@ export function OfficialReceiptModal({ isOpen, onClose, data }: OfficialReceiptM
               <p>
                 {isAm
                   ? 'ይህ ሰነድ በሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል የተዘጋጀ ይፋዊ የክፍያ ማረጋገጫ ነው። ለተጨማሪ ማብራሪያ በ 09 47 74 70 70 ያነጋግሩን።'
-                  : 'This computer-generated receipt serves as official proof of fee settlement for Hello Technology Training Center vocational cohort admission.'}
+                  : 'This computer-generated receipt serves as official proof of fee settlement for Hello Technology self-paced technical education enrollment.'}
               </p>
             </div>
 

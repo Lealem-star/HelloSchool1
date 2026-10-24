@@ -203,7 +203,7 @@ export function TestimonialsSection() {
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white">
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary/90 px-3 py-1 font-bold backdrop-blur-sm shadow text-white">
                   <GraduationCap className="size-4 text-amber-300" />
-                  {language === 'am' ? 'የተመራቂዎች የጋራ መታሰቢያ' : 'Official Graduating Cohort'}
+                  {language === 'am' ? 'የተመራቂዎች የጋራ መታሰቢያ' : 'Official Graduating Alumni'}
                 </span>
                 <span className="font-semibold text-white/90 bg-black/50 px-2.5 py-1 rounded-md backdrop-blur-sm">
                   ባሕር ዳር ካምፓስ · Bahir Dar
@@ -228,7 +228,7 @@ export function TestimonialsSection() {
                 <p className="mt-3 text-sm sm:text-base leading-relaxed text-muted-foreground">
                   {language === 'am'
                     ? 'በሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል ስልጠናው በወረቀት ላይ ብቻ የቀረ ሳይሆን፤ እያንዳንዱ ሰልጣኝ በራሱ የመስሪያ ቤንች ላይ እውነተኛ መሳሪያ በእጁ ይዞ ቦርዶችን፣ ስልኮችን፣ ኮምፒውተሮችንና ኤሌክትሪካል ሲስተሞችን እንዲጠግን ይደረጋል።'
-                    : 'At Hello Technology Training Center, education is forged with hands-on practice. Trainees spend 90%+ of cohort hours testing, probing, desoldering, and restoring live motherboards under the continuous mentorship of master technicians.'}
+                    : 'At Hello Technology Training Center, education is forged with hands-on practice. Trainees spend 90%+ of their self-paced training testing, probing, desoldering, and restoring live motherboards under the continuous mentorship of master technicians.'}
                 </p>
               </div>
 
