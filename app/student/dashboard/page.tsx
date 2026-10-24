@@ -335,28 +335,6 @@ export default function StudentDashboardPage() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#071330] text-white">
-        <div className="flex flex-col items-center justify-center p-8 text-center animate-fade-in">
-          <div className="flex size-16 items-center justify-center rounded-2xl bg-[#155DFC]/20 text-[#155DFC] animate-pulse border border-[#155DFC]/30 shadow-xl shadow-blue-500/20">
-            <GraduationCap className="size-9" />
-          </div>
-          <h3 className="mt-4 text-base font-bold text-white">
-            {isAm ? 'ሄሎ ቴክኖሎጂ የተማሪ ፖርታል' : 'Hello Technology Student Portal'}
-          </h3>
-          <p className="mt-1 text-xs text-blue-200/70">
-            {isAm ? 'የተማሪ መረጃዎች በመጫን ላይ...' : 'Loading your authenticated learning workspace...'}
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  if (!student) {
-    return null
-  }
-
   const latestRegistration = registrations[0]
 
   // Live popular master courses synced from database
@@ -531,6 +509,7 @@ export default function StudentDashboardPage() {
   const currentSection: NavItem | undefined = allNavItems.find((n) => n.id === activeTab) || allNavItems[0]
 
   const openCertificateForCourse = (courseTitle: string, refOrId?: string | null) => {
+    if (!student) return
     setActiveCertificate({
       certificateNumber: `HTTC-CERT-2026-${refOrId || student.studentId}`,
       studentName: student.fullName,
@@ -543,6 +522,7 @@ export default function StudentDashboardPage() {
   }
 
   const openReceiptForCourse = (courseTitle: string, amount: number, paymentMethod: string, txnRef?: string | null, date?: string) => {
+    if (!student) return
     setActiveReceipt({
       receiptNumber: txnRef || `REC-${Date.now().toString().slice(-6)}`,
       studentName: student.fullName,
@@ -555,6 +535,28 @@ export default function StudentDashboardPage() {
       transactionRef: txnRef,
       createdAt: date || new Date().toISOString(),
     })
+  }
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#071330] text-white">
+        <div className="flex flex-col items-center justify-center p-8 text-center animate-fade-in">
+          <div className="flex size-16 items-center justify-center rounded-2xl bg-[#155DFC]/20 text-[#155DFC] animate-pulse border border-[#155DFC]/30 shadow-xl shadow-blue-500/20">
+            <GraduationCap className="size-9" />
+          </div>
+          <h3 className="mt-4 text-base font-bold text-white">
+            {isAm ? 'ሄሎ ቴክኖሎጂ የተማሪ ፖርታል' : 'Hello Technology Student Portal'}
+          </h3>
+          <p className="mt-1 text-xs text-blue-200/70">
+            {isAm ? 'የተማሪ መረጃዎች በመጫን ላይ...' : 'Loading your authenticated learning workspace...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!student) {
+    return null
   }
 
   return (
