@@ -159,7 +159,7 @@ export default function StudentDashboardPage() {
   const [courses, setCourses] = useState<CourseItem[]>([])
   const [libraryResources, setLibraryResources] = useState<LibraryResource[]>([])
   const [digitalPurchases, setDigitalPurchases] = useState<DigitalPurchaseItem[]>([])
-  const [activeTab, setActiveTab] = useState<'overview' | 'mycourses' | 'catalog' | 'credentials'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview'>('overview')
   const [copiedKey, setCopiedKey] = useState<string | null>(null)
 
   // Studio and Digital Library Purchase Modal States
@@ -173,27 +173,36 @@ export default function StudentDashboardPage() {
   const [activeCertificate, setActiveCertificate] = useState<CertificateData | null>(null)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
-  const handleSelectTab = (tab: 'overview' | 'mycourses' | 'catalog' | 'credentials') => {
-    setActiveTab(tab)
-    if (typeof window !== 'undefined') {
-      const url = new URL(window.location.href)
-      url.searchParams.set('tab', tab)
-      window.history.replaceState({}, '', url.toString())
+  const handleScrollTo = (sectionId: string) => {
+    if (typeof document !== 'undefined') {
+      const targetId = sectionId === 'mycourses'
+        ? 'enrolled-courses'
+        : sectionId === 'catalog'
+        ? 'courses-catalog'
+        : sectionId === 'credentials'
+        ? 'credentials-section'
+        : sectionId
+      const el = document.getElementById(targetId)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
+      }
     }
+  }
+
+  const handleSelectTab = (tab: string) => {
+    setActiveTab('overview')
+    handleScrollTo(tab)
   }
 
   useEffect(() => {
     fetchStudentData()
 
-    // Sync tab from URL if present
+    // Sync section scroll from URL if present
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       const tabParam = params.get('tab')
-      const validTabs = ['overview', 'mycourses', 'catalog', 'credentials']
-      if (tabParam && validTabs.includes(tabParam)) {
-        setActiveTab(tabParam as any)
-      } else if (tabParam === 'selflearning' || tabParam === 'courses') {
-        setActiveTab('mycourses')
+      if (tabParam) {
+        setTimeout(() => handleScrollTo(tabParam), 300)
       }
     }
   }, [])
@@ -471,7 +480,7 @@ export default function StudentDashboardPage() {
   const totalEnrolledCount = enrolledCourses.filter((c) => c.status === 'Active').length
   const totalCompletedLessons = enrolledCourses.reduce((sum, c) => sum + c.completedCount, 0)
 
-  type NavTabId = 'overview' | 'mycourses' | 'catalog' | 'credentials'
+  type NavTabId = 'overview'
 
   interface NavItem {
     id: NavTabId
@@ -493,35 +502,11 @@ export default function StudentDashboardPage() {
       items: [
         {
           id: 'overview',
-          label: isAm ? 'የተማሪ ዳሽቦርድ ማጠቃለያ' : 'Dashboard Overview',
-          shortLabel: isAm ? 'አጠቃላይ' : 'Overview',
+          label: isAm ? 'የተማሪ ዳሽቦርድ' : 'Student Dashboard',
+          shortLabel: isAm ? 'ዳሽቦርድ' : 'Dashboard',
           icon: Sparkles,
           count: 0,
           badge: isAm ? 'ንቁ' : 'Active',
-        },
-        {
-          id: 'mycourses',
-          label: isAm ? 'የእኔ ትምህርቶች' : 'My Enrolled Courses',
-          shortLabel: isAm ? 'ትምህርቶች' : 'My Courses',
-          icon: BookOpen,
-          count: totalEnrolledCount,
-          badge: totalEnrolledCount > 0 ? `${totalEnrolledCount}` : null,
-        },
-        {
-          id: 'catalog',
-          label: isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore All Courses',
-          shortLabel: isAm ? 'ካታሎግ' : 'Browse Courses',
-          icon: ShoppingBag,
-          count: popularMasterCourses.length,
-          badge: null,
-        },
-        {
-          id: 'credentials',
-          label: isAm ? 'የምስክር ወረቀት እና ደረሰኝ' : 'Certificates & Receipts',
-          shortLabel: isAm ? 'ሰነዶች' : 'Credentials',
-          icon: Award,
-          count: 0,
-          badge: null,
         },
       ],
     },
@@ -821,40 +806,12 @@ export default function StudentDashboardPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setHelpModalOpen(true)}
-                className="rounded-xl border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-300 gap-1.5 text-xs font-semibold hover:border-blue-500 cursor-pointer"
+                className="rounded-xl border-slate-300 dark:border-slate-700 text-xs font-semibold"
               >
-                <HelpCircle className="size-3.5 text-blue-600 dark:text-sky-400" />
-                <span className="hidden sm:inline">{isAm ? 'እገዛ' : 'Help Desk'}</span>
+                <HelpCircle className="size-3.5 mr-1" />
+                <span>{isAm ? 'እርዳታ' : 'Help'}</span>
               </Button>
             </div>
-          </div>
-
-          {/* Clean Segmented Quick-Tabs Bar */}
-          <div className="flex items-center gap-1.5 pb-2.5 overflow-x-auto no-scrollbar border-t border-slate-100 dark:border-slate-800/60 pt-2">
-            {allNavItems.map((item) => {
-              const active = activeTab === item.id
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleSelectTab(item.id)}
-                  className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all shrink-0 cursor-pointer ${
-                    active
-                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25 font-bold'
-                      : 'bg-slate-100 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  <item.icon className="size-3.5 shrink-0" />
-                  <span>{item.shortLabel}</span>
-                  {item.badge ? (
-                    <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
-                      active ? 'bg-white text-blue-700' : 'bg-blue-500/15 text-blue-600 dark:text-sky-300'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  ) : null}
-                </button>
-              )
-            })}
           </div>
         </header>
 
@@ -864,12 +821,8 @@ export default function StudentDashboardPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {/* Card 1: Enrolled Courses */}
             <div
-              onClick={() => handleSelectTab('mycourses')}
-              className={`rounded-2xl border p-4 cursor-pointer transition-all ${
-                activeTab === 'mycourses'
-                  ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/30 shadow-sm'
-                  : 'border-border/80 bg-card hover:border-blue-500/40 hover:bg-muted/40'
-              }`}
+              onClick={() => handleScrollTo('enrolled-courses')}
+              className="rounded-2xl border border-border/80 bg-card p-4 hover:border-blue-500/40 hover:bg-muted/40 cursor-pointer transition-all"
             >
               <div className="flex items-center justify-between text-muted-foreground">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400">
@@ -889,7 +842,7 @@ export default function StudentDashboardPage() {
 
             {/* Card 2: Completed Lessons */}
             <div
-              onClick={() => handleSelectTab('mycourses')}
+              onClick={() => handleScrollTo('enrolled-courses')}
               className="rounded-2xl border border-border/80 bg-card p-4 hover:border-blue-500/40 cursor-pointer transition-all"
             >
               <div className="flex items-center justify-between text-muted-foreground">
@@ -907,7 +860,10 @@ export default function StudentDashboardPage() {
             </div>
 
             {/* Card 3: Learning Mode */}
-            <div className="rounded-2xl border border-border/80 bg-card p-4">
+            <div
+              onClick={() => handleScrollTo('courses-catalog')}
+              className="rounded-2xl border border-border/80 bg-card p-4 hover:border-blue-500/40 cursor-pointer transition-all"
+            >
               <div className="flex items-center justify-between text-muted-foreground">
                 <span className="text-[11px] font-bold uppercase tracking-wider">
                   {isAm ? 'የትምህርት ዘይቤ' : 'Learning Mode'}
@@ -924,12 +880,8 @@ export default function StudentDashboardPage() {
 
             {/* Card 4: Credentials */}
             <div
-              onClick={() => handleSelectTab('credentials')}
-              className={`rounded-2xl border p-4 cursor-pointer transition-all group ${
-                activeTab === 'credentials'
-                  ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/30 shadow-sm'
-                  : 'border-border/80 bg-card hover:border-blue-500/40 hover:bg-muted/40'
-              }`}
+              onClick={() => handleScrollTo('credentials-section')}
+              className="rounded-2xl border border-border/80 bg-card p-4 hover:border-blue-500/40 hover:bg-muted/40 cursor-pointer transition-all group"
             >
               <div className="flex items-center justify-between text-muted-foreground">
                 <span className="text-[11px] font-bold uppercase tracking-wider flex items-center gap-1">
@@ -966,7 +918,7 @@ export default function StudentDashboardPage() {
                 </div>
               </div>
               <button
-                onClick={() => handleSelectTab('mycourses')}
+                onClick={() => handleScrollTo('enrolled-courses')}
                 className="shrink-0 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline underline-offset-4 self-end sm:self-center cursor-pointer"
               >
                 {isAm ? 'ወደ ትምህርቶቼ ሂድ →' : 'Go to My Courses →'}
@@ -984,13 +936,13 @@ export default function StudentDashboardPage() {
                   </span>{' '}
                   <span>
                     {isAm
-                      ? 'እንኳን ወደ ሄሎ ቴክኖሎጂ ተማሪ ፖርታል በደህና መጡ! የሚፈልጉትን የቪዲዮ ኮርስ ወይም ማኑዋል በመክፈት ትምህርትዎን አሁኑኑ በራስዎ ፍጥነት ይጀምሩ።'
+                      ? 'እንኳን ወደ ሄሎ ቴክኖሎጂ ተማሪ ፖርታል በደህና መጡ! የሚፈልጉትን የቪዲዮ ኮርስ ወይም ማንዋል በመክፈት ትምህርትዎን አሁኑኑ በራስዎ ፍጥነት ይጀምሩ።'
                       : 'Welcome to Hello Technology Student Portal! Browse our self-paced mastercourses below to unlock instant 24/7 access.'}
                   </span>
                 </div>
               </div>
               <button
-                onClick={() => handleSelectTab('catalog')}
+                onClick={() => handleScrollTo('courses-catalog')}
                 className="shrink-0 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline underline-offset-4 self-end sm:self-center cursor-pointer"
               >
                 {isAm ? 'ስልጠናዎችን ይመልከቱ →' : 'Browse Courses →'}
@@ -998,75 +950,75 @@ export default function StudentDashboardPage() {
             </div>
           )}
 
-          {/* ─── TAB 1: OVERVIEW / DASHBOARD HUB ─── */}
-          {activeTab === 'overview' && (
-            <div className="mt-4 space-y-8 animate-fade-in">
-              {/* Student Welcome & Quick Actions Hero */}
-              <div className="rounded-3xl border border-blue-500/25 bg-gradient-to-r from-blue-600/10 via-sky-500/10 to-transparent p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 shadow-sm">
-                <div className="space-y-1.5">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                      <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      {isAm ? 'ንቁ የተማሪ አካውንት' : 'Authenticated Student Workspace'}
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 border border-blue-500/25 px-2.5 py-0.5 text-[11px] font-mono font-bold text-blue-700 dark:text-sky-300">
-                      {student.studentId}
-                    </span>
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
-                    {isAm ? `እንኳን ደህና መጡ፣ ${student.fullName}!` : `Welcome back, ${student.fullName}!`}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
-                    {isAm
-                      ? `በሄሎ ቴክኖሎጂ ተማሪ ፖርታል አማካኝነት በራስዎ ፍጥነት የተዘጋጁ የቪዲዮ ማስተርክላሶችን እና የቴክኒክ ጥገና ማንዋሎችን በማንኛውም ሰዓት ይከታተሉ።`
-                      : `Study high-definition video masterclasses and practical technical repair manuals at your own pace with 24/7 on-demand access.`}
-                  </p>
+          {/* ─── UNIFIED DASHBOARD HUB ─── */}
+          <div className="mt-4 space-y-8 animate-fade-in">
+            {/* Student Welcome & Quick Actions Hero */}
+            <div className="rounded-3xl border border-blue-500/25 bg-gradient-to-r from-blue-600/10 via-sky-500/10 to-transparent p-6 sm:p-7 flex flex-col md:flex-row md:items-center justify-between gap-5 shadow-sm">
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-0.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    {isAm ? 'ንቁ የተማሪ አካውንት' : 'Authenticated Student Workspace'}
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/15 border border-blue-500/25 px-2.5 py-0.5 text-[11px] font-mono font-bold text-blue-700 dark:text-sky-300">
+                    {student.studentId}
+                  </span>
                 </div>
-
-                <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-                  <Button
-                    onClick={() => handleSelectTab('mycourses')}
-                    className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs h-10 px-4 shadow-md shadow-blue-500/25 cursor-pointer"
-                  >
-                    <BookOpen className="size-3.5 mr-1.5" />
-                    {isAm ? 'የእኔ ትምህርቶች' : 'My Enrolled Courses'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleSelectTab('catalog')}
-                    className="rounded-xl text-xs font-semibold h-10 px-4 cursor-pointer"
-                  >
-                    <ShoppingBag className="size-3.5 mr-1.5 text-blue-600 dark:text-sky-400" />
-                    {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore Courses'}
-                  </Button>
-                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
+                  {isAm ? `እንኳን ደህና መጡ፣ ${student.fullName}!` : `Welcome back, ${student.fullName}!`}
+                </h2>
+                <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
+                  {isAm
+                    ? `በሄሎ ቴክኖሎጂ ተማሪ ፖርታል አማካኝነት በራስዎ ፍጥነት የተዘጋጁ የቪዲዮ ማስተርክላሶችን እና የቴክኒክ ጥገና ማንዋሎችን በማንኛውም ሰዓት ይከታተሉ።`
+                    : `Study high-definition video masterclasses and practical technical repair manuals at your own pace with 24/7 on-demand access.`}
+                </p>
               </div>
 
-              {/* SECTION: MY ENROLLED COURSES */}
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b">
-                  <div>
-                    <h3 className="text-xl font-black text-foreground flex items-center gap-2">
-                      <BookOpen className="size-5 text-blue-600 dark:text-sky-400" />
-                      <span>{isAm ? 'የእኔ የተከፈቱ ትምህርቶች' : 'My Enrolled Courses'}</span>
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {isAm
-                        ? 'በተማሪ አካውንትዎ የተከፈቱ ሁሉም የቪዲዮ ስልጠናዎች እና ማንዋሎች'
-                        : 'Continue learning your self-paced video masterclasses and manuals'}
-                    </p>
-                  </div>
-                  {enrolledCourses.length > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleSelectTab('mycourses')}
-                      className="text-xs font-semibold text-blue-600 dark:text-sky-400 self-start sm:self-center"
-                    >
-                      {isAm ? 'ሁሉንም ይመልከቱ →' : 'View All →'}
-                    </Button>
-                  )}
+              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+                <Button
+                  onClick={() => handleScrollTo('enrolled-courses')}
+                  className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs h-10 px-4 shadow-md shadow-blue-500/25 cursor-pointer"
+                >
+                  <BookOpen className="size-3.5 mr-1.5" />
+                  {isAm ? 'የእኔ ትምህርቶች' : 'My Enrolled Courses'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleScrollTo('courses-catalog')}
+                  className="rounded-xl text-xs font-semibold h-10 px-4 cursor-pointer"
+                >
+                  <ShoppingBag className="size-3.5 mr-1.5 text-blue-600 dark:text-sky-400" />
+                  {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore Courses'}
+                </Button>
+              </div>
+            </div>
+
+            {/* SECTION: MY ENROLLED COURSES */}
+            <div id="enrolled-courses" className="space-y-4 scroll-mt-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b">
+                <div>
+                  <h3 className="text-xl font-black text-foreground flex items-center gap-2">
+                    <BookOpen className="size-5 text-blue-600 dark:text-sky-400" />
+                    <span>{isAm ? 'የእኔ የተከፈቱ ትምህርቶች' : 'My Enrolled Courses'}</span>
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {isAm
+                      ? 'በተማሪ አካውንትዎ የተከፈቱ ሁሉም የቪዲዮ ስልጠናዎች እና ማንዋሎች'
+                      : 'Continue learning your self-paced video masterclasses and manuals'}
+                  </p>
                 </div>
+                {enrolledCourses.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleScrollTo('courses-catalog')}
+                    className="rounded-xl text-xs font-semibold text-blue-600 dark:text-sky-400 self-start sm:self-center"
+                  >
+                    <ShoppingBag className="size-3.5 mr-1" />
+                    {isAm ? 'ተጨማሪ ስልጠናዎች →' : 'Browse Catalog →'}
+                  </Button>
+                )}
+              </div>
 
                 {enrolledCourses.length === 0 ? (
                   <div className="rounded-3xl border border-dashed p-10 text-center bg-card">
@@ -1203,7 +1155,7 @@ export default function StudentDashboardPage() {
               </div>
 
               {/* SECTION: POPULAR MASTER COURSES */}
-              <div className="space-y-4 pt-6 border-t">
+              <div id="courses-catalog" className="space-y-4 pt-6 border-t scroll-mt-6">
                 <div className="text-center max-w-2xl mx-auto space-y-2">
                   <span className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-sky-400">
                     {isAm ? 'ተወዳጅ የቪዲዮ ትምህርቶች እና መጻሕፍት' : 'Featured Video Masterclasses & Manuals'}
@@ -1411,523 +1363,127 @@ export default function StudentDashboardPage() {
                 </div>
               </div>
 
-              {/* SECTION: CREDENTIALS QUICK CARD */}
-              <div className="pt-6 border-t">
-                <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-card to-blue-500/10 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-                  <div className="flex items-center gap-4">
-                    <div className="flex size-12 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 shrink-0">
-                      <Award className="size-7" />
-                    </div>
-                    <div>
-                      <h4 className="text-base font-black text-foreground">
-                        {isAm ? 'ይፋዊ የሙያ ብቃት ማረጋገጫ የምስክር ወረቀት' : 'Accredited Certificate of Competence'}
-                      </h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {isAm
-                          ? 'የቪዲዮ ማስተርክላሶችን ሲያጠናቅቁ ይፋዊ የምስክር ወረቀት በኦንላይን QR ማረጋገጫ ይዘጋጅልዎታል።'
-                          : 'Upon completing self-paced milestones, your verified accredited certificate with online QR code is instantly accessible.'}
-                      </p>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => handleSelectTab('credentials')}
-                    className="rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-amber-600/20 shrink-0"
-                  >
-                    <Award className="size-3.5" />
-                    {isAm ? 'ሰነዶችን ይመልከቱ' : 'View Credentials'}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ─── TAB 2: MY COURSES DEDICATED VIEW ─── */}
-          {activeTab === 'mycourses' && (
-            <div className="mt-4 space-y-6 animate-fade-in">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b">
-                <div>
-                  <h2 className="text-2xl font-black text-foreground">
-                    {isAm ? 'የእኔ የተከፈቱ ትምህርቶች' : 'My Enrolled Courses'}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {isAm
-                      ? 'በራስዎ ፍጥነት የሚማሩባቸው ሁሉም የቪዲዮ ማስተርክላሶች እና የጥገና ማንዋሎች።'
-                      : 'All self-paced video masterclasses and repair manuals unlocked on your student account.'}
-                  </p>
-                </div>
-
-                <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 px-3.5 py-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  <ShieldCheck className="size-4" /> {isAm ? '100% በራስ ፍጥነት · ቋሚ መዳረሻ' : '100% Self-Paced · Lifetime Access'}
-                </div>
-              </div>
-
-              {enrolledCourses.length === 0 ? (
-                <div className="rounded-3xl border border-dashed p-12 text-center bg-card">
-                  <BookOpen className="size-12 mx-auto text-muted-foreground opacity-40 mb-3" />
-                  <h3 className="text-lg font-bold">
-                    {isAm ? 'እስካሁን የተከፈተ የቪዲዮ ትምህርት የለም' : 'No Self-Paced Courses Unlocked Yet'}
+              {/* SECTION: CREDENTIALS & TUITION RECEIPTS */}
+              <div id="credentials-section" className="pt-6 border-t scroll-mt-6 space-y-4">
+                <div className="pb-2 border-b">
+                  <h3 className="text-xl font-black text-foreground flex items-center gap-2">
+                    <Award className="size-5 text-amber-500" />
+                    <span>{isAm ? 'ይፋዊ የምስክር ወረቀቶች እና ደረሰኞች' : 'Official Certificates & Tuition Receipts'}</span>
                   </h3>
-                  <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-md mx-auto">
+                  <p className="text-xs text-muted-foreground">
                     {isAm
-                      ? 'እስካሁን ምንም አይነት የቪዲዮ ኮርስ ወይም ማንዋል አልከፈቱም። ፈጣን መዳረሻ ለማግኘት ተወዳጅ ስልጠናዎቻችንን ይመልከቱ።'
-                      : "You haven't enrolled in any self-paced courses yet. Browse our masterclasses to unlock instant lifetime access."}
+                      ? 'በሄሎ ቴክኖሎጂ የሙያ ማሰልጠኛ ማዕከል የተዘጋጁ የብቃት ማረጋገጫ የምስክር ወረቀቶች እና ይፋዊ የክፍያ ደረሰኞች።'
+                      : 'Accredited certificates of practical competence and computer-generated tuition receipts.'}
                   </p>
-                  <Button
-                    onClick={() => handleSelectTab('catalog')}
-                    className="mt-6 rounded-xl bg-blue-600 text-white font-bold"
-                  >
-                    {isAm ? 'ስልጠናዎችን ይመልከቱ →' : 'Browse Courses →'}
-                  </Button>
                 </div>
-              ) : (
+
                 <div className="grid gap-6 md:grid-cols-2">
-                  {enrolledCourses.map((item) => {
-                    const isVideo = item.format === 'Video Masterclass'
-                    return (
-                      <div
-                        key={item.id}
-                        className="rounded-3xl border border-blue-500/30 bg-card p-6 sm:p-7 shadow-lg flex flex-col justify-between"
+                  {/* Certificate Card */}
+                  <div className="rounded-3xl border border-amber-500/30 bg-card p-6 sm:p-7 shadow-lg flex flex-col justify-between">
+                    <div>
+                      <div className="flex size-14 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 mb-4">
+                        <Award className="size-8" />
+                      </div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                        {isAm ? 'የሙያ ብቃት ማረጋገጫ' : 'Accredited TVET Credential'}
+                      </span>
+                      <h3 className="mt-1 text-xl font-black text-foreground">
+                        {isAm ? 'የሙያ ብቃት ማረጋገጫ የምስክር ወረቀት' : 'Certificate of Practical Competence'}
+                      </h3>
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                        {isAm
+                          ? 'በሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል የተዘጋጁትን የቪዲዮ ትምህርቶችና የተግባር ሙያዊ መስፈርቶች በማጠናቀቅ የሚሰጥ ይፋዊ የምስክር ወረቀት። በኦንላይን QR ማረጋገጫ የተደገፈ።'
+                          : 'Official TVET accredited certificate issued upon completing self-paced masterclasses and practical diagnostic competencies. Verified by online QR code.'}
+                      </p>
+
+                      <div className="mt-5 p-4 rounded-2xl bg-muted/30 border space-y-1.5 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">{isAm ? 'ተማሪ፦' : 'Student:'}</span>
+                          <strong className="text-foreground">{student.fullName}</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">{isAm ? 'መለያ ቁጥር፦' : 'Student ID:'}</span>
+                          <strong className="font-mono text-blue-600 dark:text-sky-400">{student.studentId}</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">{isAm ? 'የትምህርት አይነት፦' : 'Learning Mode:'}</span>
+                          <strong className="text-foreground">{isAm ? 'በራስ ፍጥነት የሚጠና' : '100% Self-Paced'}</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t">
+                      <Button
+                        onClick={() =>
+                          openCertificateForCourse(
+                            enrolledCourses[0]?.title || 'Professional Hardware & Electronics Mastery',
+                            enrolledCourses[0]?.transactionRef
+                          )
+                        }
+                        className="w-full rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-amber-600/20"
                       >
-                        <div>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span className="rounded-full bg-blue-500/10 px-3 py-1 font-bold text-blue-600 dark:text-sky-400">
-                              {item.format}
-                            </span>
-                            {item.status === 'Pending' ? (
-                              <span className="font-mono text-amber-600 dark:text-amber-400 font-semibold bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 flex items-center gap-1">
-                                <Clock className="size-3" /> {isAm ? 'ማረጋገጫ በመጠባበቅ ላይ' : 'Waiting for Admin Approval'}
-                              </span>
-                            ) : (
-                              <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-                                {isAm ? '✓ ክፍት እና ንቁ' : '✓ Unlocked & Licensed'}
-                              </span>
-                            )}
-                          </div>
-
-                          <h3 className="mt-4 text-xl font-bold text-foreground">
-                            {item.title}
-                          </h3>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {item.subtitle}
-                          </p>
-
-                          {item.status === 'Pending' ? (
-                            <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-3.5 text-xs text-amber-800 dark:text-amber-300 space-y-1">
-                              <p className="font-bold flex items-center gap-1.5">
-                                <AlertCircle className="size-3.5" /> {isAm ? 'የክፍያ ማመሳከሪያ ደርሷል' : 'Payment Reference Received'}
-                              </p>
-                              <p className="text-[11px] text-muted-foreground">
-                                {isAm ? 'የግብይት ቁጥር፦' : 'Transaction Ref:'} <strong className="font-mono text-foreground">{item.transactionRef || 'N/A'}</strong> ({item.paymentMethod?.toUpperCase()})
-                              </p>
-                              <p className="text-[11px] text-muted-foreground">
-                                {isAm
-                                  ? 'የምዝገባ እና የፋይናንስ ክፍላችን ክፍያዎን እያረጋገጠ ነው። እንደተረጋገጠ ወዲያውኑ መዳረሻዎ ይከፈታል።'
-                                  : 'Our financial desk is reviewing your payment. Access will unlock immediately once approved.'}
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="mt-5 space-y-1.5">
-                              <div className="flex justify-between text-xs font-semibold">
-                                <span className="text-muted-foreground">{isAm ? 'የትምህርት ሂደት፦' : 'Learning Progress:'}</span>
-                                <span className="text-blue-600 dark:text-sky-400 font-mono">
-                                  {item.progress}% ({item.completedCount} of {item.totalCount} {isVideo ? (isAm ? 'ትምህርቶች' : 'lessons') : (isAm ? 'ምዕራፎች' : 'chapters')})
-                                </span>
-                              </div>
-                              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-blue-600 rounded-full transition-all duration-500"
-                                  style={{ width: `${Math.max(item.progress, 5)}%` }}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="mt-6 pt-4 border-t flex flex-wrap items-center justify-between gap-3">
-                          <span className="text-xs text-muted-foreground">
-                            {isAm ? 'አሰልጣኝ፦' : 'Instructor:'} <strong>{item.instructor}</strong>
-                          </span>
-
-                          <div className="flex items-center gap-2">
-                            {item.status === 'Pending' ? (
-                              <Button
-                                disabled
-                                className="rounded-xl bg-muted text-muted-foreground cursor-not-allowed text-xs gap-1.5"
-                              >
-                                <Clock className="size-3.5" /> {isAm ? 'ማረጋገጫ በመጠባበቅ ላይ' : 'Pending Approval'}
-                              </Button>
-                            ) : (
-                              <>
-                                <Button
-                                  onClick={() => setActiveStudioResource(item.meta)}
-                                  className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-blue-500/20"
-                                >
-                                  <Play className="size-3.5" /> {isAm ? 'ትምህርቱን ጀምር' : 'Resume Learning'}
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openCertificateForCourse(item.title, item.transactionRef)}
-                                  className="rounded-xl text-xs gap-1"
-                                >
-                                  <Award className="size-3.5 text-amber-500" />
-                                  <span>{isAm ? 'ምስክር ወረቀት' : 'Certificate'}</span>
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => openReceiptForCourse(item.title, item.amount || 2999, item.paymentMethod || 'telebirr', item.transactionRef, item.createdAt)}
-                                  className="rounded-xl text-xs gap-1 text-muted-foreground hover:text-foreground"
-                                >
-                                  <FileText className="size-3.5" />
-                                  <span>{isAm ? 'ደረሰኝ' : 'Receipt'}</span>
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ─── TAB 3: EXPLORE ALL COURSES CATALOG ─── */}
-          {activeTab === 'catalog' && (
-            <div className="mt-4 space-y-6 animate-fade-in">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b">
-                <div>
-                  <h2 className="text-2xl font-black text-foreground">
-                    {isAm ? 'ሁሉንም ስልጠናዎች ይመልከቱ' : 'Explore All Self-Paced Courses'}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {isAm
-                      ? 'አንዴ በመክፈል በማንኛውም ሰዓት በራስዎ ፍጥነት የሚማሩባቸው የቪዲዮ ማስተርክላሶች እና የጥገና ማንዋሎች።'
-                      : 'High-definition video courses and technical repair manuals with lifetime on-demand access.'}
-                  </p>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {popularMasterCourses.length} {isAm ? 'ስልጠናዎች ይገኛሉ' : 'Courses Available'}
-                </div>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {popularMasterCourses.map((item) => {
-                  const unlocked = isResourcePurchased(item.id)
-                  const isPending = getPurchaseStatus(item.id) === 'Pending'
-                  const isVideo =
-                    item.format.toLowerCase().includes('video') ||
-                    (item.lessons && item.lessons.length > 0)
-
-                  let durationOrPages = item.pages || (isVideo ? '6:00 Hours' : `${(item.chapters?.length || 8) * 20} Pages`)
-                  let activityCount = isVideo
-                    ? `${item.lessons?.length || 18} Lessons`
-                    : `${item.chapters?.length || 8} Chapters`
-
-                  if (item.pages && item.pages.includes('·')) {
-                    const parts = item.pages.split('·')
-                    durationOrPages = parts[0].trim().replace(/Hours?/i, '').trim()
-                    activityCount = parts[1].trim()
-                  }
-
-                  const thumbImage =
-                    item.thumbnailUrl ||
-                    (isVideo ? '/images/course-preview-hero.jpg' : '/images/manual-book-cover.jpg')
-
-                  return (
-                    <article
-                      key={item.id}
-                      className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-xl"
-                    >
-                      <div>
-                        {/* Media Thumbnail Container with Circular Play Overlay */}
-                        <div
-                          onClick={() => {
-                            if (unlocked) {
-                              setActiveStudioResource(item)
-                            } else {
-                              router.push(`/library/${item.id}`)
-                            }
-                          }}
-                          className="relative block aspect-[16/10] overflow-hidden bg-slate-900 cursor-pointer"
-                        >
-                          <img
-                            src={thumbImage}
-                            alt={item.title}
-                            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-
-                          {/* Top-Left Format Pill */}
-                          <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                            <span
-                              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-bold text-white shadow-md backdrop-blur-md ${
-                                isVideo ? 'bg-blue-600/90' : 'bg-indigo-600/90'
-                              }`}
-                            >
-                              {isVideo ? <Video className="size-3" /> : <BookOpen className="size-3" />}
-                              {isVideo
-                                ? (isAm ? 'ቪዲዮ ኮርስ' : 'Video Course')
-                                : (isAm ? 'ቴክኒካል መጽሐፍ' : 'Book / Manual')}
-                            </span>
-                          </div>
-
-                          {/* Top-Right Price Tag */}
-                          <div className="absolute top-3 right-3">
-                            <span
-                              className={`inline-flex items-center rounded-lg px-2.5 py-1 text-[11px] font-bold shadow-md backdrop-blur-md ${
-                                item.priceETB === 0
-                                  ? 'bg-emerald-600/90 text-white'
-                                  : 'bg-black/75 text-white border border-white/20'
-                              }`}
-                            >
-                              {item.priceETB === 0
-                                ? (isAm ? 'ነፃ' : 'Free')
-                                : item.priceDisplay}
-                            </span>
-                          </div>
-
-                          {/* Centered Circular Dark Play Button */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="flex size-12 items-center justify-center rounded-full bg-slate-950/70 backdrop-blur-md text-white shadow-xl border border-white/20 transition-all duration-300 group-hover:scale-110 group-hover:bg-primary group-hover:border-primary">
-                              {isVideo ? (
-                                <Play className="size-5 fill-white ml-0.5" />
-                              ) : (
-                                <BookOpen className="size-5 text-white" />
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Card Body */}
-                        <div className="p-5">
-                          {/* Title */}
-                          <Link href={`/library/${item.id}`} className="block">
-                            <h4 className="text-base sm:text-lg font-bold text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2 cursor-pointer">
-                              {item.title}
-                            </h4>
-                          </Link>
-
-                          {/* Instructor / Author byline */}
-                          <p className="mt-1.5 text-xs text-muted-foreground font-medium">
-                            {isVideo ? (isAm ? 'መምህር፦ ' : 'A Course By : ') : (isAm ? 'አዘጋጅ፦ ' : 'Author : ')}
-                            <span className="font-semibold text-foreground">
-                              {item.instructor || 'Hello Technology Academy'}
-                            </span>
-                          </p>
-
-                          {/* Description */}
-                          <p className="mt-2.5 text-xs md:text-sm text-muted-foreground leading-relaxed line-clamp-3 min-h-[3.6rem]">
-                            {item.description}
-                          </p>
-
-                          {/* 3-Column Metadata Row */}
-                          <div className="mt-4 border-t border-border/60 pt-3 grid grid-cols-3 gap-2 text-xs">
-                            {/* Column 1: Level */}
-                            <div className="flex flex-col">
-                              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                                <BarChart3 className="size-3 text-sky-500" />
-                                {isAm ? 'ደረጃ' : 'Level'}
-                              </span>
-                              <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
-                                {item.level || (isAm ? 'ለሁሉም' : 'Everyone')}
-                              </span>
-                            </div>
-
-                            {/* Column 2: Duration / Pages */}
-                            <div className="flex flex-col">
-                              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                                <Clock className="size-3 text-amber-500" />
-                                {isVideo ? (isAm ? 'ቆይታ' : 'Duration') : (isAm ? 'ገጾች' : 'Pages')}
-                              </span>
-                              <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
-                                {durationOrPages}
-                              </span>
-                            </div>
-
-                            {/* Column 3: Activity */}
-                            <div className="flex flex-col">
-                              <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                                <ListChecks className="size-3 text-emerald-500" />
-                                {isAm ? 'ክፍል' : 'Activity'}
-                              </span>
-                              <span className="font-semibold text-foreground text-xs mt-0.5 truncate">
-                                {activityCount}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Card Actions */}
-                      <div className="p-5 pt-0 border-t border-border/50 mt-4">
-                        {unlocked ? (
-                          <Button
-                            onClick={() => setActiveStudioResource(item)}
-                            className="w-full rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-emerald-600/20"
-                          >
-                            <Play className="size-4" /> {isAm ? 'ትምህርቱን ጀምር' : 'Study on Platform'}
-                          </Button>
-                        ) : isPending ? (
-                          <Button
-                            disabled
-                            className="w-full rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 font-bold text-xs gap-1.5 cursor-not-allowed"
-                          >
-                            <Clock className="size-4" /> {isAm ? 'የአስተዳዳሪ ማረጋገጫ በመጠባበቅ ላይ' : 'Waiting for Admin Approval'}
-                          </Button>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <Link href={`/library/${item.id}`} className="flex-1">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full rounded-xl border-sky-500/40 text-sky-600 dark:text-sky-400 font-bold hover:bg-sky-500 hover:text-white transition-all text-xs"
-                              >
-                                <ExternalLink className="size-3.5 mr-1" />
-                                {isAm ? 'ማሳያ' : 'Preview'}
-                              </Button>
-                            </Link>
-                            <Button
-                              size="sm"
-                              onClick={() => setPurchasingResource(item)}
-                              className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-blue-600/20 hover:scale-[1.02] transition-all"
-                            >
-                              <ShoppingBag className="size-3.5" />
-                              {isAm ? `ክፈት (${item.priceDisplay})` : `Purchase (${item.priceDisplay})`}
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </article>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* ─── TAB 4: CREDENTIALS & OFFICIAL RECORDS ─── */}
-          {activeTab === 'credentials' && (
-            <div className="mt-4 space-y-6 animate-fade-in">
-              <div className="pb-4 border-b">
-                <h2 className="text-2xl font-black text-foreground">
-                  {isAm ? 'ይፋዊ የምስክር ወረቀቶች እና ደረሰኞች' : 'Official Certificates & Tuition Receipts'}
-                </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  {isAm
-                    ? 'በሄሎ ቴክኖሎጂ የሙያ ማሰልጠኛ ማዕከል የተዘጋጁ የብቃት ማረጋገጫ የምስክር ወረቀቶች እና ይፋዊ የክፍያ ደረሰኞች።'
-                    : 'Accredited certificates of practical competence and computer-generated tuition receipts.'}
-                </p>
-              </div>
-
-              <div className="grid gap-6 md:grid-cols-2">
-                {/* Certificate Card */}
-                <div className="rounded-3xl border border-amber-500/30 bg-card p-6 sm:p-7 shadow-lg flex flex-col justify-between">
-                  <div>
-                    <div className="flex size-14 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 mb-4">
-                      <Award className="size-8" />
-                    </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                      {isAm ? 'የሙያ ብቃት ማረጋገጫ' : 'Accredited TVET Credential'}
-                    </span>
-                    <h3 className="mt-1 text-xl font-black text-foreground">
-                      {isAm ? 'የሙያ ብቃት ማረጋገጫ የምስክር ወረቀት' : 'Certificate of Practical Competence'}
-                    </h3>
-                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                      {isAm
-                        ? 'በሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል የተዘጋጁትን የቪዲዮ ትምህርቶችና የተግባር ሙያዊ መስፈርቶች በማጠናቀቅ የሚሰጥ ይፋዊ የምስክር ወረቀት። በኦንላይን QR ማረጋገጫ የተደገፈ።'
-                        : 'Official TVET accredited certificate issued upon completing self-paced masterclasses and practical diagnostic competencies. Verified by online QR code.'}
-                    </p>
-
-                    <div className="mt-5 p-4 rounded-2xl bg-muted/30 border space-y-1.5 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{isAm ? 'ተማሪ፦' : 'Student:'}</span>
-                        <strong className="text-foreground">{student.fullName}</strong>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{isAm ? 'መለያ ቁጥር፦' : 'Student ID:'}</span>
-                        <strong className="font-mono text-blue-600 dark:text-sky-400">{student.studentId}</strong>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{isAm ? 'የትምህርት አይነት፦' : 'Learning Mode:'}</span>
-                        <strong className="text-foreground">{isAm ? 'በራስ ፍጥነት የሚጠና' : '100% Self-Paced'}</strong>
-                      </div>
+                        <Award className="size-4" />
+                        {isAm ? 'ምስክር ወረቀት ቅድመ-ዕይታ እና ማተም' : 'Preview & Print Certificate'}
+                      </Button>
                     </div>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t">
-                    <Button
-                      onClick={() =>
-                        openCertificateForCourse(
-                          enrolledCourses[0]?.title || 'Professional Hardware & Electronics Mastery',
-                          enrolledCourses[0]?.transactionRef
-                        )
-                      }
-                      className="w-full rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-amber-600/20"
-                    >
-                      <Award className="size-4" />
-                      {isAm ? 'ምስክር ወረቀት ቅድመ-ዕይታ እና ማተም' : 'Preview & Print Certificate'}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Tuition Receipt Card */}
-                <div className="rounded-3xl border border-blue-500/30 bg-card p-6 sm:p-7 shadow-lg flex flex-col justify-between">
-                  <div>
-                    <div className="flex size-14 items-center justify-center rounded-2xl bg-blue-500/20 text-blue-600 dark:text-sky-400 border border-blue-500/30 mb-4">
-                      <FileText className="size-8" />
-                    </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400">
-                      {isAm ? 'ይፋዊ ደረሰኝ' : 'Official Tuition Receipt'}
-                    </span>
-                    <h3 className="mt-1 text-xl font-black text-foreground">
-                      {isAm ? 'የትምህርት ክፍያ ይፋዊ ደረሰኝ' : 'Official Payment Receipt'}
-                    </h3>
-                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-                      {isAm
-                        ? 'በሄሎ ቴክኖሎጂ የሙያ ማሰልጠኛ ማዕከል የተከፈለውን የትምህርት ክፍያ የሚያረጋግጥ በኮምፒውተር የተዘጋጀ ይፋዊ የክፍያ ሰነድ።'
-                        : 'Computer-generated official receipt proving fee settlement and enrollment in Hello Technology self-paced technical courses.'}
-                    </p>
-
-                    <div className="mt-5 p-4 rounded-2xl bg-muted/30 border space-y-1.5 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{isAm ? 'ተማሪ፦' : 'Student:'}</span>
-                        <strong className="text-foreground">{student.fullName}</strong>
+                  {/* Tuition Receipt Card */}
+                  <div className="rounded-3xl border border-blue-500/30 bg-card p-6 sm:p-7 shadow-lg flex flex-col justify-between">
+                    <div>
+                      <div className="flex size-14 items-center justify-center rounded-2xl bg-blue-500/20 text-blue-600 dark:text-sky-400 border border-blue-500/30 mb-4">
+                        <FileText className="size-8" />
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{isAm ? 'ሁኔታ፦' : 'Status:'}</span>
-                        <strong className="text-emerald-600 dark:text-emerald-400">{isAm ? 'ተረጋግጧል (Settled)' : 'Verified & Settled'}</strong>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{isAm ? 'የክፍያ አይነት፦' : 'Payment Mode:'}</span>
-                        <strong className="text-foreground">{isAm ? 'ቋሚ መዳረሻ (One-Time)' : 'Lifetime Access'}</strong>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400">
+                        {isAm ? 'ይፋዊ ደረሰኝ' : 'Official Tuition Receipt'}
+                      </span>
+                      <h3 className="mt-1 text-xl font-black text-foreground">
+                        {isAm ? 'የትምህርት ክፍያ ይፋዊ ደረሰኝ' : 'Official Payment Receipt'}
+                      </h3>
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                        {isAm
+                          ? 'በሄሎ ቴክኖሎጂ የሙያ ማሰልጠኛ ማዕከል የተከፈለውን የትምህርት ክፍያ የሚያረጋግጥ በኮምፒውተር የተዘጋጀ ይፋዊ የክፍያ ሰነድ።'
+                          : 'Computer-generated official receipt proving fee settlement and enrollment in Hello Technology self-paced technical courses.'}
+                      </p>
+
+                      <div className="mt-5 p-4 rounded-2xl bg-muted/30 border space-y-1.5 text-xs">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">{isAm ? 'ተማሪ፦' : 'Student:'}</span>
+                          <strong className="text-foreground">{student.fullName}</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">{isAm ? 'ሁኔታ፦' : 'Status:'}</span>
+                          <strong className="text-emerald-600 dark:text-emerald-400">{isAm ? 'ተረጋግጧል (Settled)' : 'Verified & Settled'}</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">{isAm ? 'የክፍያ አይነት፦' : 'Payment Mode:'}</span>
+                          <strong className="text-foreground">{isAm ? 'ቋሚ መዳረሻ (One-Time)' : 'Lifetime Access'}</strong>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="mt-6 pt-4 border-t">
-                    <Button
-                      onClick={() =>
-                        openReceiptForCourse(
-                          enrolledCourses[0]?.title || 'Hello Technology Self-Paced Course',
-                          enrolledCourses[0]?.amount || 2999,
-                          enrolledCourses[0]?.paymentMethod || 'telebirr',
-                          enrolledCourses[0]?.transactionRef,
-                          enrolledCourses[0]?.createdAt
-                        )
-                      }
-                      variant="outline"
-                      className="w-full rounded-xl font-bold text-xs gap-1.5 border-blue-500/30 text-blue-600 dark:text-sky-400 hover:bg-blue-500/10"
-                    >
-                      <FileText className="size-4" />
-                      {isAm ? 'ይፋዊ ደረሰኝ ይመልከቱ እና ያትሙ' : 'View & Print Receipt'}
-                    </Button>
+                    <div className="mt-6 pt-4 border-t">
+                      <Button
+                        onClick={() =>
+                          openReceiptForCourse(
+                            enrolledCourses[0]?.title || 'Hello Technology Self-Paced Course',
+                            enrolledCourses[0]?.amount || 2999,
+                            enrolledCourses[0]?.paymentMethod || 'telebirr',
+                            enrolledCourses[0]?.transactionRef,
+                            enrolledCourses[0]?.createdAt
+                          )
+                        }
+                        variant="outline"
+                        className="w-full rounded-xl font-bold text-xs gap-1.5 border-blue-500/30 text-blue-600 dark:text-sky-400 hover:bg-blue-500/10"
+                      >
+                        <FileText className="size-4" />
+                        {isAm ? 'ይፋዊ ደረሰኝ ይመልከቱ እና ያትሙ' : 'View & Print Receipt'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          )}
         </main>
       </div>
 
