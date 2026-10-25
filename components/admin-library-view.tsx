@@ -247,39 +247,10 @@ export function AdminLibraryView({
       {/* ─── Top Sub-Navigation Bar ─── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setSubTab('catalog')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all ${
-              subTab === 'catalog'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
-                : 'bg-card text-muted-foreground hover:text-foreground border border-border/80'
-            }`}
-          >
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold bg-blue-600 text-white shadow-md shadow-blue-500/25">
             <BookOpen className="size-4" />
             Online Courses Catalog ({totalItems})
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setSubTab('purchases')
-              loadPurchases()
-            }}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all relative ${
-              subTab === 'purchases'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
-                : 'bg-card text-muted-foreground hover:text-foreground border border-border/80'
-            }`}
-          >
-            <ShoppingBag className="size-4" />
-            Student Purchases &amp; Approvals
-            {pendingPurchases.length > 0 && (
-              <span className="flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-amber-500 text-slate-950 font-black text-[10px] animate-pulse">
-                {pendingPurchases.length} Pending
-              </span>
-            )}
-          </button>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

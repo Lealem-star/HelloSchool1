@@ -1379,7 +1379,7 @@ export default function AdminPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-11 rounded-xl border border-slate-300 bg-slate-50 px-3.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-[#155DFC] focus:bg-white focus:ring-2 focus:ring-blue-500/20"
-                placeholder="admin@emschool.edu.et"
+                placeholder="admin@example.com"
                 required
               />
             </Field>
@@ -1407,9 +1407,6 @@ export default function AdminPage() {
                 'Sign in'
               )}
             </Button>
-            <p className="text-center text-xs text-slate-500">
-              Default: admin@emschool.edu.et / admin123
-            </p>
           </form>
         </div>
       </div>
@@ -1683,160 +1680,114 @@ export default function AdminPage() {
       {/* ── MAIN CONTENT ── */}
       <div className="flex flex-1 flex-col overflow-hidden">
 
-        {/* Top bar with Group Header & Segmented Sub-Pills */}
-        <header className="flex flex-col border-b border-slate-200/80 bg-white/95 backdrop-blur-md px-6 dark:border-slate-800/80 dark:bg-slate-900/95 shrink-0 z-10">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="flex size-9 items-center justify-center rounded-xl bg-blue-50 text-[#155DFC] dark:bg-blue-950/50 dark:text-sky-400">
-                <currentGroup.icon className="size-4" />
-              </span>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                    {currentGroup.title}
-                  </span>
-                  <span className="text-muted-foreground/50">•</span>
-                  <span className="text-[11px] font-semibold text-blue-600 dark:text-sky-400">
-                    {currentItem.label}
-                  </span>
-                </div>
-                <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+        {/* Top bar with Group Header */}
+        <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200/80 bg-white/95 backdrop-blur-md px-6 dark:border-slate-800/80 dark:bg-slate-900/95 z-10">
+          <div className="flex items-center gap-3">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-blue-50 text-[#155DFC] dark:bg-blue-950/50 dark:text-sky-400">
+              <currentGroup.icon className="size-4" />
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                  {currentGroup.title}
+                </span>
+                <span className="text-muted-foreground/50">•</span>
+                <span className="text-[11px] font-semibold text-blue-600 dark:text-sky-400">
                   {currentItem.label}
-                </h1>
+                </span>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <AdminInquiriesNotification
-                inquiries={inquiries}
-                companyInquiries={companyInquiries}
-                onOpenReader={(item) => setReaderInquiry(item)}
-                onMarkAllAsRead={markAllInquiriesAsRead}
-                onUpdateStudentStatus={updateInquiryStatus}
-                onUpdateCompanyStatus={updateCompanyInquiryStatus}
-              />
-              <ThemeToggle size="sm" />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={refreshCurrent}
-                disabled={loading}
-                className="rounded-xl border-slate-200 text-slate-600 hover:text-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:text-white gap-1.5 font-medium cursor-pointer"
-              >
-                <RefreshCw className={`size-3.5 ${loading ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
-              </Button>
-
-              {/* Header profile dropdown trigger */}
-              <div className="relative ml-1" ref={headerProfileRef}>
-                <button
-                  type="button"
-                  onClick={() => setHeaderProfileOpen((prev) => !prev)}
-                  className="flex items-center gap-2 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 p-1 pr-2.5 transition cursor-pointer"
-                  aria-expanded={headerProfileOpen}
-                  aria-label="Admin Profile"
-                >
-                  {user.avatarUrl ? (
-                    <img
-                      src={user.avatarUrl}
-                      alt=""
-                      className="size-7 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
-                    />
-                  ) : (
-                    <span className="flex size-7 items-center justify-center rounded-lg bg-[#155DFC] text-[11px] font-bold text-white shadow-xs">
-                      {(user.name || user.email).charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 hidden sm:inline truncate max-w-[110px]">
-                    {user.name || 'Admin'}
-                  </span>
-                  <ChevronDown className={`size-3.5 text-slate-400 transition-transform duration-200 ${headerProfileOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {headerProfileOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
-                      <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{user.name || 'Admin'}</p>
-                      <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
-                      <span className="mt-1 inline-block rounded-md bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.5 text-[9px] font-semibold text-blue-600 dark:text-sky-400 uppercase">
-                        {user.role}
-                      </span>
-                    </div>
-                    <div className="p-1 space-y-0.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTab('profile')
-                          setHeaderProfileOpen(false)
-                        }}
-                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer text-left"
-                      >
-                        <UserCog className="size-4 text-blue-600 dark:text-sky-400 shrink-0" />
-                        <span>Profile & Picture</span>
-                      </button>
-                      <a
-                        href="/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer text-left"
-                        onClick={() => setHeaderProfileOpen(false)}
-                      >
-                        <ExternalLink className="size-4 text-slate-400 shrink-0" />
-                        <span>View Public Site</span>
-                      </a>
-                    </div>
-                    <div className="p-1 border-t border-slate-100 dark:border-slate-800">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setHeaderProfileOpen(false)
-                          handleLogout()
-                        }}
-                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer text-left"
-                      >
-                        <LogOut className="size-4 shrink-0" />
-                        <span className="font-semibold">Log out</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                {currentItem.label}
+              </h1>
             </div>
           </div>
 
-          {/* Segmented Sub-Nav Pills for Current Group */}
-          {currentGroup.items.length > 1 && (
-            <div className="flex items-center gap-1.5 pb-3 overflow-x-auto no-scrollbar border-t border-slate-100 dark:border-slate-800/60 pt-2.5">
-              {currentGroup.items.map((subItem) => {
-                const isSubActive = tab === subItem.id
-                return (
-                  <button
-                    key={subItem.id}
-                    onClick={() => setTab(subItem.id as any)}
-                    className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all shrink-0 cursor-pointer ${
-                      isSubActive
-                        ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25'
-                        : 'bg-slate-100 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    <subItem.icon className="size-3.5 shrink-0" />
-                    <span>{subItem.shortLabel}</span>
-                    {subItem.badge ? (
-                      <span className={`rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
-                        isSubActive ? 'bg-white text-blue-700' : 'bg-blue-500/15 text-blue-600 dark:text-sky-300'
-                      }`}>
-                        {subItem.badge}
-                      </span>
-                    ) : subItem.count > 0 ? (
-                      <span className={`text-[10px] font-medium opacity-80`}>
-                        ({subItem.count})
-                      </span>
-                    ) : null}
-                  </button>
-                )
-              })}
+          <div className="flex items-center gap-2">
+            <AdminInquiriesNotification
+              inquiries={inquiries}
+              companyInquiries={companyInquiries}
+              onOpenReader={(item) => setReaderInquiry(item)}
+              onMarkAllAsRead={markAllInquiriesAsRead}
+              onUpdateStudentStatus={updateInquiryStatus}
+              onUpdateCompanyStatus={updateCompanyInquiryStatus}
+            />
+            <ThemeToggle size="sm" />
+
+            {/* Header profile dropdown trigger */}
+            <div className="relative ml-1" ref={headerProfileRef}>
+              <button
+                type="button"
+                onClick={() => setHeaderProfileOpen((prev) => !prev)}
+                className="flex items-center gap-2 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 p-1 pr-2.5 transition cursor-pointer"
+                aria-expanded={headerProfileOpen}
+                aria-label="Admin Profile"
+              >
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt=""
+                    className="size-7 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
+                  />
+                ) : (
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-[#155DFC] text-[11px] font-bold text-white shadow-xs">
+                    {(user.name || user.email).charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 hidden sm:inline truncate max-w-[110px]">
+                  {user.name || 'Admin'}
+                </span>
+                <ChevronDown className={`size-3.5 text-slate-400 transition-transform duration-200 ${headerProfileOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {headerProfileOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+                    <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{user.name || 'Admin'}</p>
+                    <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
+                    <span className="mt-1 inline-block rounded-md bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.5 text-[9px] font-semibold text-blue-600 dark:text-sky-400 uppercase">
+                      {user.role}
+                    </span>
+                  </div>
+                  <div className="p-1 space-y-0.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTab('profile')
+                        setHeaderProfileOpen(false)
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer text-left"
+                    >
+                      <UserCog className="size-4 text-blue-600 dark:text-sky-400 shrink-0" />
+                      <span>Profile & Picture</span>
+                    </button>
+                    <a
+                      href="/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer text-left"
+                      onClick={() => setHeaderProfileOpen(false)}
+                    >
+                      <ExternalLink className="size-4 text-slate-400 shrink-0" />
+                      <span>View Public Site</span>
+                    </a>
+                  </div>
+                  <div className="p-1 border-t border-slate-100 dark:border-slate-800">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHeaderProfileOpen(false)
+                        handleLogout()
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer text-left"
+                    >
+                      <LogOut className="size-4 shrink-0" />
+                      <span className="font-semibold">Log out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </header>
 
         {/* Scrollable content */}
