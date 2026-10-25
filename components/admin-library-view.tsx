@@ -394,9 +394,28 @@ export function AdminLibraryView({
                   <div>
                     {/* Header Row */}
                     <div className="flex items-center justify-between gap-2">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-sky-400 border border-blue-500/20">
-                        {isVideo ? <Video className="size-5" /> : <BookOpen className="size-5" />}
-                      </span>
+                      <div className="flex items-center gap-2.5">
+                        {item.thumbnailUrl ? (
+                          <div className="relative size-12 overflow-hidden rounded-xl border border-border/80 bg-slate-950 shrink-0 shadow-sm">
+                            <img
+                              src={item.thumbnailUrl}
+                              alt={item.title}
+                              className="size-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                              {isVideo ? (
+                                <Play className="size-3.5 fill-white text-white ml-0.5" />
+                              ) : (
+                                <BookOpen className="size-3.5 text-white" />
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:text-sky-400 border border-blue-500/20">
+                            {isVideo ? <Video className="size-5" /> : <BookOpen className="size-5" />}
+                          </span>
+                        )}
+                      </div>
 
                       <div className="flex items-center gap-1.5">
                         <span

@@ -823,22 +823,22 @@ export default function AdminPage() {
       id: '',
       title: '',
       subtitle: '',
-      category: 'General',
-      description: null,
-      format: 'Technical Repair Manual',
+      category: 'Online Course',
+      description: '',
+      format: 'Video Masterclass',
       level: 'All Skill Levels',
       status: 'Available',
-      price: '450 ETB',
-      priceETB: 450,
-      pages: '85 Pages',
-      fileUrl: null,
-      thumbnailUrl: null,
-      instructor: 'Hello Technology Faculty',
-      instructorRole: 'Technical Instructor',
+      price: '850 ETB',
+      priceETB: 850,
+      pages: '6:00 Hours · 18 Lessons',
+      fileUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      thumbnailUrl: '/images/course-preview-hero.jpg',
+      instructor: 'Hello Technology Academy',
+      instructorRole: 'Lead Hardware Diagnostic Instructor',
       rating: 4.9,
       reviewCount: 95,
       badgeText: 'Popular',
-      skillsLearned: 'Schematic tracing, Multimeter diagnosis, Board repair',
+      skillsLearned: 'Schematic tracing, Multimeter diagnosis, Board repair, BGA reballing',
       lessons: [],
       chapters: [],
       published: true,
@@ -864,11 +864,15 @@ export default function AdminPage() {
       priceETB: pETB,
       price: l.price || (pETB === 0 ? 'Free' : `${pETB} ETB`),
       subtitle: l.subtitle || '',
-      instructor: l.instructor || 'Hello Technology Faculty',
-      instructorRole: l.instructorRole || 'Technical Instructor',
+      category: l.category || 'Online Course',
+      thumbnailUrl: l.thumbnailUrl || '/images/course-preview-hero.jpg',
+      fileUrl: l.fileUrl || '',
+      instructor: l.instructor || 'Hello Technology Academy',
+      instructorRole: l.instructorRole || 'Lead Hardware Diagnostic Instructor',
       rating: l.rating ?? 4.9,
       reviewCount: l.reviewCount ?? 100,
       badgeText: l.badgeText || (pETB === 0 ? 'Free' : 'Popular'),
+      skillsLearned: l.skillsLearned || '',
       lessons: parsedLessons,
       chapters: parsedChapters,
     })
@@ -4238,10 +4242,12 @@ function LibraryEditor({
 }) {
   const [form, setForm] = useState<LibraryItem>({
     ...initial,
-    category: initial.category || 'General',
+    category: initial.category || 'Online Course',
   })
-  const [uploadingPdf, setUploadingPdf] = useState(false)
+  const [uploadingCover, setUploadingCover] = useState(false)
+  const [uploadingMedia, setUploadingMedia] = useState(false)
   const [uploadingVideoIdx, setUploadingVideoIdx] = useState<number | null>(null)
+  const [showVideoPreview, setShowVideoPreview] = useState(false)
   const isEdit = !!initial.id
 
   useEffect(() => {
@@ -4260,11 +4266,17 @@ function LibraryEditor({
 
     setForm({
       ...initial,
+      category: initial.category || 'Online Course',
       priceETB: pETB,
       price: initial.price || (pETB === 0 ? 'Free' : `${pETB} ETB`),
       subtitle: initial.subtitle || '',
-      instructor: initial.instructor || 'Hello Technology Faculty',
-      instructorRole: initial.instructorRole || 'Technical Instructor',
+      thumbnailUrl: initial.thumbnailUrl || '/images/course-preview-hero.jpg',
+      fileUrl: initial.fileUrl || '',
+      format: initial.format || 'Video Masterclass',
+      level: initial.level || 'All Skill Levels',
+      pages: initial.pages || '6:00 Hours · 18 Lessons',
+      instructor: initial.instructor || 'Hello Technology Academy',
+      instructorRole: initial.instructorRole || 'Lead Hardware Diagnostic Instructor',
       rating: initial.rating ?? 4.9,
       reviewCount: initial.reviewCount ?? 100,
       badgeText: initial.badgeText || (pETB === 0 ? 'Free Gift' : 'Popular'),
@@ -4272,6 +4284,7 @@ function LibraryEditor({
       lessons: parsedLessons,
       chapters: parsedChapters,
     })
+    setShowVideoPreview(false)
   }, [initial, open])
 
   function update<K extends keyof LibraryItem>(k: K, v: LibraryItem[K]) {
@@ -4292,7 +4305,7 @@ function LibraryEditor({
       id: `les-${Date.now()}`,
       title: `Lesson ${currentLessons.length + 1}: Diagnostic Procedure & Bench Testing`,
       duration: '30 min',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
       summary: 'Practical hands-on multimeter analysis and workbench demonstration.',
       labExercise: 'Execute diode mode voltage drop measurement on battery connector.',
       keyTakeaways: ['Power sequencing', 'Multimeter readings'],
@@ -4343,7 +4356,7 @@ function LibraryEditor({
     const pETB = typeof form.priceETB === 'number' ? form.priceETB : 0
     onSave({
       ...form,
-      category: form.category || 'General',
+      category: form.category || 'Online Course',
       priceETB: pETB,
       price: form.price?.trim() || (pETB === 0 ? 'Free' : `${pETB} ETB`),
     })
@@ -4351,7 +4364,8 @@ function LibraryEditor({
 
   const isVideoFormat =
     (form.format && form.format.toLowerCase().includes('video')) ||
-    (form.category && form.category.toLowerCase().includes('video'))
+    (form.category && form.category.toLowerCase().includes('video')) ||
+    (form.pages && (form.pages.toLowerCase().includes('hour') || form.pages.toLowerCase().includes('lesson')))
 
   const lessonsList: any[] = Array.isArray(form.lessons) ? form.lessons : []
   const chaptersList: any[] = Array.isArray(form.chapters) ? form.chapters : []
@@ -4364,45 +4378,99 @@ function LibraryEditor({
       width="max-w-4xl"
     >
       <div className="space-y-6">
-        {/* Basic Resource Info */}
-        <div className="rounded-2xl border bg-muted/20 p-4 space-y-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
-            1. Resource Overview &amp; Categorization
+        {/* ── LIVE PREVIEW BANNER (MATCHING STUDENT ONLINE COURSE CARD STYLE) ── */}
+        <div className="overflow-hidden rounded-2xl border border-border/80 bg-slate-950 p-4 sm:p-5 text-white shadow-xl relative">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            {/* Thumbnail Preview with Play Icon */}
+            <div className="relative aspect-video w-full sm:w-44 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-slate-900 shadow-md">
+              <img
+                src={form.thumbnailUrl || (isVideoFormat ? '/images/course-preview-hero.jpg' : '/images/manual-book-cover.jpg')}
+                alt={form.title || 'Course Preview'}
+                className="size-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <div className="flex size-9 items-center justify-center rounded-full bg-blue-600/90 text-white shadow-lg backdrop-blur-sm">
+                  {isVideoFormat ? <Play className="size-4 fill-white ml-0.5" /> : <BookOpen className="size-4" />}
+                </div>
+              </div>
+              <div className="absolute top-1.5 left-1.5">
+                <span className="rounded-md bg-black/70 px-1.5 py-0.5 text-[9px] font-bold text-white uppercase tracking-wider backdrop-blur-sm">
+                  {form.format || 'Course'}
+                </span>
+              </div>
+            </div>
+
+            {/* Course Summary on Banner */}
+            <div className="flex-1 min-w-0 space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-blue-500/20 px-2.5 py-0.5 text-[10px] font-bold text-sky-400 border border-blue-500/30">
+                  {form.badgeText || (form.priceETB === 0 ? 'Free Gift' : 'Online Course')}
+                </span>
+                <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/30">
+                  {form.status || 'Available'}
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-white truncate">
+                {form.title || 'Untitled Online Course'}
+              </h3>
+              {form.subtitle && (
+                <p className="text-xs text-slate-300 line-clamp-1">
+                  {form.subtitle}
+                </p>
+              )}
+              <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-400">
+                <span>By: <strong className="text-slate-200">{form.instructor || 'Hello Technology Academy'}</strong></span>
+                <span>•</span>
+                <span>{form.level || 'All Skill Levels'}</span>
+                <span>•</span>
+                <span className="font-bold text-emerald-400">
+                  {form.priceETB === 0 ? 'Free' : `${form.priceETB ?? 850} ETB`}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── 1. COURSE IDENTITY & STUDENT PRESENTATION ── */}
+        <div className="rounded-2xl border bg-muted/20 p-5 space-y-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 flex items-center gap-1.5">
+            <Sparkles className="size-3.5" /> 1. Course Identity &amp; Title
           </h4>
-          <Field label="Title *">
+          <Field label="Course Title *">
             <input
               className={inputCls}
               value={form.title}
               onChange={(e) => update('title', e.target.value)}
-              placeholder="e.g. Complete Mobile Phone Hardware Diagnostic Manual"
+              placeholder="e.g. Complete Mobile Phone Hardware Diagnostic & Repair Masterclass"
             />
           </Field>
 
-          <Field label="Subtitle / Tagline">
+          <Field label="Subtitle / Tagline (Displayed beneath title on Student Side)">
             <input
               className={inputCls}
               value={form.subtitle || ''}
               onChange={(e) => update('subtitle', e.target.value || null)}
-              placeholder="e.g. Step-by-step schematics, multimeter board diagnosis, power IC & baseband repair"
+              placeholder="e.g. Practical multimeter diagnostics, schematic reading, power rail sequencing & BGA soldering"
             />
           </Field>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <Field label="Format">
+            <Field label="Format Style">
               <select
                 className={inputCls}
-                value={form.format || 'Technical Repair Manual'}
+                value={form.format || 'Video Masterclass'}
                 onChange={(e) => update('format', e.target.value || null)}
               >
-                <option>Technical Repair Manual</option>
                 <option>Video Masterclass</option>
+                <option>Technical Repair Manual</option>
                 <option>Quick Reference Guide</option>
-                <option>Schematic & Circuit Handbook</option>
+                <option>Schematic &amp; Circuit Handbook</option>
                 <option>Book</option>
                 <option>PDF Guide</option>
               </select>
             </Field>
-            <Field label="Level">
+
+            <Field label="Target Skill Level">
               <select
                 className={inputCls}
                 value={form.level || 'All Skill Levels'}
@@ -4413,23 +4481,218 @@ function LibraryEditor({
                 <option>Intermediate</option>
                 <option>Intermediate to Advanced</option>
                 <option>Advanced</option>
+                <option>Everyone</option>
               </select>
             </Field>
-            <Field label="Pages / Video Duration">
+
+            <Field label="Course Completion Duration">
               <input
                 className={inputCls}
                 value={form.pages || ''}
                 onChange={(e) => update('pages', e.target.value || null)}
-                placeholder="e.g. 18 Lessons (14 Hours) or 128 Pages"
+                placeholder="e.g. 6:00 Hours · 18 Lessons or 250 Pages"
               />
             </Field>
           </div>
         </div>
 
-        {/* Pricing, Commercial & Access */}
-        <div className="rounded-2xl border bg-muted/20 p-4 space-y-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
-            2. Live Pricing &amp; Access Controls
+        {/* ── 2. COURSE MEDIA & PREVIEWS (THUMBNAIL COVER & VIDEO) ── */}
+        <div className="rounded-2xl border bg-muted/20 p-5 space-y-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 flex items-center gap-1.5">
+            <Video className="size-3.5" /> 2. Course Media &amp; Video Previews
+          </h4>
+
+          {/* Cover Image Upload & Presets */}
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-1.5">
+              <label className="text-xs font-semibold text-foreground">
+                Course Cover Thumbnail Image (16:9 Aspect Ratio)
+              </label>
+              <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline">
+                <Upload className="size-3.5" /> Upload Cover Image
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/avif"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0]
+                    if (!f) return
+                    const fd = new FormData()
+                    fd.append('file', f)
+                    fd.append('folder', 'covers')
+                    try {
+                      setUploadingCover(true)
+                      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+                      const d = await res.json()
+                      if (d.url) {
+                        update('thumbnailUrl', d.url)
+                      } else {
+                        alert(d.error || 'Failed to upload image')
+                      }
+                    } catch (err: any) {
+                      alert(err.message || 'Error uploading image')
+                    } finally {
+                      setUploadingCover(false)
+                    }
+                  }}
+                />
+              </label>
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                className={`${inputCls} flex-1`}
+                value={form.thumbnailUrl || ''}
+                onChange={(e) => update('thumbnailUrl', e.target.value || null)}
+                placeholder="/images/course-preview-hero.jpg or /uploads/covers/..."
+              />
+              {uploadingCover && (
+                <div className="flex items-center gap-1.5 text-xs text-blue-600 px-3 py-2 bg-blue-500/10 rounded-xl">
+                  <Loader2 className="size-4 animate-spin" /> Uploading...
+                </div>
+              )}
+            </div>
+
+            {/* Preset quick buttons */}
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <span className="text-[11px] text-muted-foreground">Quick Presets:</span>
+              <button
+                type="button"
+                onClick={() => update('thumbnailUrl', '/images/course-preview-hero.jpg')}
+                className="rounded-lg border px-2.5 py-1 text-[11px] font-medium hover:border-blue-500 hover:text-blue-600 transition"
+              >
+                Hero Preview
+              </button>
+              <button
+                type="button"
+                onClick={() => update('thumbnailUrl', '/images/manual-book-cover.jpg')}
+                className="rounded-lg border px-2.5 py-1 text-[11px] font-medium hover:border-blue-500 hover:text-blue-600 transition"
+              >
+                Manual Cover
+              </button>
+              <button
+                type="button"
+                onClick={() => update('thumbnailUrl', '/images/workshop-gallery-1.jpg')}
+                className="rounded-lg border px-2.5 py-1 text-[11px] font-medium hover:border-blue-500 hover:text-blue-600 transition"
+              >
+                Workshop Lab
+              </button>
+            </div>
+          </div>
+
+          {/* Main Course Video / DRM Document */}
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-1.5">
+              <label className="text-xs font-semibold text-foreground">
+                {isVideoFormat
+                  ? 'Course Preview Video / Full Stream URL (MP4, YouTube, or Stream)'
+                  : 'DRM Document / PDF Manual URL'}
+              </label>
+              <div className="flex items-center gap-3">
+                {isVideoFormat ? (
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline">
+                    <Upload className="size-3.5" /> Upload MP4 Video
+                    <input
+                      type="file"
+                      accept="video/mp4,video/webm,video/quicktime"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0]
+                        if (!f) return
+                        const fd = new FormData()
+                        fd.append('file', f)
+                        fd.append('folder', 'videos')
+                        try {
+                          setUploadingMedia(true)
+                          const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+                          const d = await res.json()
+                          if (d.url) {
+                            update('fileUrl', d.url)
+                          } else {
+                            alert(d.error || 'Failed to upload video')
+                          }
+                        } catch (err: any) {
+                          alert(err.message || 'Error uploading video')
+                        } finally {
+                          setUploadingMedia(false)
+                        }
+                      }}
+                    />
+                  </label>
+                ) : (
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline">
+                    <Upload className="size-3.5" /> Upload PDF Document
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0]
+                        if (!f) return
+                        const fd = new FormData()
+                        fd.append('file', f)
+                        fd.append('folder', 'manuals')
+                        try {
+                          setUploadingMedia(true)
+                          const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+                          const d = await res.json()
+                          if (d.url) {
+                            update('fileUrl', d.url)
+                          } else {
+                            alert(d.error || 'Failed to upload PDF')
+                          }
+                        } catch (err: any) {
+                          alert(err.message || 'Error uploading file')
+                        } finally {
+                          setUploadingMedia(false)
+                        }
+                      }}
+                    />
+                  </label>
+                )}
+                {form.fileUrl && isVideoFormat && (
+                  <button
+                    type="button"
+                    onClick={() => setShowVideoPreview(!showVideoPreview)}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-sky-600 hover:underline"
+                  >
+                    <Eye className="size-3.5" /> {showVideoPreview ? 'Hide Player' : 'Test Player'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <input
+                className={`${inputCls} flex-1`}
+                value={form.fileUrl || ''}
+                onChange={(e) => update('fileUrl', e.target.value || null)}
+                placeholder={
+                  isVideoFormat
+                    ? 'https://... (MP4 video URL, YouTube embed, or uploaded video)'
+                    : '/uploads/manuals/... or PDF link'
+                }
+              />
+              {uploadingMedia && (
+                <div className="flex items-center gap-1.5 text-xs text-blue-600 px-3 py-2 bg-blue-500/10 rounded-xl">
+                  <Loader2 className="size-4 animate-spin" /> Uploading media...
+                </div>
+              )}
+            </div>
+
+            {/* Test Video Player Container */}
+            {showVideoPreview && form.fileUrl && (
+              <div className="mt-3 overflow-hidden rounded-2xl border bg-black aspect-video max-w-xl mx-auto shadow-lg">
+                <video src={form.fileUrl} controls className="size-full object-cover" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── 3. LIVE PRICING & ACCESS CONTROLS ── */}
+        <div className="rounded-2xl border bg-muted/20 p-5 space-y-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 flex items-center gap-1.5">
+            <DollarSign className="size-3.5" /> 3. Live Pricing &amp; Enrollment Access
           </h4>
           <div className="grid gap-4 sm:grid-cols-3">
             <Field label="Price in Birr (ETB) *">
@@ -4472,12 +4735,12 @@ function LibraryEditor({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <Field label="Badge Text">
+            <Field label="Badge Tag (Pill on Card)">
               <input
                 className={inputCls}
                 value={form.badgeText || ''}
                 onChange={(e) => update('badgeText', e.target.value || null)}
-                placeholder="e.g. Bestseller, Masterclass, Free Gift"
+                placeholder="e.g. Bestseller Video Masterclass, Free Gift"
               />
             </Field>
             <Field label="Rating (1.0 - 5.0)">
@@ -4503,10 +4766,10 @@ function LibraryEditor({
           </div>
         </div>
 
-        {/* Instructor & Accreditation */}
-        <div className="rounded-2xl border bg-muted/20 p-4 space-y-4">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
-            3. Author &amp; Instructor Faculty
+        {/* ── 4. INSTRUCTOR FACULTY & CREDENTIALS ── */}
+        <div className="rounded-2xl border bg-muted/20 p-5 space-y-4">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 flex items-center gap-1.5">
+            <Users className="size-3.5" /> 4. Author &amp; Instructor Faculty
           </h4>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Instructor / Author Name">
@@ -4514,7 +4777,7 @@ function LibraryEditor({
                 className={inputCls}
                 value={form.instructor || ''}
                 onChange={(e) => update('instructor', e.target.value || null)}
-                placeholder="e.g. Eng. Dawit Tadesse"
+                placeholder="e.g. Master Tech Haile or Eng. Dawit Tadesse"
               />
             </Field>
             <Field label="Instructor Role / Title">
@@ -4522,25 +4785,25 @@ function LibraryEditor({
                 className={inputCls}
                 value={form.instructorRole || ''}
                 onChange={(e) => update('instructorRole', e.target.value || null)}
-                placeholder="e.g. Senior Hardware & BGA Diagnostic Specialist"
+                placeholder="e.g. Lead Hardware Diagnostic Instructor"
               />
             </Field>
           </div>
         </div>
 
-        {/* Description & Technical Documentation Details */}
+        {/* ── 5. DESCRIPTION & CORE COMPETENCIES ── */}
         <div className="space-y-4">
-          <Field label="Description">
+          <Field label="About the Course Description (Overview on Student Detail Page)">
             <textarea
               rows={3}
               className={textareaCls}
               value={form.description || ''}
               onChange={(e) => update('description', e.target.value || null)}
-              placeholder="Describe what students will learn, diagnostic skills acquired, and equipment covered..."
+              placeholder="Describe what students will learn, diagnostic skills acquired, workbench equipment covered, and hands-on laboratory exercises..."
             />
           </Field>
 
-          <Field label="Skills Learned (comma-separated)">
+          <Field label="Skills Learned (Comma-separated pills displayed on Student Page)">
             <input
               className={inputCls}
               value={form.skillsLearned || ''}
@@ -4548,59 +4811,9 @@ function LibraryEditor({
               placeholder="e.g. Board Schematics, Multimeter Diagnostics, Short Circuit Hunting, BGA Soldering"
             />
           </Field>
-
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold text-foreground">
-                DRM Document / PDF Manual URL
-              </label>
-              <label className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-sky-400 hover:underline">
-                <Upload className="size-3.5" /> Upload PDF Document
-                <input
-                  type="file"
-                  accept="application/pdf"
-                  className="hidden"
-                  onChange={async (e) => {
-                    const f = e.target.files?.[0]
-                    if (!f) return
-                    const fd = new FormData()
-                    fd.append('file', f)
-                    fd.append('folder', 'manuals')
-                    try {
-                      setUploadingPdf(true)
-                      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-                      const d = await res.json()
-                      if (d.url) {
-                        update('fileUrl', d.url)
-                      } else {
-                        alert(d.error || 'Failed to upload PDF')
-                      }
-                    } catch (err: any) {
-                      alert(err.message || 'Error uploading file')
-                    } finally {
-                      setUploadingPdf(false)
-                    }
-                  }}
-                />
-              </label>
-            </div>
-            <div className="flex gap-2">
-              <input
-                className={`${inputCls} flex-1`}
-                value={form.fileUrl || ''}
-                onChange={(e) => update('fileUrl', e.target.value || null)}
-                placeholder="/uploads/manuals/... or https://..."
-              />
-              {uploadingPdf && (
-                <div className="flex items-center gap-1.5 text-xs text-blue-600 px-3 py-2 bg-blue-500/10 rounded-xl">
-                  <Loader2 className="size-4 animate-spin" /> Uploading PDF...
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
-        {/* Interactive Curriculum Builder */}
+        {/* ── 6. INTERACTIVE CURRICULUM BUILDER ── */}
         <div className="rounded-2xl border bg-card p-5 space-y-4 shadow-sm">
           <div className="flex items-center justify-between border-b pb-3">
             <div>
@@ -4610,16 +4823,16 @@ function LibraryEditor({
               </h4>
               <p className="text-xs text-muted-foreground">
                 {isVideoFormat
-                  ? 'Define the structured lessons students watch inside the secure DRM player.'
+                  ? 'Define the structured lessons students watch inside the course player.'
                   : 'Define the reading chapters and diagnostic tables students study inside the platform reader.'}
               </p>
             </div>
             {isVideoFormat ? (
-              <Button size="sm" type="button" onClick={addLesson} className="gap-1.5 rounded-xl text-xs">
+              <Button size="sm" type="button" onClick={addLesson} className="gap-1.5 rounded-xl text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold">
                 <Plus className="size-3.5" /> Add Lesson
               </Button>
             ) : (
-              <Button size="sm" type="button" onClick={addChapter} className="gap-1.5 rounded-xl text-xs">
+              <Button size="sm" type="button" onClick={addChapter} className="gap-1.5 rounded-xl text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold">
                 <Plus className="size-3.5" /> Add Chapter
               </Button>
             )}
@@ -4629,14 +4842,19 @@ function LibraryEditor({
           {isVideoFormat && (
             <div className="space-y-3">
               {lessonsList.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic py-3 text-center">
-                  No lessons defined yet. Click &quot;Add Lesson&quot; to configure course videos.
-                </p>
+                <div className="rounded-xl border border-dashed p-6 text-center text-xs text-muted-foreground space-y-2">
+                  <Video className="size-8 mx-auto opacity-40 text-blue-600" />
+                  <p className="font-semibold text-foreground">No custom lessons defined yet</p>
+                  <p>Click &quot;Add Lesson&quot; above to configure individual course videos, duration, and lab exercises.</p>
+                </div>
               ) : (
                 lessonsList.map((les, idx) => (
-                  <div key={les.id || idx} className="rounded-xl border bg-muted/30 p-3.5 space-y-3 text-xs">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold text-foreground">
+                  <div key={les.id || idx} className="rounded-xl border bg-muted/30 p-4 space-y-3 text-xs">
+                    <div className="flex items-center justify-between gap-2 border-b pb-2">
+                      <span className="font-bold text-foreground flex items-center gap-2">
+                        <span className="size-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
+                          {idx + 1}
+                        </span>
                         Lesson #{idx + 1}
                       </span>
                       <button
@@ -4655,7 +4873,7 @@ function LibraryEditor({
                           className={inputCls + ' h-9 text-xs'}
                           value={les.title || ''}
                           onChange={(e) => updateLesson(idx, 'title', e.target.value)}
-                          placeholder="e.g. Identifying Short Circuits with Thermal Camera"
+                          placeholder="e.g. Identifying Short Circuits with Thermal Camera & DC Bench Supply"
                         />
                       </div>
                       <div>
@@ -4664,7 +4882,7 @@ function LibraryEditor({
                           className={inputCls + ' h-9 text-xs'}
                           value={les.duration || ''}
                           onChange={(e) => updateLesson(idx, 'duration', e.target.value)}
-                          placeholder="e.g. 42 min"
+                          placeholder="e.g. 35 min"
                         />
                       </div>
                     </div>
@@ -4672,7 +4890,7 @@ function LibraryEditor({
                       <div>
                         <div className="flex items-center justify-between mb-1">
                           <label className="text-[11px] font-semibold text-muted-foreground block">
-                            Video Embed / Stream URL
+                            Video Stream / Embed URL
                           </label>
                           <label className="cursor-pointer inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:underline">
                             <Upload className="size-3" /> Upload MP4 Video
@@ -4738,14 +4956,19 @@ function LibraryEditor({
           {!isVideoFormat && (
             <div className="space-y-3">
               {chaptersList.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic py-3 text-center">
-                  No chapters defined yet. Click &quot;Add Chapter&quot; to configure reading guide sections.
-                </p>
+                <div className="rounded-xl border border-dashed p-6 text-center text-xs text-muted-foreground space-y-2">
+                  <BookOpen className="size-8 mx-auto opacity-40 text-blue-600" />
+                  <p className="font-semibold text-foreground">No chapters defined yet</p>
+                  <p>Click &quot;Add Chapter&quot; above to configure reading guide sections and test points.</p>
+                </div>
               ) : (
                 chaptersList.map((ch, idx) => (
-                  <div key={ch.id || idx} className="rounded-xl border bg-muted/30 p-3.5 space-y-3 text-xs">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold text-foreground">
+                  <div key={ch.id || idx} className="rounded-xl border bg-muted/30 p-4 space-y-3 text-xs">
+                    <div className="flex items-center justify-between gap-2 border-b pb-2">
+                      <span className="font-bold text-foreground flex items-center gap-2">
+                        <span className="size-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
+                          {idx + 1}
+                        </span>
                         Chapter #{idx + 1}
                       </span>
                       <button
@@ -4793,7 +5016,7 @@ function LibraryEditor({
           )}
         </div>
 
-        {/* Sort Order & Publishing Visibility */}
+        {/* ── 7. PUBLISHING & CATALOG VISIBILITY ── */}
         <div className="grid gap-4 sm:grid-cols-2 items-center rounded-2xl border bg-muted/20 p-4">
           <Field label="Catalog Sort Order (lower numbers appear first)">
             <input
@@ -4822,7 +5045,7 @@ function LibraryEditor({
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* ── MODAL ACTION BUTTONS ── */}
         <div className="flex justify-end gap-3 border-t pt-5">
           <Button variant="outline" onClick={onClose} disabled={saving} className="rounded-xl">
             Cancel
@@ -4832,8 +5055,8 @@ function LibraryEditor({
             {saving
               ? 'Saving Changes...'
               : isEdit
-              ? 'Save & Synchronize Resource'
-              : 'Create & Synchronize Resource'}
+              ? 'Save & Synchronize Course'
+              : 'Create & Publish Course'}
           </Button>
         </div>
       </div>

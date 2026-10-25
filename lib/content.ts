@@ -70,6 +70,9 @@ export type PublicLibraryItem = {
   rating?: number
   reviewCount?: number
   badgeText?: string
+  skillsLearned?: string | null
+  lessons?: any
+  chapters?: any
 }
 
 function toPublicCourse(course: {
@@ -234,6 +237,9 @@ export async function getPublishedLibrary(): Promise<PublicLibraryItem[]> {
       rating: item.rating ?? 4.9,
       reviewCount: item.reviewCount ?? 120,
       badgeText: item.badgeText ?? '',
+      skillsLearned: item.skillsLearned ?? null,
+      lessons: item.lessons ?? null,
+      chapters: item.chapters ?? null,
     }))
   } catch (err) {
     console.error('getPublishedLibrary error:', err)
@@ -266,6 +272,9 @@ export async function getPublishedLibraryItem(id: string): Promise<PublicLibrary
       rating: item.rating ?? 4.9,
       reviewCount: item.reviewCount ?? 120,
       badgeText: item.badgeText ?? '',
+      skillsLearned: item.skillsLearned ?? null,
+      lessons: item.lessons ?? null,
+      chapters: item.chapters ?? null,
     }
   } catch (err) {
     console.error('getPublishedLibraryItem error:', err)

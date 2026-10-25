@@ -51,7 +51,11 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
   // State
   const [isPlayingVideo, setIsPlayingVideo] = useState(false)
   const [copiedShare, setCopiedShare] = useState(false)
-  const [openModules, setOpenModules] = useState<Record<string, boolean>>({ 'mod-1': true })
+  const [openModules, setOpenModules] = useState<Record<string, boolean>>({
+    'mod-1': true,
+    'custom-mod-1': true,
+    'custom-ch-1': true,
+  })
   const [student, setStudent] = useState<any>(null)
   const [hasPurchased, setHasPurchased] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
@@ -111,17 +115,52 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
     }
   }
 
-  // Duration / Page count & activity count
-  let durationOrPages = resource.pages || (isVideo ? '6:00' : '250 Pages')
-  let activityCount = isVideo ? '43' : '18'
+  // Dynamic curriculum parsing from database if configured by admin
+  const dynamicCurriculum = React.useMemo(() => {
+    try {
+      if (isVideo && resource.lessons) {
+        const raw = typeof resource.lessons === 'string' ? JSON.parse(resource.lessons) : resource.lessons
+        if (Array.isArray(raw) && raw.length > 0) {
+          return [
+            {
+              id: 'custom-mod-1',
+              title: isAm
+                ? 'ምዕራፍ 1፡ የላብራቶሪ የቪዲዮ ትምህርቶች (Practical Video Lessons)'
+                : 'Module 1: Structured Hands-On Workbench Lessons',
+              activities: raw.map((les: any, i: number) => {
+                const title = les.title || `Lesson ${i + 1}`
+                const dur = les.duration ? ` (${les.duration})` : ''
+                const lab = les.labExercise ? ` · [Lab: ${les.labExercise}]` : ''
+                return `${title}${dur}${lab}`
+              }),
+            },
+          ]
+        }
+      } else if (!isVideo && resource.chapters) {
+        const raw = typeof resource.chapters === 'string' ? JSON.parse(resource.chapters) : resource.chapters
+        if (Array.isArray(raw) && raw.length > 0) {
+          return [
+            {
+              id: 'custom-ch-1',
+              title: isAm
+                ? 'ምዕራፍ 1፡ የመጽሐፉ ይዘቶችና የሰርኪዩት ማውጫ'
+                : 'Chapter 1: Diagnostic Reading Sections & Schematics',
+              activities: raw.map((ch: any, i: number) => {
+                const title = ch.title || `Chapter ${i + 1}`
+                const pages = ch.pageRange ? ` (${ch.pageRange})` : ''
+                const sum = ch.summary ? ` · ${ch.summary}` : ''
+                return `${title}${pages}${sum}`
+              }),
+            },
+          ]
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse dynamic curriculum:', e)
+    }
+    return null
+  }, [isVideo, resource.lessons, resource.chapters, isAm])
 
-  if (resource.pages && resource.pages.includes('·')) {
-    const parts = resource.pages.split('·')
-    durationOrPages = parts[0].trim().replace(/Hours?/i, '').trim()
-    activityCount = parts[1].trim().replace(/[^0-9]/g, '') || '43'
-  }
-
-  // Modules definition (adapted for Hello Technology Training Center)
   const defaultModules = isVideo
     ? [
         {
@@ -216,6 +255,20 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
         },
       ]
 
+  const activeModules = dynamicCurriculum || defaultModules
+
+  // Duration / Page count & activity count
+  let durationOrPages = resource.pages || (isVideo ? '6:00' : '250 Pages')
+  let activityCount = dynamicCurriculum
+    ? `${dynamicCurriculum[0]?.activities?.length || 0}`
+    : (isVideo ? '43' : '18')
+
+  if (resource.pages && resource.pages.includes('·')) {
+    const parts = resource.pages.split('·')
+    durationOrPages = parts[0].trim().replace(/Hours?/i, '').trim()
+    activityCount = parts[1].trim().replace(/[^0-9]/g, '') || activityCount
+  }
+
   const toggleModule = (id: string) => {
     setOpenModules((prev) => ({ ...prev, [id]: !prev[id] }))
   }
@@ -259,6 +312,11 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground md:text-5xl">
             {resource.title}
           </h1>
+          {resource.subtitle && (
+            <p className="mt-2.5 text-base md:text-lg text-muted-foreground font-medium max-w-3xl leading-relaxed">
+              {resource.subtitle}
+            </p>
+          )}
 
           {/* Instructor Line with Avatar */}
           <div className="mt-4 flex items-center gap-3">
@@ -283,6 +341,11 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
                 {resource.instructor ||
                   (isAm ? 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል' : 'Hello Technology Academy')}
               </p>
+              {resource.instructorRole && (
+                <p className="text-[11px] text-muted-foreground font-medium">
+                  {resource.instructorRole}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -465,6 +528,31 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
                 </ul>
               </div>
 
+              {/* Skills Learned Badges */}
+              {resource.skillsLearned && (
+                <div className="mt-8 border-t border-border/60 pt-6">
+                  <h3 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
+                    <Sparkles className="size-4 text-primary" />
+                    <span>{isAm ? 'የሚማሯቸው ዋና ዋና ክህሎቶች' : 'Skills You Will Master'}</span>
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {resource.skillsLearned.split(',').map((s: string, idx: number) => {
+                      const trimmed = s.trim()
+                      if (!trimmed) return null
+                      return (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary"
+                        >
+                          <CheckCircle2 className="size-3.5 text-primary" />
+                          {trimmed}
+                        </span>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* 5. What you will learn Section (Accordion Modules) */}
               <div className="mt-8 border-t border-border/60 pt-6">
                 <h3 className="text-lg font-bold text-foreground mb-4">
@@ -472,7 +560,7 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
                 </h3>
 
                 <div className="space-y-3">
-                  {defaultModules.map((mod) => {
+                  {activeModules.map((mod) => {
                     const isOpen = Boolean(openModules[mod.id])
                     return (
                       <div
