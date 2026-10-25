@@ -1594,19 +1594,32 @@ export default function AdminPage() {
         { id: 'trusted-partners', label: 'Trusted Partners', shortLabel: 'Partners', icon: ShieldCheck, count: trustedPartners.length, badge: null },
       ],
     },
-    {
-      id: 'settings',
-      title: 'System & Account',
-      icon: UserCog,
-      items: [
-        { id: 'profile', label: 'My Admin Profile', shortLabel: 'Profile', icon: UserCog, count: 0, badge: null },
-      ],
-    },
   ]
 
+  const profileItem = {
+    id: 'profile' as const,
+    label: 'My Admin Profile',
+    shortLabel: 'Profile',
+    icon: UserCog,
+    count: 0,
+    badge: null,
+  }
+  const profileGroup = {
+    id: 'settings',
+    title: 'Account & Settings',
+    icon: UserCog,
+    items: [profileItem],
+  }
+
   const allNavItems = adminNavGroups.flatMap((g) => g.items)
-  const currentItem = allNavItems.find((n) => n.id === tab) || allNavItems[0]
-  const currentGroup = adminNavGroups.find((g) => g.items.some((i) => i.id === tab)) || adminNavGroups[0]
+  const currentItem =
+    tab === 'profile'
+      ? profileItem
+      : allNavItems.find((n) => n.id === tab) || allNavItems[0]
+  const currentGroup =
+    tab === 'profile'
+      ? profileGroup
+      : adminNavGroups.find((g) => g.items.some((i) => i.id === tab)) || adminNavGroups[0]
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100/90 dark:bg-card/90 backdrop-blur-xs">
@@ -1902,7 +1915,7 @@ export default function AdminPage() {
                 return (
                   <button
                     key={subItem.id}
-                    onClick={() => setTab(subItem.id)}
+                    onClick={() => setTab(subItem.id as any)}
                     className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all shrink-0 cursor-pointer ${
                       isSubActive
                         ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/25'
