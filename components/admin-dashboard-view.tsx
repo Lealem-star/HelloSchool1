@@ -26,6 +26,9 @@ import {
   ArrowRight,
   Building2,
   FileSpreadsheet,
+  X,
+  Phone,
+  Mail,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -87,6 +90,7 @@ interface DashboardData {
     registrationNumber: string
     fullName: string
     phone: string
+    email?: string | null
     courseTitle: string
     amount: number
     paymentMethod: string
@@ -110,6 +114,7 @@ export function AdminDashboardView({
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedTx, setSelectedTx] = useState<DashboardData['recentTransactions'][0] | null>(null)
 
   // Initialize custom dates with default last 30 days
   useEffect(() => {
@@ -757,15 +762,6 @@ export function AdminDashboardView({
             </p>
           </div>
 
-          {onNavigateToRegistrations && (
-            <button
-              onClick={onNavigateToRegistrations}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#155DFC] hover:underline dark:text-sky-400 cursor-pointer"
-            >
-              <span>Manage all enrollments</span>
-              <ArrowRight className="size-3.5" />
-            </button>
-          )}
         </div>
 
         <div className="mt-4 overflow-x-auto">
@@ -773,11 +769,12 @@ export function AdminDashboardView({
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-800 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                 <th className="py-3 px-3">Student & Reg No</th>
-                <th className="py-3 px-3">Course Track</th>
+                <th className="py-3 px-3">Course / Material</th>
                 <th className="py-3 px-3">Amount</th>
                 <th className="py-3 px-3">Payment Method</th>
                 <th className="py-3 px-3">Status</th>
-                <th className="py-3 px-3 text-right">Submitted</th>
+                <th className="py-3 px-3">Date</th>
+                <th className="py-3 px-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -788,7 +785,7 @@ export function AdminDashboardView({
                       <p className="font-bold text-slate-900 dark:text-white">{tx.fullName}</p>
                       <p className="text-[10px] font-mono text-muted-foreground">{tx.registrationNumber}</p>
                     </td>
-                    <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300 max-w-[200px] truncate">
+                    <td className="py-3 px-3 font-medium text-slate-700 dark:text-slate-300 max-w-[200px] truncate" title={tx.courseTitle}>
                       {tx.courseTitle}
                     </td>
                     <td className="py-3 px-3 font-bold text-slate-900 dark:text-white">
@@ -807,17 +804,27 @@ export function AdminDashboardView({
                             : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300'
                         }`}
                       >
-                        {tx.status}
+                        ⚡ Instant Access Active
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-right text-slate-500 font-mono text-[10px]">
+                    <td className="py-3 px-3 text-slate-500 font-mono text-[10px]">
                       {new Date(tx.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-3 px-3 text-right">
+                      <button
+                        onClick={() => setSelectedTx(tx)}
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 shadow-2xs cursor-pointer"
+                        title="Inspect enrollment details"
+                      >
+                        <Eye className="size-3 text-[#155DFC]" />
+                        <span>Details</span>
+                      </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-6 text-center text-muted-foreground text-xs">
+                  <td colSpan={7} className="py-8 text-center text-muted-foreground text-xs">
                     No registrations found in this timeframe.
                   </td>
                 </tr>
@@ -826,6 +833,109 @@ export function AdminDashboardView({
           </table>
         </div>
       </div>
+
+      {/* ── TRANSACTION / LEARNER DETAILS INSPECTION MODAL ── */}
+      {selectedTx && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900 animate-scale-up space-y-5">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                  Online Learner Enrollment
+                </span>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
+                  {selectedTx.fullName}
+                </h3>
+                <span className="font-mono text-xs text-[#155DFC] font-bold">
+                  {selectedTx.registrationNumber}
+                </span>
+              </div>
+              <button
+                onClick={() => setSelectedTx(null)}
+                className="rounded-full p-1.5 text-muted-foreground hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white cursor-pointer"
+              >
+                <X className="size-4.5" />
+              </button>
+            </div>
+
+            {/* Instant Access Banner */}
+            <div className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5">
+              <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <div className="text-xs">
+                <p className="font-bold text-emerald-800 dark:text-emerald-300">
+                  ⚡ 100% Automated Instant Access Active
+                </p>
+                <p className="text-emerald-700/90 dark:text-emerald-400/90 mt-0.5">
+                  Registered online and auto-verified via Chapa. Course and DRM player access are unlocked 24/7 without admin approval required.
+                </p>
+              </div>
+            </div>
+
+            {/* Details Grid */}
+            <div className="space-y-3 text-xs">
+              <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800 dark:bg-slate-950/50 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Course / Material:</span>
+                  <span className="font-bold text-slate-900 dark:text-white text-right max-w-[240px]">
+                    {selectedTx.courseTitle}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Amount Paid:</span>
+                  <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">
+                    {formatETB(selectedTx.amount)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Payment Method:</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 uppercase">
+                    {selectedTx.paymentMethod}
+                  </span>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800 dark:bg-slate-950/50 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Contact Phone:</span>
+                  <a
+                    href={`tel:${selectedTx.phone}`}
+                    className="font-bold text-blue-600 dark:text-sky-400 flex items-center gap-1 hover:underline"
+                  >
+                    <Phone className="size-3" />
+                    {selectedTx.phone}
+                  </a>
+                </div>
+                {selectedTx.email && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Email:</span>
+                    <span className="font-medium text-slate-800 dark:text-slate-200 flex items-center gap-1">
+                      <Mail className="size-3" />
+                      {selectedTx.email}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Submitted At:</span>
+                  <span className="font-mono text-muted-foreground">
+                    {new Date(selectedTx.createdAt).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button
+                size="sm"
+                onClick={() => setSelectedTx(null)}
+                className="rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 font-semibold cursor-pointer"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

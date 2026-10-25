@@ -179,7 +179,7 @@ export function RegistrationsView({
   return (
     <div className="space-y-6">
       {/* ── AUTOMATED ENROLLMENT OVERVIEW ── */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div
           onClick={() => setStatusFilter('All')}
           className={`cursor-pointer rounded-2xl border bg-card p-5 shadow-sm transition hover:border-blue-500/50 ${
@@ -232,23 +232,6 @@ export function RegistrationsView({
             </span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">Instant access on payment</p>
-        </div>
-
-        <div
-          onClick={() => setStatusFilter('Enrolled')}
-          className="rounded-2xl border bg-card p-5 shadow-sm transition hover:border-purple-500/50 cursor-pointer"
-        >
-          <div className="flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
-            <span>Admin Approvals</span>
-            <Sparkles className="size-4 text-purple-500" />
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <p className="text-2xl font-black text-purple-600 dark:text-purple-400">0 Needed</p>
-            <span className="rounded-full bg-purple-500/15 px-2 py-0.5 text-[11px] font-bold text-purple-600 dark:text-purple-300">
-              Zero-Touch
-            </span>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">Online registrants unlock immediately</p>
         </div>
       </div>
 

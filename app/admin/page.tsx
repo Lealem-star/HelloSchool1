@@ -1464,21 +1464,6 @@ export default function AdminPage() {
       ],
     },
     {
-      id: 'admissions',
-      title: 'Learners & Enrollments',
-      icon: Users,
-      items: [
-        {
-          id: 'registrations',
-          label: 'Self-Paced Enrollments',
-          shortLabel: 'Enrollments',
-          icon: GraduationCap,
-          count: registrations.length,
-          badge: null,
-        },
-      ],
-    },
-    {
       id: 'content',
       title: 'Content Management',
       icon: BookOpen,
@@ -1859,28 +1844,7 @@ export default function AdminPage() {
 
           {/* ─── TAB: EXECUTIVE DASHBOARD & REPORTS ─── */}
           {tab === 'dashboard' && (
-            <AdminDashboardView
-              onNavigateToRegistrations={() => setTab('registrations')}
-            />
-          )}
-
-          {/* ─── TAB: REGISTRATIONS / ENROLLMENTS ─── */}
-          {tab === 'registrations' && (
-            <RegistrationsView
-              items={registrations}
-              overview={regOverview}
-              loading={loading}
-              search={search}
-              setSearch={setSearch}
-              statusFilter={regStatusFilter}
-              setStatusFilter={setRegStatusFilter}
-              savingId={savingId}
-              onUpdateStatus={updateRegistrationStatus}
-              onBulkUpdateStatus={bulkUpdateRegistrationStatus}
-              onDelete={deleteRegistration}
-              onBulkDelete={bulkDeleteRegistrations}
-              onSaveNotes={saveRegistrationNotes}
-            />
+            <AdminDashboardView />
           )}
 
 
