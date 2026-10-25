@@ -25,7 +25,6 @@ import {
   Lock,
   Sparkles,
   Shield,
-  Tag,
   AlertCircle,
   Download,
   FileSpreadsheet,
@@ -346,11 +345,8 @@ export default function AdminPage() {
   const [libraryOpen, setLibraryOpen] = useState(false)
   const [editingLibrary, setEditingLibrary] = useState<LibraryItem | null>(null)
 
-  // Categories state
+  // Categories state (used for course and library dropdowns)
   const [categories, setCategories] = useState<Category[]>([])
-  const [categoryOpen, setCategoryOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-  const [categoryTypeFilter, setCategoryTypeFilter] = useState<'all' | 'course' | 'library'>('all')
 
   /* ─── Session check ─── */
   useEffect(() => {
@@ -387,11 +383,6 @@ export default function AdminPage() {
     if (tab === 'trusted-partners') loadTrustedPartners()
     if (tab === 'courses') loadCourses()
     if (tab === 'library') loadLibrary()
-    if (tab === 'categories') {
-      loadCategories()
-      loadCourses()
-      loadLibrary()
-    }
     if (tab === 'instructors') loadInstructors()
     if (tab === 'facilities') loadFacilities()
     if (tab === 'projects') loadProjects()
@@ -951,81 +942,6 @@ export default function AdminPage() {
     }
   }
 
-  /* ─── Category operations ─── */
-  function openNewCategory(defaultType?: 'course' | 'library') {
-    const t = defaultType || (categoryTypeFilter !== 'all' ? categoryTypeFilter : 'course')
-    setEditingCategory({
-      id: '',
-      name: '',
-      type: t,
-      sortOrder: categories.filter((c) => c.type === t).length,
-      createdAt: '',
-    })
-    setCategoryOpen(true)
-  }
-  function openEditCategory(cat: Category) {
-    setEditingCategory({ ...cat })
-    setCategoryOpen(true)
-  }
-  async function saveCategory(formData: Category) {
-    setSavingId('category')
-    try {
-      const isNew = !editingCategory?.id
-      const body = isNew
-        ? {
-            name: formData.name.trim(),
-            type: formData.type.trim(),
-            sortOrder: Number(formData.sortOrder) || 0,
-          }
-        : {
-            id: editingCategory!.id,
-            name: formData.name.trim(),
-            type: formData.type.trim(),
-            sortOrder: Number(formData.sortOrder) || 0,
-          }
-      const res = await fetch('/api/admin/categories', {
-        method: isNew ? 'POST' : 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      const d = await res.json()
-      if (!res.ok) {
-        throw new Error(d.error || 'Save failed')
-      }
-      setCategoryOpen(false)
-      setEditingCategory(null)
-      loadCategories()
-    } finally {
-      setSavingId(null)
-    }
-  }
-  async function deleteCategory(id: string) {
-    const cat = categories.find((c) => c.id === id)
-    const label = cat ? `"${cat.name}"` : 'this category'
-    const ok = await confirm({
-      title: 'Delete Category',
-      message: `Are you sure you want to delete ${label}? Courses or digital library items using it will retain their text label, but it will be removed from navigation filters.`,
-      confirmText: 'Delete',
-      variant: 'danger',
-    })
-    if (!ok) return
-    setSavingId(id)
-    try {
-      const res = await fetch(`/api/admin/categories?id=${id}`, { method: 'DELETE' })
-      const d = await res.json()
-      if (!res.ok) {
-        await alert({
-          title: 'Delete Failed',
-          message: d.error || 'Delete failed',
-          variant: 'danger',
-        })
-        return
-      }
-      loadCategories()
-    } finally {
-      setSavingId(null)
-    }
-  }
 
   /* ─── Extra Operations ─── */
   async function saveInstructor(data: Partial<AdminInstructor>) {
@@ -1333,11 +1249,6 @@ export default function AdminPage() {
     if (tab === 'trusted-partners') loadTrustedPartners()
     if (tab === 'courses') loadCourses()
     if (tab === 'library') loadLibrary()
-    if (tab === 'categories') {
-      loadCategories()
-      loadCourses()
-      loadLibrary()
-    }
     if (tab === 'instructors') loadInstructors()
     if (tab === 'facilities') loadFacilities()
     if (tab === 'projects') loadProjects()
@@ -1422,7 +1333,6 @@ export default function AdminPage() {
     | 'trusted-partners'
     | 'courses'
     | 'library'
-    | 'categories'
     | 'instructors'
     | 'facilities'
     | 'projects'
@@ -1467,7 +1377,6 @@ export default function AdminPage() {
       items: [
         { id: 'courses', label: 'Courses (What You Can Learn)', shortLabel: 'Courses', icon: BookOpen, count: courses.length, badge: null },
         { id: 'library', label: 'Online Courses & Resources', shortLabel: 'Online Courses', icon: Folder, count: library.length, badge: null },
-        { id: 'categories', label: 'Categories & Depts', shortLabel: 'Categories', icon: Tag, count: categories.length, badge: null },
       ],
     },
     {
@@ -1871,23 +1780,6 @@ export default function AdminPage() {
             />
           )}
 
-          {/* ─── TAB: CATEGORIES ─── */}
-          {tab === 'categories' && (
-            <CategoriesView
-              categories={categories}
-              courses={courses}
-              library={library}
-              loading={loading}
-              search={search}
-              setSearch={setSearch}
-              typeFilter={categoryTypeFilter}
-              setTypeFilter={setCategoryTypeFilter}
-              onAdd={() => openNewCategory()}
-              onEdit={openEditCategory}
-              onDelete={deleteCategory}
-              savingId={savingId}
-            />
-          )}
 
           {/* ─── TAB: INSTRUCTORS ─── */}
           {tab === 'instructors' && (
@@ -1982,18 +1874,6 @@ export default function AdminPage() {
           onSave={saveLibrary}
           saving={savingId === 'library'}
           categoryOptions={categories.filter((c) => c.type === 'library').map((c) => c.name)}
-        />
-      )}
-      {editingCategory && (
-        <CategoryEditor
-          open={categoryOpen}
-          onClose={() => {
-            setCategoryOpen(false)
-            setEditingCategory(null)
-          }}
-          initial={editingCategory}
-          onSave={saveCategory}
-          saving={savingId === 'category'}
         />
       )}
       {seoPreviewCourse && (
@@ -5051,441 +4931,3 @@ function LibraryEditor({
   )
 }
 
-/* ──────────────────────────────────────────────────────────────
-   Categories View
-   ────────────────────────────────────────────────────────────── */
-function CategoriesView({
-  categories,
-  courses,
-  library,
-  loading,
-  search,
-  setSearch,
-  typeFilter,
-  setTypeFilter,
-  onAdd,
-  onEdit,
-  onDelete,
-  savingId,
-}: {
-  categories: Category[]
-  courses: Course[]
-  library: LibraryItem[]
-  loading: boolean
-  search: string
-  setSearch: (v: string) => void
-  typeFilter: 'all' | 'course' | 'library'
-  setTypeFilter: (v: 'all' | 'course' | 'library') => void
-  onAdd: (defaultType?: 'course' | 'library') => void
-  onEdit: (cat: Category) => void
-  onDelete: (id: string) => void
-  savingId: string | null
-}) {
-  const courseCount = useMemo(
-    () => categories.filter((c) => c.type === 'course').length,
-    [categories]
-  )
-  const libraryCount = useMemo(
-    () => categories.filter((c) => c.type === 'library').length,
-    [categories]
-  )
-
-  const filtered = useMemo(() => {
-    return categories
-      .filter((c) => {
-        if (typeFilter !== 'all' && c.type !== typeFilter) return false
-        if (!search.trim()) return true
-        return c.name.toLowerCase().includes(search.toLowerCase())
-      })
-      .sort((a, b) => a.sortOrder - b.sortOrder)
-  }, [categories, typeFilter, search])
-
-  return (
-    <div>
-      {/* ── Overview Stat Cards ── */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Categories</p>
-          <div className="mt-2 flex items-baseline justify-between">
-            <p className="text-3xl font-bold text-slate-800 dark:text-white">{categories.length}</p>
-            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-              Live sync
-            </span>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-blue-100 bg-blue-50/60 p-5 shadow-sm dark:border-blue-900/40 dark:bg-blue-950/30">
-          <p className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-sky-400">Course Categories</p>
-          <div className="mt-2 flex items-baseline justify-between">
-            <p className="text-3xl font-bold text-blue-700 dark:text-sky-300">{courseCount}</p>
-            <span className="rounded-md bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/60 dark:text-sky-300">
-              Courses catalog
-            </span>
-          </div>
-        </div>
-        <div className="rounded-2xl border border-purple-100 bg-purple-50/60 p-5 shadow-sm dark:border-purple-900/40 dark:bg-purple-950/30">
-          <p className="text-xs font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400">Online Courses Categories</p>
-          <div className="mt-2 flex items-baseline justify-between">
-            <p className="text-3xl font-bold text-purple-700 dark:text-purple-300">{libraryCount}</p>
-            <span className="rounded-md bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/60 dark:text-purple-300">
-              Online Courses
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Toolbar & Filters ── */}
-      <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Category Management</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Manage course and online courses/resources categories dynamically. Changes sync immediately with public catalog filters.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search categories..."
-              className="h-9 w-52 rounded-lg border bg-background pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-
-          {/* Type Filter Pills */}
-          <div className="flex rounded-lg border bg-muted/40 p-0.5 text-xs">
-            <button
-              onClick={() => setTypeFilter('all')}
-              className={`rounded-md px-3 py-1.5 font-medium transition ${
-                typeFilter === 'all'
-                  ? 'bg-card text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              All ({categories.length})
-            </button>
-            <button
-              onClick={() => setTypeFilter('course')}
-              className={`rounded-md px-3 py-1.5 font-medium transition ${
-                typeFilter === 'course'
-                  ? 'bg-card text-blue-600 shadow-sm dark:text-sky-400 font-bold'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Courses ({courseCount})
-            </button>
-            <button
-              onClick={() => setTypeFilter('library')}
-              className={`rounded-md px-3 py-1.5 font-medium transition ${
-                typeFilter === 'library'
-                  ? 'bg-card text-purple-600 shadow-sm dark:text-purple-400'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Library ({libraryCount})
-            </button>
-          </div>
-
-          {/* Add Category Button */}
-          <Button
-            onClick={() => onAdd()}
-            className="rounded-lg bg-blue-600 font-bold text-white hover:bg-blue-700 shadow-md shadow-blue-500/25"
-          >
-            <Plus className="mr-1.5 size-4" /> Add Category
-          </Button>
-        </div>
-      </div>
-
-      {/* ── Table Card ── */}
-      <div className="rounded-2xl border bg-card shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center p-12">
-            <Loader2 className="size-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-center">
-            <span className="flex size-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground mb-3">
-              <Tag className="size-6" />
-            </span>
-            <p className="font-semibold text-slate-800 dark:text-white">No categories found</p>
-            <p className="mt-1 text-xs text-muted-foreground max-w-sm">
-              {search
-                ? `No categories match "${search}". Try clearing your search term.`
-                : 'No categories currently configured in this section.'}
-            </p>
-            <div className="mt-4 flex gap-2">
-              {search && (
-                <Button variant="outline" size="sm" onClick={() => setSearch('')}>
-                  Clear search
-                </Button>
-              )}
-              <Button size="sm" onClick={() => onAdd()}>
-                <Plus className="mr-1.5 size-3.5" /> Create category
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b bg-muted/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <tr>
-                  <th className="px-6 py-3.5">Category Name</th>
-                  <th className="px-6 py-3.5">Section</th>
-                  <th className="px-6 py-3.5 text-center">Display Order</th>
-                  <th className="px-6 py-3.5">Assigned Items</th>
-                  <th className="px-6 py-3.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {filtered.map((cat) => {
-                  const assignedCount =
-                    cat.type === 'course'
-                      ? courses.filter((c) => c.category === cat.name).length
-                      : library.filter((l) => l.category === cat.name).length
-
-                  return (
-                    <tr
-                      key={cat.id}
-                      className="group transition hover:bg-muted/40"
-                    >
-                      {/* Name */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                            <Tag className="size-4" />
-                          </span>
-                          <div>
-                            <p className="font-semibold text-slate-900 dark:text-white">{cat.name}</p>
-                            <p className="text-[11px] text-muted-foreground">ID: {cat.id}</p>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Section */}
-                      <td className="px-6 py-4">
-                        {cat.type === 'course' ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-800 dark:border-blue-800/60 dark:bg-blue-950/40 dark:text-sky-300">
-                            <BookOpen className="size-3 text-blue-600 dark:text-sky-400" />
-                            Course Catalog
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-800 dark:border-purple-800/60 dark:bg-purple-950/40 dark:text-purple-300">
-                            <Folder className="size-3 text-purple-600 dark:text-purple-400" />
-                            Online Courses
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Display Order */}
-                      <td className="px-6 py-4 text-center">
-                        <span className="inline-flex items-center rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 font-mono text-xs font-semibold text-slate-600 dark:border-slate-800 dark:bg-slate-800/80 dark:text-slate-300">
-                          #{cat.sortOrder}
-                        </span>
-                      </td>
-
-                      {/* Assigned Items */}
-                      <td className="px-6 py-4">
-                        {assignedCount > 0 ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-                            <span className="size-1.5 rounded-full bg-emerald-500" />
-                            {assignedCount} {cat.type === 'course' ? (assignedCount === 1 ? 'course' : 'courses') : (assignedCount === 1 ? 'resource' : 'resources')}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-muted-foreground italic">
-                            0 items assigned
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onEdit(cat)}
-                            className="h-8 px-2 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                            title="Edit Category"
-                          >
-                            <Pencil className="size-3.5" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onDelete(cat.id)}
-                            disabled={savingId === cat.id}
-                            className="h-8 px-2 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950/30"
-                            title="Delete Category"
-                          >
-                            {savingId === cat.id ? (
-                              <Loader2 className="size-3.5 animate-spin" />
-                            ) : (
-                              <Trash2 className="size-3.5" />
-                            )}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-/* ──────────────────────────────────────────────────────────────
-   Category Editor Modal
-   ────────────────────────────────────────────────────────────── */
-function CategoryEditor({
-  open,
-  onClose,
-  initial,
-  onSave,
-  saving,
-}: {
-  open: boolean
-  onClose: () => void
-  initial: Category
-  onSave: (data: Category) => Promise<void> | void
-  saving: boolean
-}) {
-  const [name, setName] = useState(initial.name)
-  const [type, setType] = useState(initial.type || 'course')
-  const [sortOrder, setSortOrder] = useState(initial.sortOrder ?? 0)
-  const [formError, setFormError] = useState<string | null>(null)
-  const isEdit = !!initial.id
-
-  useEffect(() => {
-    setName(initial.name)
-    setType(initial.type || 'course')
-    setSortOrder(initial.sortOrder ?? 0)
-    setFormError(null)
-  }, [initial, open])
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setFormError(null)
-    const trimmed = name.trim()
-    if (!trimmed || trimmed.length < 2) {
-      setFormError('Category name must be at least 2 characters long.')
-      return
-    }
-    try {
-      await onSave({
-        ...initial,
-        name: trimmed,
-        type,
-        sortOrder: Number(sortOrder) || 0,
-      })
-    } catch (err: any) {
-      setFormError(err.message || 'Failed to save category.')
-    }
-  }
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={isEdit ? 'Edit Category' : 'Add New Category'}
-      width="max-w-lg"
-    >
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {formError && (
-          <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400">
-            <AlertCircle className="size-4 shrink-0" />
-            <p className="flex-1">{formError}</p>
-          </div>
-        )}
-
-        <Field label="Category Name *">
-          <input
-            className={inputCls}
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value)
-              if (formError) setFormError(null)
-            }}
-            placeholder="e.g. Micro-Soldering & BGA"
-            required
-            autoFocus
-          />
-          <span className="text-xs text-muted-foreground">
-            Unique name as displayed in navigation tabs and filter pills.
-          </span>
-        </Field>
-
-        <Field label="Catalog Section *">
-          <div className="grid grid-cols-2 gap-3 pt-1">
-            <button
-              type="button"
-              onClick={() => setType('course')}
-              className={`flex flex-col items-start gap-1.5 rounded-xl border p-3.5 text-left transition ${
-                type === 'course'
-                  ? 'border-blue-500 bg-blue-50/50 ring-2 ring-blue-500/20 dark:border-blue-400 dark:bg-blue-950/30'
-                  : 'border-border bg-card hover:bg-muted/40'
-              }`}
-            >
-              <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-                <BookOpen className="size-4 text-blue-600 dark:text-sky-400" />
-                <span>Course Catalog</span>
-              </div>
-              <p className="text-[11px] text-muted-foreground leading-snug">
-                For training courses, practical workshops & syllabus
-              </p>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setType('library')}
-              className={`flex flex-col items-start gap-1.5 rounded-xl border p-3.5 text-left transition ${
-                type === 'library'
-                  ? 'border-purple-500 bg-purple-50/50 ring-2 ring-purple-500/20 dark:border-purple-400 dark:bg-purple-950/30'
-                  : 'border-border bg-card hover:bg-muted/40'
-              }`}
-            >
-              <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
-                <Folder className="size-4 text-purple-500" />
-                <span>Online Courses</span>
-              </div>
-              <p className="text-[11px] text-muted-foreground leading-snug">
-                For online video courses, manuals, schematics & guides
-              </p>
-            </button>
-          </div>
-        </Field>
-
-        <Field label="Display Sort Order">
-          <input
-            type="number"
-            min={0}
-            className={inputCls}
-            value={sortOrder}
-            onChange={(e) => setSortOrder(Number(e.target.value) || 0)}
-          />
-          <span className="text-xs text-muted-foreground">
-            Lower numbers appear first in the catalog filter tabs (e.g. 0, 1, 2).
-          </span>
-        </Field>
-
-        <div className="flex justify-end gap-3 border-t pt-5">
-          <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={saving}
-            className="bg-blue-600 font-bold text-white hover:bg-blue-700 shadow-md shadow-blue-500/25"
-          >
-            {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
-            {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Category'}
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  )
-}
