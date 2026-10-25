@@ -2347,44 +2347,67 @@ function ProfileView({
     }
   }
 
+  function compressImage(file: File, maxDim = 400, quality = 0.85): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onload = () => {
+          let { width, height } = img
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width)
+              width = maxDim
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height)
+              height = maxDim
+            }
+          }
+
+          const canvas = document.createElement('canvas')
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          if (!ctx) {
+            resolve(e.target?.result as string)
+            return
+          }
+
+          ctx.drawImage(img, 0, 0, width, height)
+          const dataUrl = canvas.toDataURL('image/jpeg', quality)
+          resolve(dataUrl)
+        }
+        img.onerror = () => resolve(e.target?.result as string)
+        img.src = e.target?.result as string
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
   async function handleFileUpload(file: File) {
     if (!file) return
     if (!file.type.startsWith('image/')) {
       setAvatarMsg({ type: 'err', text: 'Please select a valid image file (JPG, PNG, WebP, GIF)' })
       return
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setAvatarMsg({ type: 'err', text: 'File size must be under 5MB' })
+    if (file.size > 10 * 1024 * 1024) {
+      setAvatarMsg({ type: 'err', text: 'File size must be under 10MB' })
       return
     }
 
     setAvatarMsg(null)
     setUploading(true)
 
-    // Instant local preview
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      if (ev.target?.result) {
-        setAvatarUrl(ev.target.result as string)
-      }
-    }
-    reader.readAsDataURL(file)
-
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('folder', 'avatars')
+      // 1. Compress image to clean lightweight avatar in browser
+      const optimizedDataUrl = await compressImage(file, 400, 0.85)
+      setAvatarUrl(optimizedDataUrl)
 
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error || 'Upload failed')
-      }
-
-      await saveAvatar(data.url)
+      // 2. Save directly to database profile (persisted in TiDB Cloud)
+      await saveAvatar(optimizedDataUrl)
       setAvatarMsg({ type: 'ok', text: 'Photo uploaded and profile updated successfully!' })
     } catch (err: any) {
       setAvatarMsg({ type: 'err', text: err.message || 'Error uploading file' })

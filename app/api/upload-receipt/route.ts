@@ -50,16 +50,22 @@ export async function POST(request: Request) {
     const randomId = crypto.randomBytes(8).toString('hex')
     const fileName = `receipt-${Date.now()}-${randomId}${ext}`
 
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'receipts')
-    await fs.promises.mkdir(uploadDir, { recursive: true })
-
-    const filePath = path.join(uploadDir, fileName)
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    await fs.promises.writeFile(filePath, buffer)
-
-    const publicUrl = `/uploads/receipts/${fileName}`
+    let publicUrl = `/uploads/receipts/${fileName}`
+    try {
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'receipts')
+      await fs.promises.mkdir(uploadDir, { recursive: true })
+      const filePath = path.join(uploadDir, fileName)
+      await fs.promises.writeFile(filePath, buffer)
+    } catch (fsErr: any) {
+      if (fsErr.code === 'EROFS' || fsErr.message?.includes('read-only')) {
+        publicUrl = `data:${file.type};base64,${buffer.toString('base64')}`
+      } else {
+        throw fsErr
+      }
+    }
 
     return NextResponse.json({
       url: publicUrl,

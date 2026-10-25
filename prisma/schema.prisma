@@ -98,7 +98,7 @@ model AdminUser {
   name      String?
   password  String
   role      String         @default("editor")
-  avatarUrl String?
+  avatarUrl String?        @db.MediumText
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
   sessions  AdminSession[]
