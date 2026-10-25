@@ -257,7 +257,7 @@ export function AdminLibraryView({
             }`}
           >
             <BookOpen className="size-4" />
-            Digital Library Catalog ({totalItems})
+            Online Courses Catalog ({totalItems})
           </button>
 
           <button
@@ -299,7 +299,7 @@ export function AdminLibraryView({
                 onClick={onCreate}
                 className="rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs gap-1.5 shadow-md shadow-blue-500/20"
               >
-                <Plus className="size-4" /> Add Digital Resource
+                <Plus className="size-4" /> + Add Online Course / Resource
               </Button>
             </>
           ) : (
@@ -325,13 +325,13 @@ export function AdminLibraryView({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="rounded-2xl border bg-card p-4 shadow-sm">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Total Digital Assets
+                Total Online Offerings
               </span>
               <p className="mt-1 text-2xl font-black text-foreground">{totalItems}</p>
             </div>
             <div className="rounded-2xl border bg-card p-4 shadow-sm">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Video Masterclasses
+                Online Video Courses
               </span>
               <p className="mt-1 text-2xl font-black text-blue-600 dark:text-sky-400">
                 {videoCount}
@@ -345,7 +345,7 @@ export function AdminLibraryView({
             </div>
             <div className="rounded-2xl border bg-card p-4 shadow-sm">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Available to Buy / Study
+                Available Online
               </span>
               <p className="mt-1 text-2xl font-black text-emerald-600 dark:text-emerald-400">
                 {availableCount}
@@ -362,7 +362,7 @@ export function AdminLibraryView({
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search digital courses, manuals, topics..."
+                  placeholder="Search online courses, manuals, topics..."
                   className="h-10 w-full rounded-xl border border-input bg-background pl-9 pr-3 text-xs outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                 />
               </div>
@@ -505,16 +505,16 @@ export function AdminLibraryView({
           {filteredCatalog.length === 0 && (
             <div className="rounded-3xl border border-dashed p-12 text-center bg-card">
               <BookOpen className="size-10 mx-auto text-muted-foreground opacity-40 mb-2" />
-              <h3 className="text-base font-bold">No Digital Resources Match Query</h3>
+              <h3 className="text-base font-bold">No Online Courses Match Query</h3>
               <p className="text-xs text-muted-foreground mt-1">
-                Try adjusting your search query or add a new digital course.
+                Try adjusting your search query or add a new online course.
               </p>
               <Button
                 onClick={onCreate}
                 size="sm"
                 className="mt-4 rounded-xl bg-blue-600 text-white font-bold"
               >
-                Create New Resource
+                + Add Online Course / Resource
               </Button>
             </div>
           )}
@@ -985,13 +985,13 @@ export function AdminLibraryModal({
         <div className="flex items-start justify-between pb-4 border-b">
           <div>
             <span className="rounded-full bg-blue-500/10 px-3 py-0.5 text-xs font-bold text-blue-600 dark:text-sky-400">
-              Admin Digital Library Manager
+              Admin Online Courses &amp; Resources Manager
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-foreground mt-1">
-              {item?.id ? 'Edit Digital Resource' : 'Create New Digital Resource'}
+              {item?.id ? 'Edit Online Course / Resource' : 'Add Online Course / Resource'}
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Set title, ETB tuition fee, video lessons curriculum, PDF manuals, and DRM protection settings.
+              Set title, ETB tuition fee, video lessons curriculum, PDF manuals, and DRM protection settings for instant online registration.
             </p>
           </div>
           <button
@@ -1267,7 +1267,7 @@ export function AdminLibraryModal({
                   className="size-4 rounded text-blue-600 focus:ring-blue-500"
                 />
                 <label htmlFor="published_checkbox" className="text-xs font-semibold cursor-pointer">
-                  Publish resource on public digital library and student portal
+                  Publish resource on public online courses catalog and student portal
                 </label>
               </div>
             </div>

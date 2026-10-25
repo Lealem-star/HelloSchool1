@@ -5,9 +5,9 @@ import { getCategoryNames, getPublishedLibrary } from '@/lib/content'
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: 'Digital Library & Repair Manuals | Hello Technology Training Center',
+  title: 'Online Courses & Learning Materials | Hello Technology Academy',
   description:
-    'Free technical repair manuals, multimeter cheat sheets, smartphone schematics, and laptop motherboard power rail diagnostic guides in Ethiopia.',
+    'Register for self-paced practical online video courses, technical repair manuals, schematics, and diagnostic guides. Instant automated access via Chapa in Ethiopia.',
 }
 
 export default async function LibraryPage() {

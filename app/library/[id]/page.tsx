@@ -21,7 +21,7 @@ export async function generateMetadata({
   if (!resource) return { title: 'Resource Not Found' }
 
   return {
-    title: `${resource.title} | Hello Technology Academy Digital Library`,
+    title: `${resource.title} | Hello Technology Academy Online Courses`,
     description: resource.description,
     openGraph: {
       title: `${resource.title} | Hello Technology Academy`,

@@ -6,9 +6,9 @@ import { getCourseListSchema, JsonLd } from '@/lib/schema'
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: 'Certified Repair Courses & Practical Curriculum',
+  title: 'What You Can Learn - Courses & Practical Curriculum | Hello Technology',
   description:
-    'Explore hands-on technical courses in smartphone hardware, laptop component maintenance, circuit diagnostics, and television repair in Bahir Dar, Ethiopia.',
+    'Explore hands-on technical courses in smartphone hardware, laptop component maintenance, circuit diagnostics, and television repair in Ethiopia.',
   alternates: {
     canonical: '/courses',
   },

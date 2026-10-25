@@ -167,7 +167,7 @@ export function AdminDashboardView({
       ['METRIC', 'VALUE'],
       ['Total Revenue (ETB)', data.metrics.totalRevenue],
       ['Online Registration Revenue (ETB)', data.metrics.registrationRevenue],
-      ['Digital Library Revenue (ETB)', data.metrics.digitalRevenue],
+      ['Online Courses & Materials Revenue (ETB)', data.metrics.digitalRevenue],
       ['Total Online Registrations', data.metrics.totalRegistrations],
       ['Approved / Active Enrollments', data.metrics.approvedRegistrations],
       ['Pending Registrations', data.metrics.pendingRegistrations],

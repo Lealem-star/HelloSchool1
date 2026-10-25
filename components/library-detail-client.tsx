@@ -250,7 +250,7 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
             className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="size-3.5" />
-            <span>{isAm ? 'ወደ ዲጂታል ቤተ-መጽሐፍት ተመለስ' : 'Back to Digital Library'}</span>
+            <span>{isAm ? 'ወደ ኦንላይን ኮርሶች ተመለስ' : 'Back to Online Courses'}</span>
           </Link>
         </div>
 

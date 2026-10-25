@@ -101,7 +101,7 @@ BEHAVIOR & GUIDELINES:
 1. Always respond in the language the user speaks: if they write in Amharic (አማርኛ), respond fluently in polite, natural Amharic. If they write in English, respond in professional English.
 2. Be warm, encouraging, respectful, and concise. Format responses with neat bullet points, bold highlights, and readable structure.
 3. If asked "Who is Hello Technology Training Center?" or "What is the goal of Hello Technology?", give an inspiring, comprehensive overview of our institution, our practical hands-on mission, and the key fields we train in.
-4. If recommending courses, mention practical modules, high-res schematics, and invite them to explore the digital library at: /library.
+4. If recommending courses, mention practical modules, high-res schematics, and invite them to explore the online courses catalog at: /library.
 5. If asked about prices or discounts, provide the figures from the catalog and note that online payment via Chapa is supported with instant activation.
 6. If user asks for direct contact or calls, provide: ${schoolConfig.phone} and Telegram: ${schoolConfig.telegram}.`
 
@@ -248,16 +248,16 @@ function generateFallbackResponse(query: string, courses: any[], batches: any[])
   ) {
     const b = batches[0]
     return isAmharic
-      ? `📅 **የዲጂታል ኮርሶችና ማኑዋሎች መረጃ:**\n\nበአሁኑ ወቅት ሁሉም የቪዲዮ ኮርሶች እና የቴክኒክ ሰርኪውት መመሪያዎች በኦንላይን ክፍት ናቸው!\n\n• **ሁኔታ:** ክፍት ነው\n• **የመማሪያ መንገድ:** በስልክ ወይም በኮምፒውተር 24/7 በራስዎ ፍጥነት\n• **ክፍያ:** በቻፓ (Chapa) አማካኝነት በቴሌብር፣ በሲቢኢ ብር ወይም በባንክ ካርድ በቅጽበት ይከፈታል\n\n👉 [ኮርሶችን ለመመልከት እዚህ ይጫኑ](/library) ወይም በ **${schoolConfig.phone}** ይደውሉልን!`
-      : `📅 **Digital Academy Courses & Manuals:**\n\nAll practical video masterclasses and high-resolution schematics are open and accessible 24/7!\n\n• **Format:** 100% Online, self-paced on your mobile phone or laptop\n• **Activation:** Instant automatic unlocking via Chapa (Telebirr, CBEBirr, Cards)\n\n👉 [Browse courses in Digital Library](/library) or call us at **${schoolConfig.phone}**!`
+      ? `📅 **የኦንላይን ኮርሶችና ማኑዋሎች መረጃ:**\n\nበአሁኑ ወቅት ሁሉም የቪዲዮ ኮርሶች እና የቴክኒክ ሰርኪውት መመሪያዎች በኦንላይን ክፍት ናቸው!\n\n• **ሁኔታ:** ክፍት ነው\n• **የመማሪያ መንገድ:** በስልክ ወይም በኮምፒውተር 24/7 በራስዎ ፍጥነት\n• **ክፍያ:** በቻፓ (Chapa) አማካኝነት በቴሌብር፣ በሲቢኢ ብር ወይም በባንክ ካርድ በቅጽበት ይከፈታል\n\n👉 [ኦንላይን ኮርሶችን ለመመልከት እዚህ ይጫኑ](/library) ወይም በ **${schoolConfig.phone}** ይደውሉልን!`
+      : `📅 **Online Courses & Technical Manuals:**\n\nAll practical video masterclasses and high-resolution schematics are open and accessible 24/7!\n\n• **Format:** 100% Online, self-paced on your mobile phone or laptop\n• **Activation:** Instant automatic unlocking via Chapa (Telebirr, CBEBirr, Cards)\n\n👉 [Browse Online Courses & Manuals](/library) or call us at **${schoolConfig.phone}**!`
   }
 
   // 3. Mobile Repair Course
   if (q.includes('mobile') || q.includes('phone') || q.includes('ሞባይል') || q.includes('ስልክ')) {
     const mobileCourse = courses.find((c) => c.slug.includes('mobile') || c.title.includes('ሞባይል'))
     return isAmharic
-      ? `📱 **የሞባይል ስልክ ጥገና ስልጠና (Smartphone Repair Training):**\n\nይህ ስልጠና ከጀማሪ እስከ ከፍተኛ ደረጃ የሃርድዌርና የሶፍትዌር ጥገናን፣ ማይክሮ-ሶልደሪንግን (Micro-soldering) እና የስክሪን ቅየራን በተሟላ የቪዲዮ ትምህርት ያካትታል።\n\n• **የሚሸፈኑ ርዕሶች:** የቦርድ ዲያግኖስቲክስ፣ አይሲ (IC) ማንሳትና መትከል፣ ፍላሽ ማድረግ፣ ኔትወርክና ባትሪ ጥገና\n• **ቆይታ:** ${mobileCourse?.duration || 'በራስዎ ፍጥነት'}\n• **ክፍያ:** ${mobileCourse?.price || 'ተመጣጣኝ'} ETB\n\n👉 [ኮርሱን በዲጂታል ላይብረሪ ለመጀመር እዚህ ይጫኑ](/library)!`
-      : `📱 **Mobile Phone Repair Training Track:**\n\nComprehensive practical training covering hardware diagnostics, software troubleshooting, micro-soldering, and screen replacement.\n\n• **Topics:** Board-level troubleshooting, IC rework, flashing, unlocking, power circuits\n• **Duration:** ${mobileCourse?.duration || 'Self-paced'}\n• **Tuition:** ${mobileCourse?.price || 'Affordable'} ETB\n\n👉 [Start learning in the Digital Library](/library)!`
+      ? `📱 **የሞባይል ስልክ ጥገና ስልጠና (Smartphone Repair Training):**\n\nይህ ስልጠና ከጀማሪ እስከ ከፍተኛ ደረጃ የሃርድዌርና የሶፍትዌር ጥገናን፣ ማይክሮ-ሶልደሪንግን (Micro-soldering) እና የስክሪን ቅየራን በተሟላ የቪዲዮ ትምህርት ያካትታል።\n\n• **የሚሸፈኑ ርዕሶች:** የቦርድ ዲያግኖስቲክስ፣ አይሲ (IC) ማንሳትና መትከል፣ ፍላሽ ማድረግ፣ ኔትወርክና ባትሪ ጥገና\n• **ቆይታ:** ${mobileCourse?.duration || 'በራስዎ ፍጥነት'}\n• **ክፍያ:** ${mobileCourse?.price || 'ተመጣጣኝ'} ETB\n\n👉 [ኮርሱን በኦንላይን ኮርሶች ለመጀመር እዚህ ይጫኑ](/library)!`
+      : `📱 **Mobile Phone Repair Training Track:**\n\nComprehensive practical training covering hardware diagnostics, software troubleshooting, micro-soldering, and screen replacement.\n\n• **Topics:** Board-level troubleshooting, IC rework, flashing, unlocking, power circuits\n• **Duration:** ${mobileCourse?.duration || 'Self-paced'}\n• **Tuition:** ${mobileCourse?.price || 'Affordable'} ETB\n\n👉 [Start learning in Online Courses](/library)!`
   }
 
   // 4. Computer / Laptop Course
@@ -294,8 +294,8 @@ function generateFallbackResponse(query: string, courses: any[], batches: any[])
     q.includes('መስፈርት')
   ) {
     return isAmharic
-      ? `📝 **እንዴት መመዝገብና መማር ይቻላል? (How to Enroll):**\n\n1. **በድረ-ገፃችን (Online 24/7):** በ [ዲጂታል ላይብረሪ](/library) ገጽ ላይ የሚፈልጉትን ኮርስ ይምረጡ።\n2. **ክፍያ መፈጸም:** በቻፓ (Chapa) በቴሌብር፣ በሲቢኢ ብር ወይም በባንክ ካርድ ይክፈሉ። ወዲያውኑ የቪዲዮ ትምህርቶች እና ማኑዋሎች ይከፈቱልዎታል!\n3. **አካውንት መክፈት:** እስካሁን ካልተመዘገቡ በ [አካውንት መፍጠሪያ](/auth/signup) ላይ በ 1 ደቂቃ ውስጥ መመዝገብ ይችላሉ።\n\n👉 [አሁኑኑ ኮርሶችን ለመመልከት እዚህ ይጫኑ](/library)!`
-      : `📝 **How to Enroll & Access Courses:**\n\n1. **Browse Digital Library (24/7):** Visit our [Digital Library](/library) to select your desired course or technical manual.\n2. **Instant Payment:** Pay securely via Chapa with Telebirr, CBEBirr, or Bank Cards. Access is unlocked immediately!\n3. **Create Account:** If you don't have an account yet, sign up at [Create Account](/auth/signup).\n\n👉 [Click here to browse courses](/library)!`
+      ? `📝 **እንዴት መመዝገብና መማር ይቻላል? (How to Enroll):**\n\n1. **በድረ-ገፃችን (Online 24/7):** በ [ኦንላይን ኮርሶች](/library) ገጽ ላይ የሚፈልጉትን ኮርስ ይምረጡ።\n2. **ክፍያ መፈጸም:** በቻፓ (Chapa) በቴሌብር፣ በሲቢኢ ብር ወይም በባንክ ካርድ ይክፈሉ። ወዲያውኑ የቪዲዮ ትምህርቶች እና ማኑዋሎች ይከፈቱልዎታል!\n3. **አካውንት መክፈት:** እስካሁን ካልተመዘገቡ በ [አካውንት መፍጠሪያ](/auth/signup) ላይ በ 1 ደቂቃ ውስጥ መመዝገብ ይችላሉ።\n\n👉 [አሁኑኑ ኦንላይን ኮርሶችን ለመመልከት እዚህ ይጫኑ](/library)!`
+      : `📝 **How to Enroll & Access Courses:**\n\n1. **Browse Online Courses (24/7):** Visit our [Online Courses](/library) to select your desired course or technical manual.\n2. **Instant Payment:** Pay securely via Chapa with Telebirr, CBEBirr, or Bank Cards. Access is unlocked immediately!\n3. **Create Account:** If you don't have an account yet, sign up at [Create Account](/auth/signup).\n\n👉 [Click here to browse online courses](/library)!`
   }
 
   // 7. General Course Catalog Question

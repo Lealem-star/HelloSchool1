@@ -1468,8 +1468,8 @@ export default function AdminPage() {
       title: 'Content Management',
       icon: BookOpen,
       items: [
-        { id: 'courses', label: 'Courses & Tracks', shortLabel: 'Courses', icon: BookOpen, count: courses.length, badge: null },
-        { id: 'library', label: 'Digital Library & DRM', shortLabel: 'Library & DRM', icon: Folder, count: library.length, badge: null },
+        { id: 'courses', label: 'Courses (What You Can Learn)', shortLabel: 'Courses', icon: BookOpen, count: courses.length, badge: null },
+        { id: 'library', label: 'Online Courses & Resources', shortLabel: 'Online Courses', icon: Folder, count: library.length, badge: null },
         { id: 'categories', label: 'Categories & Depts', shortLabel: 'Categories', icon: Tag, count: categories.length, badge: null },
       ],
     },
@@ -4604,7 +4604,7 @@ function LibraryEditor({
     <Modal
       open={open}
       onClose={onClose}
-      title={isEdit ? 'Edit Digital Library Resource' : 'Add Digital Library Resource'}
+      title={isEdit ? 'Edit Online Course / Resource' : 'Add Online Course / Resource'}
       width="max-w-4xl"
     >
       <div className="space-y-6">
@@ -5172,11 +5172,11 @@ function CategoriesView({
           </div>
         </div>
         <div className="rounded-2xl border border-purple-100 bg-purple-50/60 p-5 shadow-sm dark:border-purple-900/40 dark:bg-purple-950/30">
-          <p className="text-xs font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400">Library Categories</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400">Online Courses Categories</p>
           <div className="mt-2 flex items-baseline justify-between">
             <p className="text-3xl font-bold text-purple-700 dark:text-purple-300">{libraryCount}</p>
             <span className="rounded-md bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/60 dark:text-purple-300">
-              Digital Library
+              Online Courses
             </span>
           </div>
         </div>
@@ -5187,7 +5187,7 @@ function CategoriesView({
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Category Management</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage course and digital library categories dynamically. Changes sync immediately with public catalog filters.
+            Manage course and online courses/resources categories dynamically. Changes sync immediately with public catalog filters.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -5321,7 +5321,7 @@ function CategoriesView({
                         ) : (
                           <span className="inline-flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-800 dark:border-purple-800/60 dark:bg-purple-950/40 dark:text-purple-300">
                             <Folder className="size-3 text-purple-600 dark:text-purple-400" />
-                            Digital Library
+                            Online Courses
                           </span>
                         )}
                       </td>
@@ -5499,10 +5499,10 @@ function CategoryEditor({
             >
               <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
                 <Folder className="size-4 text-purple-500" />
-                <span>Digital Library</span>
+                <span>Online Courses</span>
               </div>
               <p className="text-[11px] text-muted-foreground leading-snug">
-                For downloadable PDFs, manuals, schematics & videos
+                For online video courses, manuals, schematics & guides
               </p>
             </button>
           </div>

@@ -323,7 +323,7 @@ export function DigitalPurchaseModal({
               <div className="flex-1 pr-6">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400">
-                    {resource.category || 'Digital Library'}
+                    {resource.category || 'Online Course'}
                   </span>
                   <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-[10px] font-bold text-blue-600 dark:text-sky-400 border border-blue-500/20">
                     {resource.format}

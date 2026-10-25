@@ -9,7 +9,7 @@ export const translations = {
     // Navigation
     navHome: 'Home',
     navCourses: 'Courses',
-    navLibrary: 'Digital Library',
+    navLibrary: 'Online Courses',
     navAbout: 'About',
     navContact: 'Contact',
     registerNow: 'Create Account',
@@ -39,7 +39,7 @@ export const translations = {
     // Navigation
     navHome: 'መነሻ',
     navCourses: 'ስልጠናዎች',
-    navLibrary: 'ዲጂታል ቤተ-መጽሐፍት',
+    navLibrary: 'ኦንላይን ኮርሶች',
     navAbout: 'ስለ እኛ',
     navContact: 'አግኙን',
     registerNow: 'አካውንት ይክፈቱ',

@@ -81,7 +81,7 @@ export function Logo() {
 const navItems = [
   { href: '/', labelEn: 'Home', labelAm: 'መነሻ' },
   { href: '/courses', labelEn: 'Courses', labelAm: 'ስልጠናዎች' },
-  { href: '/library', labelEn: 'Digital Library', labelAm: 'ዲጂታል ቤተ-መጽሐፍት' },
+  { href: '/library', labelEn: 'Online Courses', labelAm: 'ኦንላይን ኮርሶች' },
   { href: '/about', labelEn: 'About', labelAm: 'ስለ እኛ' },
   { href: '/contact', labelEn: 'Contact', labelAm: 'አግኙን' },
 ]
@@ -782,10 +782,10 @@ export function Footer() {
           </h3>
           <div className="flex flex-col gap-3 text-sm text-blue-100">
             <Link href="/courses" className="hover:text-white transition-colors">
-              {language === 'am' ? 'ስልጠናዎቻችን' : 'Our Courses'}
+              {language === 'am' ? 'ስልጠናዎቻችን (ምን መማር ይችላሉ)' : 'Courses (What You Can Learn)'}
             </Link>
             <Link href="/library" className="hover:text-white transition-colors">
-              {language === 'am' ? 'ዲጂታል ቤተ-መጽሐፍት' : 'Digital Library'}
+              {language === 'am' ? 'ኦንላይን ኮርሶች' : 'Online Courses'}
             </Link>
             <Link href="/about" className="hover:text-white transition-colors">
               {language === 'am' ? 'ስለ እኛ' : 'About Us'}
