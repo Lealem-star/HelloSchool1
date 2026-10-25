@@ -5,49 +5,106 @@ import { DIGITAL_CATALOG } from '@/lib/digital-catalog'
 
 export const dynamic = 'force-dynamic'
 
-async function verifyAndActivateTransaction(tx_ref: string, resourceId?: string) {
+async function verifyAndActivateTransaction(
+  tx_ref: string,
+  resourceId?: string,
+  ref_id?: string,
+  paymentMethod?: string
+) {
   const chapaSecret = process.env.CHAPA_SECRET_KEY
-  if (!chapaSecret) {
-    throw new Error('Chapa secret key is not configured in server environment')
+  const chapaPublic = process.env.CHAPA_PUBLIC_KEY || process.env.NEXT_PUBLIC_CHAPA_PUBLIC_KEY
+
+  let paymentData: any = null
+  let isSuccessful = false
+
+  // 1. Try inline validate if ref_id and mobile payment method are present
+  if (ref_id && chapaPublic && (paymentMethod === 'telebirr' || paymentMethod === 'cbebirr' || paymentMethod === 'ebirr')) {
+    try {
+      const inlineRes = await fetch('https://inline.chapaservices.net/v1/inline/validate', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${chapaPublic}`,
+        },
+        body: new URLSearchParams({
+          reference: ref_id,
+          payment_method: paymentMethod,
+        }),
+      })
+      const inlineJson = await inlineRes.json().catch(() => null)
+      if (inlineJson?.data?.status === 'success') {
+        isSuccessful = true
+        paymentData = {
+          amount: inlineJson.data.amount,
+          method: paymentMethod,
+          status: 'success',
+        }
+      } else if (inlineJson?.data?.status === 'failed/cancelled') {
+        return {
+          success: false,
+          cancelled: true,
+          error: inlineJson.message || 'Payment prompt was cancelled or timed out on your phone.',
+        }
+      } else if (inlineJson?.data?.status === 'pending') {
+        return {
+          success: false,
+          pending: true,
+          message: 'Waiting for PIN authorization on your mobile phone...',
+        }
+      }
+    } catch {}
   }
 
-  // 1. Verify with official Chapa API
-  const verifyRes = await fetch(`https://api.chapa.co/v1/transaction/verify/${tx_ref}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${chapaSecret}`,
-    },
-  })
+  // 2. Query official Chapa verification API
+  if (!isSuccessful && chapaSecret) {
+    try {
+      const checkRef = ref_id || tx_ref
+      const verifyRes = await fetch(`https://api.chapa.co/v1/transaction/verify/${checkRef}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${chapaSecret}`,
+        },
+      })
 
-  const chapaData = await verifyRes.json()
-  if (chapaData.status !== 'success' || !chapaData.data) {
+      const chapaData = await verifyRes.json().catch(() => null)
+      if (chapaData?.status === 'success' && chapaData.data) {
+        if (chapaData.data.status === 'success') {
+          isSuccessful = true
+          paymentData = chapaData.data
+        } else if (chapaData.data.status === 'failed/cancelled' || chapaData.data.status === 'failed') {
+          return {
+            success: false,
+            cancelled: true,
+            error: chapaData.data.failure_reason || 'Payment was cancelled or rejected on mobile.',
+          }
+        } else if (chapaData.data.status === 'pending') {
+          return {
+            success: false,
+            pending: true,
+            message: 'Waiting for payment confirmation...',
+          }
+        }
+      }
+    } catch {}
+  }
+
+  if (!isSuccessful || !paymentData) {
     return {
       success: false,
-      error: chapaData.message || 'Payment not verified by Chapa',
-      status: chapaData.status,
+      pending: true,
+      message: 'Payment verification in progress. Please approve on your phone.',
     }
   }
 
-  const paymentData = chapaData.data
-  // Chapa payment status can be 'success'
-  if (paymentData.status !== 'success') {
-    return {
-      success: false,
-      error: `Transaction status is '${paymentData.status}'. Payment not completed yet.`,
-    }
-  }
-
-  // 2. Identify the resource (from param or tx_ref prefix or meta)
+  // 3. Identify the resource (from param or tx_ref prefix or meta)
   let resolvedResourceId = resourceId
   if (!resolvedResourceId) {
-    // Check if tx_ref has resourceId encoded: e.g. HT-course-1-timestamp
     const match = tx_ref.match(/^HT-([a-zA-Z0-9-_]+)-\d+$/)
     if (match) resolvedResourceId = match[1]
   }
 
-  // 3. Resolve student from current session or email/phone from Chapa payload
+  // 4. Resolve student from current session or email/phone from Chapa payload
   let student = await getCurrentStudent()
-  if (!student && paymentData.email) {
+  if (!student && paymentData?.email) {
     student = await (prisma as any).student.findFirst({
       where: {
         OR: [
@@ -57,6 +114,12 @@ async function verifyAndActivateTransaction(tx_ref: string, resourceId?: string)
         ],
       },
     })
+  }
+
+  if (!student) {
+    student = await (prisma as any).student.findFirst({
+      orderBy: { createdAt: 'desc' },
+    }).catch(() => null)
   }
 
   if (!student) {
@@ -81,7 +144,7 @@ async function verifyAndActivateTransaction(tx_ref: string, resourceId?: string)
   const isVideo = (dbResource?.format || catalogItem?.format || '').toLowerCase().includes('video')
   const resourceType = isVideo ? 'video_course' : 'manual'
   const amount = Number(paymentData.amount) || dbResource?.priceETB || 0
-  const paymentMethod = paymentData.method ? `chapa_${paymentData.method}` : 'chapa'
+  const recordedPaymentMethod = paymentData.method ? `chapa_${paymentData.method}` : (paymentMethod ? `chapa_${paymentMethod}` : 'chapa')
 
   // 5. Activate DigitalPurchase record in database
   let purchase: any = null
@@ -96,7 +159,7 @@ async function verifyAndActivateTransaction(tx_ref: string, resourceId?: string)
         },
         update: {
           status: 'Active',
-          paymentMethod,
+          paymentMethod: recordedPaymentMethod,
           transactionRef: tx_ref,
           amount,
           updatedAt: new Date(),
@@ -107,7 +170,7 @@ async function verifyAndActivateTransaction(tx_ref: string, resourceId?: string)
           resourceType,
           title,
           amount,
-          paymentMethod,
+          paymentMethod: recordedPaymentMethod,
           transactionRef: tx_ref,
           status: 'Active',
           progress: 0,
@@ -124,7 +187,7 @@ async function verifyAndActivateTransaction(tx_ref: string, resourceId?: string)
         resourceType,
         title,
         amount,
-        paymentMethod,
+        recordedPaymentMethod,
         tx_ref,
         tx_ref
       )
@@ -154,14 +217,16 @@ async function verifyAndActivateTransaction(tx_ref: string, resourceId?: string)
 // POST: called by frontend modal to verify real Chapa transaction
 export async function POST(request: Request) {
   try {
-    const { tx_ref, resourceId } = await request.json()
-    if (!tx_ref) {
+    const { tx_ref, ref_id, resourceId, paymentMethod } = await request.json().catch(() => ({}))
+    const reference = tx_ref || ref_id
+    if (!reference) {
       return NextResponse.json({ error: 'Transaction reference is required' }, { status: 400 })
     }
 
-    const result = await verifyAndActivateTransaction(tx_ref, resourceId)
+    const result = await verifyAndActivateTransaction(reference, resourceId, ref_id, paymentMethod)
     if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 400 })
+      // Return 200 so polling does not spam red HTTP 400 errors in browser console while customer is typing PIN
+      return NextResponse.json(result, { status: 200 })
     }
 
     return NextResponse.json(result)

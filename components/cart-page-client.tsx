@@ -21,7 +21,6 @@ import {
   User,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ChapaInlineModal } from '@/components/chapa-inline-modal'
 import { useLanguage } from '@/components/language-provider'
 import { LanguageToggle } from '@/components/language-toggle'
 import type { PublicLibraryItem } from '@/lib/content'
@@ -56,8 +55,41 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
   // Countdown timer (e.g. 08h : 11m : 28s matching screenshot)
   const [timeLeft, setTimeLeft] = useState({ hours: 8, minutes: 11, seconds: 28 })
 
-  // Chapa Payment Modal State
-  const [isChapaModalOpen, setIsChapaModalOpen] = useState(false)
+  // Chapa Hosted Checkout Redirect State
+  const [isRedirecting, setIsRedirecting] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
+
+  // Direct checkout handler (redirects to Chapa official hosted checkout page)
+  const handlePayNow = async () => {
+    if (!cartResource) return
+    setIsRedirecting(true)
+    setCheckoutError(null)
+
+    try {
+      const res = await fetch('/api/chapa/initialize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resourceId: cartResource.id,
+          amount: finalPrice,
+          phone: student?.phone || '0934551781',
+          email: student?.personalEmail || student?.institutionalEmail || 'mekonenalemayehu95@gmail.com',
+          fullName: student?.fullName || 'Mekonen Alemayehu',
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok || !data.checkout_url) {
+        throw new Error(data.error || 'Failed to initialize Chapa gateway')
+      }
+
+      // Redirect directly to Chapa's official hosted checkout page
+      window.location.href = data.checkout_url
+    } catch (err: any) {
+      setCheckoutError(err.message || 'Payment gateway connection error. Please try again.')
+      setIsRedirecting(false)
+    }
+  }
 
   // Fetch Student & Check Auth
   useEffect(() => {
@@ -68,10 +100,6 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
         if (!isMounted) return
         if (data.student) {
           setStudent(data.student)
-        } else {
-          // If not logged in, redirect to login with cart return URL
-          const currentUrl = window.location.pathname + window.location.search
-          router.replace(`/auth/signin?redirect=${encodeURIComponent(currentUrl)}`)
         }
       })
       .catch(() => {})
@@ -408,14 +436,25 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
                   )}
                 </div>
 
-                {/* Big Green "Pay Now" Button matching Screenshot */}
-                <div>
+                {/* Big Green "Pay Now" Button - directly opens Chapa Official Checkout */}
+                <div className="space-y-2">
                   <Button
-                    onClick={() => setIsChapaModalOpen(true)}
-                    className="w-full h-13 rounded-xl bg-[#70c922] hover:bg-[#62b01e] text-white font-extrabold text-base shadow-md transition-all duration-200"
+                    onClick={handlePayNow}
+                    disabled={isRedirecting}
+                    className="w-full h-13 rounded-xl bg-[#70c922] hover:bg-[#62b01e] text-white font-extrabold text-base shadow-md transition-all duration-200 cursor-pointer disabled:opacity-75"
                   >
-                    {isAm ? 'አሁን ይክፈሉ (Pay Now)' : 'Pay Now'}
+                    {isRedirecting ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 className="size-5 animate-spin" />
+                        <span>{isAm ? 'ወደ ቻፓ በማቅናት ላይ...' : 'Connecting to Chapa...'}</span>
+                      </span>
+                    ) : (
+                      isAm ? 'አሁን ይክፈሉ (Pay Now)' : 'Pay Now'
+                    )}
                   </Button>
+                  {checkoutError && (
+                    <p className="text-xs text-destructive text-center font-medium">{checkoutError}</p>
+                  )}
                 </div>
 
                 {/* Offer Countdown Timer */}
@@ -458,27 +497,6 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
           </div>
         )}
       </main>
-
-      {/* ──── REAL CHAPA INLINE CHECKOUT MODAL ──── */}
-      {cartResource && (
-        <ChapaInlineModal
-          resource={{
-            id: cartResource.id,
-            title: cartResource.title,
-            subtitle: cartResource.subtitle,
-            format: cartResource.format,
-            price: cartResource.price,
-            priceETB: finalPrice,
-            instructor: cartResource.instructor,
-            thumbnailUrl: cartResource.thumbnailUrl,
-          }}
-          isOpen={isChapaModalOpen}
-          onClose={() => setIsChapaModalOpen(false)}
-          onSuccess={() => {
-            router.push(`/student/dashboard?enrolled=${cartResource.id}&verified=1`)
-          }}
-        />
-      )}
     </div>
   )
 }

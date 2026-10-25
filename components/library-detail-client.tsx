@@ -31,7 +31,6 @@ import { SiteShell } from '@/components/site'
 import { useLanguage } from '@/components/language-provider'
 import type { PublicLibraryItem } from '@/lib/content'
 import { DIGITAL_CATALOG, type DigitalResourceMeta } from '@/lib/digital-catalog'
-import { ChapaInlineModal } from '@/components/chapa-inline-modal'
 
 interface LibraryDetailClientProps {
   resource: PublicLibraryItem
@@ -53,7 +52,6 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
   const [isPlayingVideo, setIsPlayingVideo] = useState(false)
   const [copiedShare, setCopiedShare] = useState(false)
   const [openModules, setOpenModules] = useState<Record<string, boolean>>({ 'mod-1': true })
-  const [isChapaModalOpen, setIsChapaModalOpen] = useState(false)
   const [student, setStudent] = useState<any>(null)
   const [hasPurchased, setHasPurchased] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
@@ -91,12 +89,12 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
     }
   }, [resource.id])
 
-  // Automatically open Chapa Inline Modal if redirected with ?checkout=1
+  // Automatically navigate to cart if redirected with ?checkout=1
   useEffect(() => {
     if (searchParams.get('checkout') === '1') {
-      setIsChapaModalOpen(true)
+      router.push(`/cart?course=${resource.id}`)
     }
-  }, [searchParams])
+  }, [searchParams, resource.id, router])
 
   // Handle Get Started button click
   const handleGetStarted = () => {
@@ -109,9 +107,7 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
       // Existing logged-in user: navigate to cart review step
       router.push(`/cart?course=${resource.id}`)
     } else {
-      // Not logged in: go through sign-in / create account flow, then proceed to cart
-      const destination = `/cart?course=${resource.id}`
-      router.push(`/auth/signin?redirect=${encodeURIComponent(destination)}`)
+      router.push(`/student/login`)
     }
   }
 
@@ -652,24 +648,6 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
         </div>
       </main>
 
-      {/* ── CHAPA INLINE CHECKOUT MODAL ── */}
-      <ChapaInlineModal
-        resource={{
-          id: resource.id,
-          title: resource.title,
-          subtitle: resource.subtitle,
-          format: resource.format,
-          price: resource.price,
-          priceETB: resource.priceETB ?? 0,
-          instructor: resource.instructor,
-          thumbnailUrl: resource.thumbnailUrl,
-        }}
-        isOpen={isChapaModalOpen}
-        onClose={() => setIsChapaModalOpen(false)}
-        onSuccess={() => {
-          setHasPurchased(true)
-        }}
-      />
     </SiteShell>
   )
 }

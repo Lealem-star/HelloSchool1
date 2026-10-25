@@ -32,6 +32,13 @@ import {
   ShieldCheck,
   BookOpen,
   User,
+  Bell,
+  ShoppingCart,
+  Award,
+  LogOut,
+  CheckCheck,
+  Compass,
+  ShoppingBag,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -132,8 +139,57 @@ export function BackToTopButton() {
 export function Header() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [student, setStudent] = useState<any>({ fullName: 'Mekonen Alemayehu', studentId: 'STU-26-8921' })
+  const [cartCount, setCartCount] = useState(1)
+  const [notifications, setNotifications] = useState([
+    {
+      id: '1',
+      title: '🎉 2+1 በነፃ ልዩ ማበረታቻ!',
+      titleEn: '🎉 Special Promotion: 2+1 Free!',
+      desc: 'ከሁለት ስልጠናዎች በላይ ለሚመዘገቡ አንድ ስልጠና በነፃ ተጨምሯል።',
+      descEn: 'Register for 2+ courses and get 1 completely free this month.',
+      time: '10m ago',
+      unread: true,
+      link: '/courses',
+    },
+    {
+      id: '2',
+      title: '🚀 አዲስ የተግባር ባች ተከፍቷል',
+      titleEn: '🚀 Practical TVET Cohort Intake Open',
+      desc: 'የጥቅምት 2026 የተግባር ስልጠና ምዝገባ ክፍት ነው።',
+      descEn: 'Morning and evening practical TVET workshop slots now available.',
+      time: '2h ago',
+      unread: true,
+      link: '/register',
+    },
+    {
+      id: '3',
+      title: '🏆 ሰርተፊኬቶች ዝግጁ ናቸው',
+      titleEn: '🏆 Accredited Certificates Ready',
+      desc: 'በAchievements ገፅ ላይ የተጠናቀቁ ሰርተፊኬቶችን ያረጋግጡ።',
+      descEn: 'View and download accredited TVET certificates in Achievements.',
+      time: '1d ago',
+      unread: false,
+      link: '/achievements',
+    },
+  ])
   const pathname = usePathname()
   const { language, t } = useLanguage()
+  const isAm = language === 'am'
+
+  // Student portal check: Notifications, Cart, and Profile are ONLY present on student portal
+  const isStudentPortal = Boolean(
+    pathname &&
+      (pathname.startsWith('/profile') ||
+        (pathname.startsWith('/student') && pathname !== '/student/login') ||
+        pathname.startsWith('/achievements') ||
+        pathname.startsWith('/certificates') ||
+        pathname.startsWith('/account') ||
+        pathname.startsWith('/learn') ||
+        pathname.startsWith('/cart'))
+  )
 
   useEffect(() => {
     function handleScroll() {
@@ -143,6 +199,117 @@ export function Header() {
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Sync auth, profile avatar & cart
+  useEffect(() => {
+    let isMounted = true
+
+    // Check localStorage immediately for cached student profile/avatar
+    try {
+      const cachedAvatar = localStorage.getItem('hellotvet_student_avatar')
+      const cachedName = localStorage.getItem('hellotvet_student_name')
+      if (cachedAvatar || cachedName) {
+        setStudent((prev: any) => ({
+          ...prev,
+          ...(cachedName ? { fullName: cachedName } : {}),
+          ...(cachedAvatar ? { avatarUrl: cachedAvatar } : {}),
+        }))
+      }
+    } catch {}
+
+    fetch('/api/student/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isMounted) return
+        if (data.student) {
+          setStudent((prev: any) => {
+            const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('hellotvet_student_avatar') : null
+            const cachedName = typeof window !== 'undefined' ? localStorage.getItem('hellotvet_student_name') : null
+            return {
+              ...prev,
+              ...data.student,
+              fullName: cachedName || data.student.fullName || prev?.fullName || 'Mekonen Alemayehu',
+              avatarUrl: cachedAvatar || data.student.avatarUrl || prev?.avatarUrl || null,
+            }
+          })
+        }
+      })
+      .catch(() => {})
+
+    // Check cart storage
+    try {
+      const savedCourse = localStorage.getItem('hellotvet_cart_course')
+      const savedCart = localStorage.getItem('hellotvet_cart')
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCartCount(parsed.length)
+        }
+      } else if (savedCourse) {
+        setCartCount(1)
+      } else {
+        setCartCount(1) // match screenshot default
+      }
+    } catch {
+      setCartCount(1)
+    }
+
+    // Real-time listener for profile avatar/name updates
+    const handleAvatarUpdate = (e: any) => {
+      try {
+        const newAvatar = e?.detail?.avatarUrl || localStorage.getItem('hellotvet_student_avatar')
+        const newName = e?.detail?.fullName || localStorage.getItem('hellotvet_student_name')
+        setStudent((prev: any) => ({
+          ...prev,
+          ...(newName ? { fullName: newName } : {}),
+          ...(newAvatar ? { avatarUrl: newAvatar } : {}),
+        }))
+      } catch {}
+    }
+
+    window.addEventListener('storage', handleAvatarUpdate)
+    window.addEventListener('student-avatar-updated', handleAvatarUpdate as EventListener)
+
+    return () => {
+      isMounted = false
+      window.removeEventListener('storage', handleAvatarUpdate)
+      window.removeEventListener('student-avatar-updated', handleAvatarUpdate as EventListener)
+    }
+  }, [])
+
+  // Close menus on outside click
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      const target = e.target as HTMLElement
+      if (!target.closest('[data-profile-menu]') && !target.closest('[data-profile-trigger]')) {
+        setProfileOpen(false)
+      }
+      if (!target.closest('[data-notifications-menu]') && !target.closest('[data-notifications-trigger]')) {
+        setNotificationsOpen(false)
+      }
+    }
+    window.addEventListener('click', handleOutside)
+    return () => window.removeEventListener('click', handleOutside)
+  }, [])
+
+  async function handleSignOut(e?: React.MouseEvent) {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    try {
+      await fetch('/api/student/logout', { method: 'POST' })
+    } catch {}
+    setProfileOpen(false)
+    setStudent(null)
+    window.location.replace('/')
+  }
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })))
+  }
+
+  const unreadCount = notifications.filter((n) => n.unread).length
 
   return (
     <header className="sticky top-0 z-50">
@@ -157,52 +324,248 @@ export function Header() {
         <div className="container mx-auto flex h-[62px] max-w-7xl items-center justify-between px-5 lg:px-8">
           <Logo />
 
-          <nav className="hidden items-center gap-6 xl:gap-7 lg:flex" aria-label="Main navigation">
-            {navItems.map((item) => {
-              const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
-              const label = language === 'am' ? item.labelAm : item.labelEn
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`relative text-sm font-medium transition-colors py-1 ${
-                    active
-                      ? 'text-foreground font-semibold after:absolute after:-bottom-1.5 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-blue-600 dark:after:bg-sky-400 after:shadow-[0_0_8px_rgba(37,99,235,0.8)]'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
+          {/* Public Nav Links (Hidden on Student Portal) */}
+          {!isStudentPortal && (
+            <nav className="hidden items-center gap-6 xl:gap-7 lg:flex" aria-label="Main navigation">
+              {navItems.map((item) => {
+                const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+                const label = isAm ? item.labelAm : item.labelEn
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`relative text-sm font-medium transition-colors py-1 ${
+                      active
+                        ? 'text-foreground font-semibold after:absolute after:-bottom-1.5 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-blue-600 dark:after:bg-sky-400 after:shadow-[0_0_8px_rgba(37,99,235,0.8)]'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                )
+              })}
+            </nav>
+          )}
+
+          {/* ── Right-End Controls: Student Portal vs Public Site ── */}
+          {isStudentPortal ? (
+            /* ── STUDENT PORTAL CONTROLS (Notification + Cart + Profile Dropdown + Language + Theme) ── */
+            <div className="hidden items-center gap-3 lg:flex">
+              {/* Notification Bell */}
+              <div className="relative">
+                <button
+                  data-notifications-trigger
+                  onClick={() => {
+                    setNotificationsOpen(!notificationsOpen)
+                    setProfileOpen(false)
+                  }}
+                  aria-label="Notifications"
+                  className="relative flex size-9 items-center justify-center rounded-xl text-sky-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-950/50 transition-colors"
                 >
-                  {label}
-                </Link>
-              )
-            })}
-          </nav>
+                  <Bell className="size-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 ring-2 ring-background animate-pulse" />
+                  )}
+                </button>
 
-          {/* ── Right-End Controls: Language + Light/Dark Theme + Log In + Register CTA ── */}
-          <div className="hidden items-center gap-2.5 lg:flex">
-            <LanguageToggle />
-            <ThemeToggle />
-            <Link href="/student/login">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-xl border-border/80 px-3.5 py-2 text-xs font-semibold hover:border-blue-500 hover:text-blue-600 dark:hover:text-sky-400 gap-1.5 transition"
-              >
-                <User className="size-3.5 text-blue-600 dark:text-sky-400" />
-                {language === 'am' ? 'መግቢያ' : 'Log In'}
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button
-                size="sm"
-                className="rounded-xl px-4 py-2 font-semibold bg-blue-600 text-white transition duration-300 hover:bg-blue-700 hover:shadow-md hover:shadow-blue-500/25 hover:scale-[1.02]"
-              >
-                {t('registerNow')} <ArrowRight data-icon="inline-end" />
-              </Button>
-            </Link>
-          </div>
+                {/* Notification Popover */}
+                {notificationsOpen && (
+                  <div
+                    data-notifications-menu
+                    className="absolute right-0 top-full mt-2 w-80 rounded-2xl border border-border/80 bg-background/95 p-3 shadow-2xl backdrop-blur-xl animate-fade-in z-50 text-foreground"
+                  >
+                    <div className="flex items-center justify-between px-2 pb-2 pt-1 border-b">
+                      <span className="font-bold text-sm">
+                        {isAm ? 'ማስታወቂያዎች' : 'Notifications'}
+                      </span>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={markAllRead}
+                          className="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-1"
+                        >
+                          <CheckCheck className="size-3" />
+                          {isAm ? 'ሁሉንም አንብብ' : 'Mark all read'}
+                        </button>
+                      )}
+                    </div>
+                    <div className="mt-2 divide-y divide-border/40 max-h-72 overflow-y-auto">
+                      {notifications.map((n) => (
+                        <Link
+                          key={n.id}
+                          href={n.link}
+                          onClick={() => setNotificationsOpen(false)}
+                          className={`block p-2.5 rounded-xl transition hover:bg-muted/80 ${
+                            n.unread ? 'bg-blue-50/60 dark:bg-sky-950/30' : ''
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-xs font-bold leading-tight text-foreground">
+                              {isAm ? n.title : n.titleEn}
+                            </p>
+                            <span className="text-[10px] text-muted-foreground shrink-0">{n.time}</span>
+                          </div>
+                          <p className="mt-1 text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+                            {isAm ? n.desc : n.descEn}
+                          </p>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
-          {/* ── Mobile Right Controls: Language + Theme + Hamburger ── */}
+              {/* Cart Button */}
+              <Link
+                href="/cart"
+                aria-label="Shopping Cart"
+                className="relative flex size-9 items-center justify-center rounded-xl text-sky-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-950/50 transition-colors"
+              >
+                <ShoppingCart className="size-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-background">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Profile Avatar + Name Button */}
+              <div className="relative">
+                <button
+                  data-profile-trigger
+                  onClick={() => {
+                    setProfileOpen(!profileOpen)
+                    setNotificationsOpen(false)
+                  }}
+                  className="flex items-center gap-2 rounded-xl px-2 py-1 transition-all hover:bg-sky-50 dark:hover:bg-sky-950/40"
+                >
+                  <div className="size-8 rounded-full border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-300 shadow-xs overflow-hidden shrink-0">
+                    {student?.avatarUrl ? (
+                      <img
+                        src={student.avatarUrl}
+                        alt={student.fullName || 'User Profile'}
+                        className="size-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <User className="size-4" />
+                    )}
+                  </div>
+                  <span className="font-semibold text-sm text-[#0284c7] dark:text-sky-400 hover:underline">
+                    {student?.fullName || 'Mekonen Alemayehu'}
+                  </span>
+                </button>
+
+                {/* Profile Dropdown Menu */}
+                {profileOpen && (
+                  <div
+                    data-profile-menu
+                    className="absolute right-0 top-full mt-2 w-56 rounded-2xl border border-border/80 bg-card p-2 shadow-2xl backdrop-blur-xl animate-fade-in z-50 text-foreground"
+                  >
+                    <div className="flex items-center gap-2.5 px-3 py-2 border-b border-border/60 mb-1.5">
+                      <div className="size-8 rounded-full border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-300 shadow-xs overflow-hidden shrink-0">
+                        {student?.avatarUrl ? (
+                          <img
+                            src={student.avatarUrl}
+                            alt={student.fullName || 'User Profile'}
+                            className="size-full object-cover rounded-full"
+                          />
+                        ) : (
+                          <User className="size-4" />
+                        )}
+                      </div>
+                      <div className="overflow-hidden">
+                        <p className="text-xs font-bold text-foreground truncate">
+                          {student?.fullName || 'Mekonen Alemayehu'}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground truncate">
+                          {student?.studentId || 'STU-26-8921'}
+                        </p>
+                      </div>
+                    </div>
+                    <Link
+                      href="/learn"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors"
+                    >
+                      <Monitor className="size-4 text-slate-500 dark:text-slate-400" />
+                      <span>{isAm ? 'የእኔ ስልጠናዎች' : 'My Courses'}</span>
+                    </Link>
+
+                    <Link
+                      href="/achievements"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors"
+                    >
+                      <Award className="size-4 text-slate-500 dark:text-slate-400" />
+                      <span>{isAm ? 'ሰርተፊኬቶች' : 'Certificates'}</span>
+                    </Link>
+
+                    <Link
+                      href="/profile/account"
+                      onClick={() => setProfileOpen(false)}
+                      className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors"
+                    >
+                      <User className="size-4 text-slate-500 dark:text-slate-400" />
+                      <span>{isAm ? 'መለያ' : 'Account'}</span>
+                    </Link>
+
+                    <div className="my-1.5 h-px bg-border/60" />
+
+                    <button
+                      onClick={handleSignOut}
+                      className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors text-left"
+                    >
+                      <LogOut className="size-4 text-rose-500" />
+                      <span>{isAm ? 'ውጣ' : 'Sign out'}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <LanguageToggle />
+              <ThemeToggle />
+            </div>
+          ) : (
+            /* ── PUBLIC SITE CONTROLS (Language + Theme + Log In + Register CTA) ── */
+            <div className="hidden items-center gap-2.5 lg:flex">
+              <LanguageToggle />
+              <ThemeToggle />
+              <Link href="/student/login">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl border-border/80 px-3.5 py-2 text-xs font-semibold hover:border-blue-500 hover:text-blue-600 dark:hover:text-sky-400 gap-1.5 transition"
+                >
+                  <User className="size-3.5 text-blue-600 dark:text-sky-400" />
+                  {isAm ? 'መግቢያ' : 'Log In'}
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button
+                  size="sm"
+                  className="rounded-xl px-4 py-2 font-semibold bg-blue-600 text-white transition duration-300 hover:bg-blue-700 hover:shadow-md hover:shadow-blue-500/25 hover:scale-[1.02]"
+                >
+                  {t('registerNow')} <ArrowRight data-icon="inline-end" />
+                </Button>
+              </Link>
+            </div>
+          )}
+
+          {/* ── Mobile Right Controls: Student Portal vs Public Site ── */}
           <div className="flex items-center gap-1.5 sm:gap-2 lg:hidden">
+            {isStudentPortal && (
+              <Link
+                href="/cart"
+                aria-label="Shopping Cart"
+                className="relative flex size-8 items-center justify-center rounded-lg text-sky-500"
+              >
+                <ShoppingCart className="size-4" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-red-500 px-0.5 text-[9px] font-bold text-white">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
             <LanguageToggle size="sm" />
             <ThemeToggle size="sm" />
             <button
@@ -219,39 +582,131 @@ export function Header() {
         {/* ── Mobile Menu Dropdown ── */}
         {open && (
           <div className="border-t bg-background/95 px-5 pb-6 backdrop-blur-lg lg:hidden animate-fade-in-up">
-            <nav className="flex flex-col gap-1 pt-3" aria-label="Mobile navigation">
-              {navItems.map((item) => {
-                const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
-                const label = language === 'am' ? item.labelAm : item.labelEn
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={`rounded-xl px-3.5 py-3 text-sm font-medium transition ${
-                      active
-                        ? 'bg-blue-500/10 text-blue-600 dark:text-sky-400 font-bold'
-                        : 'text-foreground hover:bg-muted'
-                    }`}
-                  >
-                    {label}
+            {isStudentPortal ? (
+              <>
+                {/* Student quick profile in mobile menu */}
+                <div className="my-3 flex items-center justify-between p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/40 border border-sky-200/50 dark:border-sky-800/50">
+                  <div className="flex items-center gap-2.5">
+                    <div className="size-8 rounded-full border border-sky-300 dark:border-sky-700 bg-white dark:bg-slate-800 flex items-center justify-center text-sky-600 overflow-hidden shrink-0">
+                      {student?.avatarUrl ? (
+                        <img
+                          src={student.avatarUrl}
+                          alt={student.fullName || 'User Profile'}
+                          className="size-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <User className="size-4" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-bold text-xs text-foreground">{student?.fullName || 'Mekonen Alemayehu'}</p>
+                      <p className="text-[10px] text-muted-foreground">{student?.studentId || 'STU-26-8921'}</p>
+                    </div>
+                  </div>
+                  <Link href="/profile/dashboard" onClick={() => setOpen(false)}>
+                    <span className="text-xs font-semibold text-blue-600 dark:text-sky-400">
+                      {isAm ? 'ዳሽቦርድ' : 'Dashboard'}
+                    </span>
                   </Link>
-                )
-              })}
-              <div className="mt-4 pt-3 border-t flex flex-col gap-2">
-                <Link href="/student/login" onClick={() => setOpen(false)}>
-                  <Button variant="outline" className="w-full rounded-xl justify-center gap-2 border-blue-500/30 text-blue-600 dark:text-sky-400">
-                    <User className="size-4" />
-                    {language === 'am' ? 'መግቢያ (Log In)' : 'Log In'}
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={() => setOpen(false)}>
-                  <Button className="w-full rounded-xl justify-center bg-blue-600 text-white hover:bg-blue-700">
-                    {t('registerNow')} <ArrowRight data-icon="inline-end" />
-                  </Button>
-                </Link>
-              </div>
-            </nav>
+                </div>
+
+                {/* Student Portal Mobile Navigation */}
+                <nav className="flex flex-col gap-1 pt-1" aria-label="Student Mobile navigation">
+                  <Link
+                    href="/profile/dashboard"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                  >
+                    <Compass className="size-4 text-sky-500" />
+                    <span>Dashboard</span>
+                  </Link>
+                  <Link
+                    href="/learn"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                  >
+                    <Monitor className="size-4 text-sky-500" />
+                    <span>{isAm ? 'የእኔ ስልጠናዎች (My Courses)' : 'My Courses'}</span>
+                  </Link>
+                  <Link
+                    href="/achievements"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                  >
+                    <Award className="size-4 text-sky-500" />
+                    <span>{isAm ? 'ሰርተፊኬቶች (Certificates)' : 'Certificates'}</span>
+                  </Link>
+                  <Link
+                    href="/profile/account"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                  >
+                    <User className="size-4 text-sky-500" />
+                    <span>{isAm ? 'መለያ (Account)' : 'Account'}</span>
+                  </Link>
+                  <Link
+                    href="/profile/purchase"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                  >
+                    <ShoppingBag className="size-4 text-sky-500" />
+                    <span>{isAm ? 'የግዢ ታሪክ' : 'Purchase History'}</span>
+                  </Link>
+                  <Link
+                    href="/profile/security"
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                  >
+                    <ShieldCheck className="size-4 text-sky-500" />
+                    <span>{isAm ? 'ደህንነት' : 'Security'}</span>
+                  </Link>
+
+                  <div className="mt-2 pt-2 border-t flex flex-col gap-2">
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center justify-center gap-2 rounded-xl py-2 text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50"
+                    >
+                      <LogOut className="size-3.5" />
+                      {isAm ? 'ውጣ (Sign out)' : 'Sign out'}
+                    </button>
+                  </div>
+                </nav>
+              </>
+            ) : (
+              <nav className="flex flex-col gap-1 pt-3" aria-label="Mobile navigation">
+                {navItems.map((item) => {
+                  const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+                  const label = isAm ? item.labelAm : item.labelEn
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className={`rounded-xl px-3.5 py-3 text-sm font-medium transition ${
+                        active
+                          ? 'bg-blue-500/10 text-blue-600 dark:text-sky-400 font-bold'
+                          : 'text-foreground hover:bg-muted'
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                  )
+                })}
+                <div className="mt-4 pt-3 border-t flex flex-col gap-2">
+                  <Link href="/student/login" onClick={() => setOpen(false)}>
+                    <Button variant="outline" className="w-full rounded-xl justify-center gap-2 border-blue-500/30 text-blue-600 dark:text-sky-400">
+                      <User className="size-4" />
+                      {isAm ? 'መግቢያ (Log In)' : 'Log In'}
+                    </Button>
+                  </Link>
+                  <Link href="/register" onClick={() => setOpen(false)}>
+                    <Button className="w-full rounded-xl justify-center bg-blue-600 text-white hover:bg-blue-700">
+                      {t('registerNow')} <ArrowRight data-icon="inline-end" />
+                    </Button>
+                  </Link>
+                </div>
+              </nav>
+            )}
           </div>
         )}
       </div>
@@ -872,13 +1327,25 @@ export function GalleryCard({
 export { ChevronRight, ChevronDown, Clock3, Play, Phone, Mail, MapPin }
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const isStudentPortal = Boolean(
+    pathname &&
+      (pathname.startsWith('/profile') ||
+        (pathname.startsWith('/student') && pathname !== '/student/login') ||
+        pathname.startsWith('/achievements') ||
+        pathname.startsWith('/certificates') ||
+        pathname.startsWith('/account') ||
+        pathname.startsWith('/learn') ||
+        pathname.startsWith('/cart'))
+  )
+
   return (
     <div className="flex min-h-screen flex-col bg-transparent text-foreground selection:bg-blue-600 selection:text-white">
       <ScrollProgressBar />
       <Header />
       <div className="flex-1 animate-fade-in">{children}</div>
       <BackToTopButton />
-      <Footer />
+      {!isStudentPortal && <Footer />}
     </div>
   )
 }

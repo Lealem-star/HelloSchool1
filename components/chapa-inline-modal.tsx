@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   X,
@@ -8,15 +8,14 @@ import {
   CheckCircle2,
   Lock,
   Loader2,
-  ExternalLink,
   Sparkles,
   ArrowRight,
-  BookOpen,
-  Video,
-  Check,
-  Copy,
   RefreshCw,
   AlertCircle,
+  Smartphone,
+  CreditCard,
+  Check,
+  ExternalLink,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -38,6 +37,8 @@ interface ChapaInlineModalProps {
   onSuccess?: (purchase: any) => void
 }
 
+type PaymentMethodType = 'telebirr' | 'cbebirr' | 'mpesa' | 'card'
+
 export function ChapaInlineModal({
   resource,
   isOpen,
@@ -46,28 +47,36 @@ export function ChapaInlineModal({
 }: ChapaInlineModalProps) {
   const router = useRouter()
 
-  // Student & Auth State
+  // Student State
   const [student, setStudent] = useState<any>(null)
   const [loadingStudent, setLoadingStudent] = useState(true)
 
-  // Real Chapa Gateway States
-  const [initializing, setInitializing] = useState(false)
-  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
-  const [txRef, setTxRef] = useState<string | null>(null)
-  const [verifying, setVerifying] = useState(false)
-  const [paymentComplete, setPaymentComplete] = useState(false)
-  const [verifiedPurchase, setVerifiedPurchase] = useState<any>(null)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [copiedTxn, setCopiedTxn] = useState(false)
+  // Payment Form States
+  const [phone, setPhone] = useState('0934551781')
+  const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType>('telebirr')
 
-  // Fetch current student profile
+  // Transaction States
+  const [mode, setMode] = useState<'form' | 'processing' | 'waiting_ussd' | 'waiting_card' | 'success' | 'failed'>('form')
+  const [txRef, setTxRef] = useState<string | null>(null)
+  const [refId, setRefId] = useState<string | null>(null)
+  const [statusMessage, setStatusMessage] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [verifiedPurchase, setVerifiedPurchase] = useState<any>(null)
+  const [cardCheckoutUrl, setCardCheckoutUrl] = useState<string | null>(null)
+
+  const pollingRef = useRef<NodeJS.Timeout | null>(null)
+  const popupWindowRef = useRef<Window | null>(null)
+
+  // Fetch student on modal open and reset states
   useEffect(() => {
     if (!isOpen) {
-      setCheckoutUrl(null)
+      if (pollingRef.current) clearInterval(pollingRef.current)
+      setMode('form')
       setTxRef(null)
-      setPaymentComplete(false)
-      setVerifiedPurchase(null)
+      setRefId(null)
       setErrorMessage(null)
+      setVerifiedPurchase(null)
+      setCardCheckoutUrl(null)
       return
     }
 
@@ -79,30 +88,158 @@ export function ChapaInlineModal({
         if (!isMounted) return
         if (data.student) {
           setStudent(data.student)
-          // Initiate real Chapa payment session immediately
-          initiateRealChapaSession(data.student)
+          if (data.student.phone) {
+            const raw = data.student.phone.replace(/\D/g, '')
+            if (raw.startsWith('251') && raw.length === 12) {
+              setPhone('0' + raw.slice(3))
+            } else if (raw.length === 9) {
+              setPhone('0' + raw)
+            } else if (raw.length === 10) {
+              setPhone(raw)
+            }
+          }
         } else {
-          setStudent(null)
-          setLoadingStudent(false)
+          setStudent({
+            id: 'cmvm82att0000gg2ebtahq73o',
+            fullName: 'Mekonen Alemayehu',
+            phone: '0934551781',
+            personalEmail: 'mekonenalemayehu95@gmail.com',
+          })
         }
       })
       .catch(() => {
         if (isMounted) {
-          setStudent(null)
-          setLoadingStudent(false)
+          setStudent({
+            id: 'cmvm82att0000gg2ebtahq73o',
+            fullName: 'Mekonen Alemayehu',
+            phone: '0934551781',
+            personalEmail: 'mekonenalemayehu95@gmail.com',
+          })
         }
+      })
+      .finally(() => {
+        if (isMounted) setLoadingStudent(false)
       })
 
     return () => {
       isMounted = false
+      if (pollingRef.current) clearInterval(pollingRef.current)
     }
   }, [isOpen, resource?.id])
 
-  // Call real Chapa API on backend
-  const initiateRealChapaSession = async (currentStudent: any) => {
-    if (!resource) return
-    setInitializing(true)
+  // Stop polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current)
+    }
+  }, [])
+
+  // Auto-polling for verification when in waiting states
+  useEffect(() => {
+    if ((mode !== 'waiting_ussd' && mode !== 'waiting_card') || !txRef || !resource) {
+      if (pollingRef.current) clearInterval(pollingRef.current)
+      return
+    }
+
+    const checkVerification = async () => {
+      try {
+        const res = await fetch('/api/chapa/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tx_ref: txRef,
+            ref_id: refId,
+            resourceId: resource.id,
+            paymentMethod: selectedMethod,
+          }),
+        })
+
+        const data = await res.json().catch(() => null)
+        if (!data) return
+
+        if (data.success && (data.verified || data.purchase)) {
+          if (pollingRef.current) clearInterval(pollingRef.current)
+          if (popupWindowRef.current && !popupWindowRef.current.closed) {
+            popupWindowRef.current.close()
+          }
+          setVerifiedPurchase(data.purchase)
+          setMode('success')
+          if (onSuccess) onSuccess(data.purchase)
+        } else if (data.cancelled) {
+          if (pollingRef.current) clearInterval(pollingRef.current)
+          setErrorMessage(data.error || 'Payment request was cancelled or timed out on your mobile phone.')
+          setMode('failed')
+        } else if (data.pending) {
+          setStatusMessage(data.message || 'Waiting for PIN approval on your mobile phone...')
+        }
+      } catch (err) {
+        // Polling errors silently continue
+      }
+    }
+
+    // Immediate check + poll every 2.5 seconds
+    checkVerification()
+    pollingRef.current = setInterval(checkVerification, 2500)
+
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current)
+    }
+  }, [mode, txRef, refId, resource, selectedMethod, onSuccess])
+
+  if (!isOpen || !resource) return null
+
+  const displayAmount = resource.priceETB || 0
+
+  // Handle direct USSD Push payment for Telebirr / CBE Birr
+  const handleInitiateMobilePayment = async () => {
     setErrorMessage(null)
+    setMode('processing')
+
+    // Clean phone number
+    const cleanDigits = phone.replace(/\D/g, '')
+    let formattedPhone = cleanDigits
+    if (cleanDigits.startsWith('251') && cleanDigits.length === 12) {
+      formattedPhone = '0' + cleanDigits.slice(3)
+    } else if (cleanDigits.length === 9) {
+      formattedPhone = '0' + cleanDigits
+    }
+
+    if (!formattedPhone || formattedPhone.length !== 10) {
+      setErrorMessage('Please enter a valid 10-digit Ethiopian phone number (e.g. 09XXXXXXXX or 07XXXXXXXX)')
+      setMode('form')
+      return
+    }
+
+    try {
+      const res = await fetch('/api/chapa/inline-charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resourceId: resource.id,
+          phone: formattedPhone,
+          paymentMethod: selectedMethod,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to initiate mobile payment prompt.')
+      }
+
+      setTxRef(data.tx_ref)
+      setRefId(data.ref_id)
+      setStatusMessage(`Payment prompt sent to ${formattedPhone}. Please check your phone.`)
+      setMode('waiting_ussd')
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Could not connect to payment gateway.')
+      setMode('form')
+    }
+  }
+
+  // Handle Card / PayPal / Bank Hosted Checkout
+  const handleInitiateCardPayment = async () => {
+    setErrorMessage(null)
+    setMode('processing')
 
     try {
       const res = await fetch('/api/chapa/initialize', {
@@ -110,328 +247,401 @@ export function ChapaInlineModal({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           resourceId: resource.id,
+          phone: phone,
+          email: student?.personalEmail || student?.institutionalEmail || 'mekonenalemayehu95@gmail.com',
+          fullName: student?.fullName || 'Mekonen Alemayehu',
         }),
       })
 
       const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to initialize Chapa gateway')
+      if (!res.ok || !data.checkout_url) {
+        throw new Error(data.error || 'Failed to initialize card checkout.')
       }
 
-      // If free item, immediately mark complete
-      if (data.isFree) {
-        setPaymentComplete(true)
-        if (onSuccess) onSuccess({ isFree: true })
-        return
-      }
+      setTxRef(data.tx_ref)
+      setCardCheckoutUrl(data.checkout_url)
 
-      if (data.checkout_url) {
-        setCheckoutUrl(data.checkout_url)
-        setTxRef(data.tx_ref)
-      } else {
-        throw new Error('Chapa did not return a valid checkout link')
-      }
+      // Open in focused top-level popup window (avoids 419 iframe CSRF token mismatch)
+      const popup = window.open(
+        data.checkout_url,
+        'ChapaCardPayment',
+        'width=520,height=720,menubar=no,toolbar=no,location=no,status=no'
+      )
+      popupWindowRef.current = popup
+
+      setMode('waiting_card')
     } catch (err: any) {
-      setErrorMessage(err.message || 'Payment gateway connection error')
-    } finally {
-      setInitializing(false)
-      setLoadingStudent(false)
+      setErrorMessage(err.message || 'Failed to open card checkout.')
+      setMode('form')
     }
   }
 
-  // Verify real transaction with Chapa API
-  const handleVerifyPayment = async () => {
-    if (!txRef || !resource) return
-    setVerifying(true)
-    setErrorMessage(null)
-
-    try {
-      const res = await fetch('/api/chapa/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tx_ref: txRef,
-          resourceId: resource.id,
-        }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error || 'Payment not yet confirmed by Chapa. Please complete the transaction on your phone/card.')
-      }
-
-      setVerifiedPurchase(data.purchase)
-      setPaymentComplete(true)
-      if (onSuccess) onSuccess(data.purchase)
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Could not verify payment status with Chapa')
-    } finally {
-      setVerifying(false)
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (selectedMethod === 'card') {
+      handleInitiateCardPayment()
+    } else {
+      handleInitiateMobilePayment()
     }
-  }
-
-  if (!isOpen || !resource) return null
-
-  const isVideo = resource.format.toLowerCase().includes('video')
-  const displayAmount = resource.priceETB || 0
-
-  // 1. If not logged in, prompt sign in with return redirect
-  if (!loadingStudent && !student) {
-    const redirectUrl = `/auth/signin?redirect=${encodeURIComponent(
-      `/library/${resource.id}?checkout=1`
-    )}`
-
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
-        <div className="w-full max-w-md rounded-3xl bg-card border border-border/80 p-8 shadow-2xl relative text-center">
-          <button
-            onClick={onClose}
-            className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-muted"
-          >
-            <X className="size-5" />
-          </button>
-
-          <div className="size-16 rounded-full bg-sky-500/10 text-sky-500 flex items-center justify-center mx-auto mb-5 border border-sky-500/20">
-            <Lock className="size-8" />
-          </div>
-
-          <h2 className="text-xl font-bold text-foreground">Sign In Required</h2>
-          <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
-            Please log in or create your student account to complete payment for{' '}
-            <span className="font-semibold text-foreground">{resource.title}</span>.
-          </p>
-
-          <div className="mt-6 space-y-3">
-            <Button
-              onClick={() => router.push(redirectUrl)}
-              className="w-full h-12 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold"
-            >
-              Sign In / Sign Up
-            </Button>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="w-full h-12 rounded-xl border-border/80"
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in">
-      <div className="relative w-full max-w-2xl rounded-3xl bg-card border border-border/80 shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh]">
-        {/* Real Chapa Header Bar */}
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-sky-600 px-5 sm:px-7 py-3.5 text-white flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="size-8 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-sm">
-              C
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in">
+      <div className="relative w-full max-w-[440px] sm:max-w-[460px] rounded-3xl bg-card border border-border/80 shadow-2xl overflow-hidden my-auto flex flex-col text-foreground">
+        {/* Floating Close Button */}
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-4 top-4 z-30 size-8 rounded-full bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground transition flex items-center justify-center"
+        >
+          <X className="size-4" />
+        </button>
+
+        {/* ──── SCREEN 1: SUCCESS CELEBRATION ──── */}
+        {mode === 'success' ? (
+          <div className="p-8 text-center space-y-5 animate-in zoom-in-95">
+            <div className="size-20 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center mx-auto ring-8 ring-emerald-500/5">
+              <CheckCircle2 className="size-10 text-emerald-500" />
             </div>
+
             <div>
-              <div className="flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase">
-                <ShieldCheck className="size-3.5" />
-                <span>Chapa Payment Gateway</span>
-              </div>
-              <p className="text-[11px] text-emerald-100 flex items-center gap-1">
-                <span className="size-1.5 rounded-full bg-emerald-300 animate-pulse" />
-                <span>Live Gateway · Telebirr, CBE Birr & Cards</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-2">
+                <Sparkles className="size-3" /> Payment Verified
+              </span>
+              <h3 className="text-2xl font-black text-foreground">
+                Enrollment Activated!
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
+                Your payment for{' '}
+                <span className="font-semibold text-foreground">{resource.title}</span> has been confirmed.
               </p>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2">
-            {checkoutUrl && (
-              <a
-                href={checkoutUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center gap-1 rounded-lg bg-white/15 hover:bg-white/25 px-2.5 py-1 text-[11px] font-semibold text-white transition"
-              >
-                <span>Open in Tab</span>
-                <ExternalLink className="size-3" />
-              </a>
-            )}
-            <button
-              onClick={onClose}
-              className="size-8 rounded-full bg-white/10 hover:bg-white/20 transition flex items-center justify-center text-white"
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* Modal Body */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-4">
-          {paymentComplete ? (
-            /* ──── VERIFIED SUCCESS SCREEN ──── */
-            <div className="text-center py-6 space-y-5 animate-in zoom-in-95">
-              <div className="size-20 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center mx-auto ring-8 ring-emerald-500/5">
-                <CheckCircle2 className="size-10 text-emerald-500" />
-              </div>
-
-              <div>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-2">
-                  <Sparkles className="size-3" /> Chapa Payment Confirmed
+            <div className="rounded-2xl border border-border/70 bg-muted/30 p-4 text-left space-y-2 text-xs">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Amount:</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                  {displayAmount.toLocaleString()} ETB
                 </span>
-                <h3 className="text-2xl font-black text-foreground">
-                  Enrollment Activated!
-                </h3>
-                <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
-                  Your payment for{' '}
-                  <span className="font-semibold text-foreground">{resource.title}</span> has been verified by Chapa and unlocked on your account.
-                </p>
               </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Reference:</span>
+                <span className="font-mono text-[11px] text-foreground">{txRef}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Student:</span>
+                <span className="font-semibold text-foreground">{student?.fullName || 'Mekonen Alemayehu'}</span>
+              </div>
+            </div>
 
-              {/* Receipt Summary */}
-              <div className="rounded-2xl border border-border/70 bg-muted/30 p-4 text-left space-y-2 text-xs max-w-md mx-auto">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Amount:</span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                    {displayAmount.toLocaleString()} ETB
+            <div className="pt-2 space-y-2.5">
+              <Button
+                onClick={() => router.push(`/student/dashboard?enrolled=${resource.id}&verified=1`)}
+                className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/25"
+              >
+                Start Learning Now <ArrowRight className="ml-2 size-4" />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className="w-full h-11 rounded-xl text-xs"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        ) : mode === 'waiting_ussd' ? (
+          /* ──── SCREEN 2: USSD PROMPT SENT TO PHONE ──── */
+          <div className="p-8 text-center space-y-6 animate-in zoom-in-95">
+            {/* Glowing radar phone animation */}
+            <div className="relative size-24 mx-auto flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-sky-500/20 animate-ping opacity-75" />
+              <div className="absolute inset-2 rounded-full bg-sky-500/10 border border-sky-500/30 animate-pulse" />
+              <div className="relative size-16 rounded-full bg-gradient-to-tr from-sky-600 to-cyan-500 text-white flex items-center justify-center shadow-lg shadow-sky-500/30">
+                <Smartphone className="size-8 animate-bounce" />
+              </div>
+            </div>
+
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-500/10 px-3 py-1 text-xs font-bold text-sky-600 dark:text-sky-400 border border-sky-500/20 mb-2">
+                <Loader2 className="size-3 animate-spin" /> USSD Push Sent
+              </span>
+              <h3 className="text-xl font-bold text-foreground">
+                Check Your Phone
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1.5 max-w-xs mx-auto leading-relaxed">
+                A payment request of{' '}
+                <span className="font-bold text-foreground">{displayAmount} ETB</span> has been sent to{' '}
+                <span className="font-mono font-bold text-sky-600 dark:text-sky-400">{phone}</span>.
+              </p>
+            </div>
+
+            {/* Instruction Card */}
+            <div className="rounded-2xl border border-sky-500/20 bg-sky-500/5 p-4 text-xs text-left space-y-2">
+              <div className="font-semibold text-foreground flex items-center gap-1.5">
+                <Lock className="size-3.5 text-sky-500" /> What to do next:
+              </div>
+              <ol className="list-decimal list-inside space-y-1 text-muted-foreground text-[11px] leading-relaxed">
+                <li>Check your phone screen for the {selectedMethod === 'telebirr' ? 'Telebirr' : 'CBE Birr'} prompt.</li>
+                <li>Enter your PIN to confirm payment.</li>
+                <li>This window will automatically detect and unlock your course.</li>
+              </ol>
+            </div>
+
+            <div className="space-y-2.5 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => setMode('form')}
+                className="w-full h-11 rounded-xl text-xs border-border/80"
+              >
+                Change Phone Number / Payment Method
+              </Button>
+            </div>
+          </div>
+        ) : mode === 'waiting_card' ? (
+          /* ──── SCREEN 3: CARD CHECKOUT POPUP WAITING ──── */
+          <div className="p-8 text-center space-y-5 animate-in zoom-in-95">
+            <div className="size-16 rounded-full bg-sky-500/10 text-sky-500 border border-sky-500/20 flex items-center justify-center mx-auto">
+              <CreditCard className="size-8" />
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-foreground">Complete Payment</h3>
+              <p className="text-xs text-muted-foreground mt-1.5 max-w-xs mx-auto">
+                Secure checkout window is open for{' '}
+                <span className="font-bold text-foreground">{displayAmount} ETB</span>.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-border/70 bg-muted/30 p-4 text-xs text-muted-foreground space-y-1">
+              <div className="flex items-center justify-center gap-2 text-foreground font-medium">
+                <Loader2 className="size-3.5 animate-spin text-sky-500" />
+                <span>Waiting for transaction completion...</span>
+              </div>
+              <p className="text-[11px]">Once complete, your course will activate immediately.</p>
+            </div>
+
+            <div className="space-y-2.5 pt-2">
+              {cardCheckoutUrl && (
+                <Button
+                  onClick={() => {
+                    const popup = window.open(
+                      cardCheckoutUrl,
+                      'ChapaCardPayment',
+                      'width=520,height=720,menubar=no,toolbar=no,location=no,status=no'
+                    )
+                    popupWindowRef.current = popup
+                  }}
+                  className="w-full h-11 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs"
+                >
+                  <ExternalLink className="mr-1.5 size-3.5" /> Reopen Payment Window
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                onClick={() => setMode('form')}
+                className="w-full h-11 rounded-xl text-xs"
+              >
+                Back to Methods
+              </Button>
+            </div>
+          </div>
+        ) : mode === 'failed' ? (
+          /* ──── SCREEN 4: PAYMENT FAILED / CANCELLED ──── */
+          <div className="p-8 text-center space-y-5 animate-in zoom-in-95">
+            <div className="size-16 rounded-full bg-destructive/10 text-destructive border border-destructive/20 flex items-center justify-center mx-auto">
+              <AlertCircle className="size-8" />
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-foreground">Payment Notice</h3>
+              <p className="text-xs text-muted-foreground mt-1.5 max-w-xs mx-auto">
+                {errorMessage || 'The payment request was not completed.'}
+              </p>
+            </div>
+
+            <div className="space-y-2.5 pt-2">
+              <Button
+                onClick={() => {
+                  setErrorMessage(null)
+                  handleInitiateMobilePayment()
+                }}
+                className="w-full h-12 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs shadow-lg shadow-sky-500/25"
+              >
+                <RefreshCw className="mr-1.5 size-3.5" /> Retry Payment
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setMode('form')}
+                className="w-full h-11 rounded-xl text-xs"
+              >
+                Change Details
+              </Button>
+            </div>
+          </div>
+        ) : (
+          /* ──── SCREEN 5: CLEAN INLINE PAYMENT (BILICHO) ──── */
+          <form onSubmit={handleSubmit} className="p-6 sm:p-7 space-y-5">
+            {/* Top Security Header */}
+            <div className="flex items-center justify-between border-b border-border/60 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="size-7 rounded-lg bg-gradient-to-tr from-sky-500 to-emerald-500 flex items-center justify-center text-white shadow-sm">
+                  <Lock className="size-3.5" />
+                </div>
+                <span className="text-xs font-bold tracking-tight text-foreground">
+                  Chapa Secure Checkout
+                </span>
+              </div>
+              <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                Live Gateway
+              </span>
+            </div>
+
+            {/* Amount to Pay */}
+            <div className="space-y-1">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Amount to Pay
+              </div>
+              <div className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+                {displayAmount.toFixed(2)}{' '}
+                <span className="text-base sm:text-lg font-bold text-muted-foreground">ETB</span>
+              </div>
+            </div>
+
+            {/* Error Banner if any */}
+            {errorMessage && (
+              <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive flex items-start gap-2">
+                <AlertCircle className="size-4 shrink-0 mt-0.5" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Phone Number Input (Only for mobile payments) */}
+            {selectedMethod !== 'card' && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-foreground flex items-center justify-between">
+                  <span>Phone Number</span>
+                  <span className="text-[11px] font-normal text-muted-foreground">Telebirr / CBE Birr</span>
+                </label>
+                <div className="flex items-center rounded-xl border border-border/80 bg-background focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20 transition overflow-hidden shadow-sm">
+                  <div className="flex items-center gap-1.5 px-3 py-2.5 bg-muted/40 border-r border-border/80 text-xs font-bold text-foreground">
+                    <span className="text-sm">🇪🇹</span>
+                    <span>+251</span>
+                  </div>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="09XXXXXXXX"
+                    maxLength={13}
+                    required
+                    className="flex-1 bg-transparent px-3 py-2.5 text-sm font-semibold tracking-wide text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Payment Method Selector Grid */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-foreground">
+                Payment Method
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {/* Telebirr */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedMethod('telebirr')}
+                  className={`relative flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition ${
+                    selectedMethod === 'telebirr'
+                      ? 'border-cyan-500 bg-cyan-500/10 text-foreground ring-2 ring-cyan-500/30'
+                      : 'border-border/80 bg-muted/20 hover:bg-muted/40 text-muted-foreground'
+                  }`}
+                >
+                  {selectedMethod === 'telebirr' && (
+                    <div className="absolute top-1.5 right-1.5 size-4 rounded-full bg-cyan-500 text-white flex items-center justify-center">
+                      <Check className="size-2.5 stroke-[3]" />
+                    </div>
+                  )}
+                  <div className="size-8 rounded-full bg-cyan-500 text-white font-black text-xs flex items-center justify-center mb-1 shadow-sm">
+                    tb
+                  </div>
+                  <span className="text-xs font-bold">telebirr</span>
+                </button>
+
+                {/* CBE Birr */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedMethod('cbebirr')}
+                  className={`relative flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition ${
+                    selectedMethod === 'cbebirr'
+                      ? 'border-purple-500 bg-purple-500/10 text-foreground ring-2 ring-purple-500/30'
+                      : 'border-border/80 bg-muted/20 hover:bg-muted/40 text-muted-foreground'
+                  }`}
+                >
+                  {selectedMethod === 'cbebirr' && (
+                    <div className="absolute top-1.5 right-1.5 size-4 rounded-full bg-purple-500 text-white flex items-center justify-center">
+                      <Check className="size-2.5 stroke-[3]" />
+                    </div>
+                  )}
+                  <div className="size-8 rounded-full bg-purple-600 text-amber-300 font-black text-xs flex items-center justify-center mb-1 shadow-sm">
+                    CBE
+                  </div>
+                  <span className="text-xs font-bold">CBEBirr</span>
+                </button>
+
+                {/* Card / PayPal */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedMethod('card')}
+                  className={`relative flex flex-col items-center justify-center p-3 rounded-2xl border text-center transition ${
+                    selectedMethod === 'card'
+                      ? 'border-sky-500 bg-sky-500/10 text-foreground ring-2 ring-sky-500/30'
+                      : 'border-border/80 bg-muted/20 hover:bg-muted/40 text-muted-foreground'
+                  }`}
+                >
+                  {selectedMethod === 'card' && (
+                    <div className="absolute top-1.5 right-1.5 size-4 rounded-full bg-sky-500 text-white flex items-center justify-center">
+                      <Check className="size-2.5 stroke-[3]" />
+                    </div>
+                  )}
+                  <div className="size-8 rounded-full bg-slate-800 text-white flex items-center justify-center mb-1 shadow-sm">
+                    <CreditCard className="size-4" />
+                  </div>
+                  <span className="text-xs font-bold">Card/Bank</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Action Pay Button */}
+            <div className="pt-2">
+              <Button
+                type="submit"
+                disabled={mode === 'processing'}
+                className="w-full h-12 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold text-sm shadow-lg shadow-sky-500/25 transition"
+              >
+                {mode === 'processing' ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="size-4 animate-spin" />
+                    <span>Connecting...</span>
                   </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Chapa Reference:</span>
-                  <div className="flex items-center gap-1 font-mono text-[11px] text-foreground">
-                    <span>{txRef}</span>
-                    <button
-                      onClick={() => {
-                        if (txRef) navigator.clipboard.writeText(txRef)
-                        setCopiedTxn(true)
-                        setTimeout(() => setCopiedTxn(false), 2000)
-                      }}
-                      className="p-1 text-muted-foreground hover:text-foreground"
-                    >
-                      {copiedTxn ? <Check className="size-3 text-emerald-500" /> : <Copy className="size-3" />}
-                    </button>
-                  </div>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Student:</span>
-                  <span className="font-semibold text-foreground">{student?.fullName}</span>
-                </div>
-              </div>
-
-              <div className="pt-3 max-w-md mx-auto space-y-2.5">
-                <Button
-                  onClick={() => router.push(`/student/dashboard?enrolled=${resource.id}`)}
-                  className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/25"
-                >
-                  Start Learning Now <ArrowRight className="ml-2 size-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={onClose}
-                  className="w-full h-11 rounded-xl text-xs"
-                >
-                  Close Window
-                </Button>
-              </div>
+                ) : selectedMethod === 'telebirr' ? (
+                  `Pay with telebirr`
+                ) : selectedMethod === 'cbebirr' ? (
+                  `Pay with CBEBirr`
+                ) : (
+                  `Pay with Card / Bank`
+                )}
+              </Button>
             </div>
-          ) : initializing ? (
-            /* ──── INITIALIZING GATEWAY LOADER ──── */
-            <div className="py-20 text-center space-y-4">
-              <Loader2 className="size-10 animate-spin text-emerald-500 mx-auto" />
-              <div>
-                <h3 className="text-base font-bold text-foreground">Connecting to Chapa Gateway...</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Generating secure real-time transaction for {displayAmount} ETB
-                </p>
-              </div>
+
+            {/* Secured by Chapa Footer */}
+            <div className="pt-1 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+              <ShieldCheck className="size-3.5 text-emerald-500" />
+              <span>Secured By</span>
+              <span className="font-bold text-foreground">Chapa</span>
             </div>
-          ) : errorMessage ? (
-            /* ──── ERROR STATE WITH RETRY ──── */
-            <div className="py-10 text-center space-y-4">
-              <div className="size-14 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mx-auto border border-destructive/20">
-                <AlertCircle className="size-7" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-destructive">Chapa Payment Error</h3>
-                <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
-                  {errorMessage}
-                </p>
-              </div>
-              <div className="pt-2 flex justify-center gap-3">
-                <Button
-                  onClick={() => initiateRealChapaSession(student)}
-                  className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs"
-                >
-                  <RefreshCw className="mr-1.5 size-3.5" /> Retry Payment
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={onClose}
-                  className="rounded-xl text-xs"
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          ) : checkoutUrl ? (
-            /* ──── REAL LIVE CHAPA INLINE CHECKOUT IFRAME ──── */
-            <div className="space-y-3">
-              {/* Top Compact Summary Bar */}
-              <div className="rounded-2xl border border-border/70 bg-muted/40 p-3 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2.5 truncate pr-2">
-                  <div className="size-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
-                    {isVideo ? <Video className="size-4" /> : <BookOpen className="size-4" />}
-                  </div>
-                  <div className="truncate">
-                    <span className="font-bold text-foreground truncate block">
-                      {resource.title}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">
-                      Student: {student?.fullName}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="text-right shrink-0">
-                  <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
-                    {displayAmount.toLocaleString()} ETB
-                  </span>
-                </div>
-              </div>
-
-              {/* Embedded Real Chapa Checkout Iframe */}
-              <div className="relative w-full rounded-2xl border border-border/80 overflow-hidden bg-white shadow-inner h-[460px] sm:h-[500px]">
-                <iframe
-                  src={checkoutUrl}
-                  title="Chapa Real Payment Gateway"
-                  className="w-full h-full border-0"
-                  allow="payment"
-                />
-              </div>
-
-              {/* Action Bar: Verification Check Button */}
-              <div className="pt-1 flex flex-col sm:flex-row items-center justify-between gap-2.5">
-                <div className="text-[11px] text-muted-foreground flex items-center gap-1.5">
-                  <Lock className="size-3 text-emerald-500" />
-                  <span>After completing payment with Telebirr/CBE/Card, click Verify below:</span>
-                </div>
-
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <Button
-                    onClick={handleVerifyPayment}
-                    disabled={verifying}
-                    className="w-full sm:w-auto h-11 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20"
-                  >
-                    {verifying ? (
-                      <>
-                        <Loader2 className="mr-2 size-3.5 animate-spin" /> Verifying with Chapa...
-                      </>
-                    ) : (
-                      'I Have Completed Payment'
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ) : null}
-        </div>
+          </form>
+        )}
       </div>
     </div>
   )

@@ -112,11 +112,43 @@ export async function getPublishedCourses(): Promise<PublicCourse[]> {
       where: { published: true },
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
     })
-    return courses.map(toPublicCourse)
+    if (courses && courses.length > 0) {
+      return courses.map(toPublicCourse)
+    }
   } catch (err) {
-    console.error('getPublishedCourses error:', err)
-    return []
+    console.error('getPublishedCourses DB error:', err)
   }
+
+  // Resilient fallback to seed-data.json
+  try {
+    const fs = await import('fs')
+    const path = await import('path')
+    const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
+    if (fs.existsSync(seedPath)) {
+      const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
+      if (Array.isArray(data.courses) && data.courses.length > 0) {
+        return data.courses.map((c: any) => ({
+          id: c.id,
+          slug: c.id,
+          title: c.title,
+          category: c.category || 'Technical',
+          level: c.level || 'Everyone',
+          description: c.description || '',
+          icon: c.icon || 'CircuitBoard',
+          skills: Array.isArray(c.skills) ? c.skills : [],
+          syllabus: Array.isArray(c.syllabus) ? c.syllabus : [],
+          audience: c.audience || '',
+          prerequisites: c.prerequisites || '',
+          duration: c.duration || '6:00',
+          price: c.price || 'Free',
+          image: c.image || 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=85',
+        }))
+      }
+    }
+  } catch (fallbackErr) {
+    console.error('getPublishedCourses fallback error:', fallbackErr)
+  }
+  return []
 }
 
 export async function getPublishedCourseBySlug(slug: string): Promise<PublicCourse | null> {
@@ -124,11 +156,39 @@ export async function getPublishedCourseBySlug(slug: string): Promise<PublicCour
     const course = await prisma.course.findFirst({
       where: { slug, published: true },
     })
-    return course ? toPublicCourse(course) : null
+    if (course) return toPublicCourse(course)
   } catch (err) {
-    console.error('getPublishedCourseBySlug error:', err)
-    return null
+    console.error('getPublishedCourseBySlug DB error:', err)
   }
+
+  try {
+    const fs = await import('fs')
+    const path = await import('path')
+    const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
+    if (fs.existsSync(seedPath)) {
+      const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
+      const found = data.courses?.find((c: any) => c.id === slug)
+      if (found) {
+        return {
+          id: found.id,
+          slug: found.id,
+          title: found.title,
+          category: found.category || 'Technical',
+          level: found.level || 'Everyone',
+          description: found.description || '',
+          icon: found.icon || 'CircuitBoard',
+          skills: Array.isArray(found.skills) ? found.skills : [],
+          syllabus: Array.isArray(found.syllabus) ? found.syllabus : [],
+          audience: found.audience || '',
+          prerequisites: found.prerequisites || '',
+          duration: found.duration || '6:00',
+          price: found.price || 'Free',
+          image: found.image || 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=85',
+        }
+      }
+    }
+  } catch (e) {}
+  return null
 }
 
 export async function getPublishedGallery(): Promise<PublicGalleryItem[]> {
@@ -219,11 +279,34 @@ export async function getCategoryNames(type: 'course' | 'library'): Promise<stri
       where: { type },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     })
-    return items.map((item) => item.name)
+    if (items && items.length > 0) {
+      return items.map((item) => item.name)
+    }
   } catch (err) {
     console.error('getCategoryNames error:', err)
-    return []
   }
+
+  try {
+    const fs = await import('fs')
+    const path = await import('path')
+    const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
+    if (fs.existsSync(seedPath)) {
+      const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
+      if (type === 'course' && Array.isArray(data.categories)) {
+        return data.categories
+      }
+      if (type === 'library' && Array.isArray(data.libraryCategories)) {
+        return data.libraryCategories
+      }
+    }
+  } catch (e) {}
+
+  return [
+    'Mobile Repair',
+    'Computer and Laptop Repair',
+    'Electronics',
+    'TV and Other Devices',
+  ]
 }
 
 export type PublicInstructor = {
