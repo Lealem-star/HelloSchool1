@@ -36,7 +36,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { PublicCourse, PublicLibraryItem } from '@/lib/content'
-import { CourseIcon, PageIntro, SearchField, SiteShell, CTASection } from '@/components/site'
+import { CourseIcon, PageIntro, SearchField, SiteShell } from '@/components/site'
 import { DigitalPurchaseModal } from '@/components/digital-purchase-modal'
 import { DIGITAL_CATALOG } from '@/lib/digital-catalog'
 
@@ -262,7 +262,6 @@ export function CoursesCatalog({
           </div>
         )}
       </main>
-      {!isStudentPortal && <CTASection />}
     </SiteShell>
   )
 }

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock3, Wrench, Layers } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { CourseIcon, CTASection, InquiryForm, SiteShell } from '@/components/site'
+import { CourseIcon, InquiryForm, SiteShell } from '@/components/site'
 import { useLanguage } from '@/components/language-provider'
 import type { PublicCourse } from '@/lib/content'
 
@@ -204,7 +204,6 @@ export function CourseDetailClient({ course, allCourseTitles }: CourseDetailClie
           </div>
         </section>
       </main>
-      <CTASection />
     </SiteShell>
   )
 }
