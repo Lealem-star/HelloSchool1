@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   MessageCircle,
   X,
@@ -37,6 +38,23 @@ const QUICK_PROMPTS = [
 ]
 
 export function ChatBot() {
+  const pathname = usePathname()
+
+  // The AI Chat Agent is intended exclusively for prospective students and visitors on the public site.
+  // It is hidden on both the Admin Portal and Student Portal.
+  const isHiddenPortal = Boolean(
+    pathname &&
+      (pathname.startsWith('/admin') ||
+        pathname.startsWith('/student') ||
+        pathname.startsWith('/profile') ||
+        pathname.startsWith('/account') ||
+        pathname.startsWith('/achievements') ||
+        pathname.startsWith('/certificates') ||
+        pathname.startsWith('/learn') ||
+        pathname.startsWith('/cart') ||
+        pathname.startsWith('/auth'))
+  )
+
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -46,6 +64,13 @@ export function ChatBot() {
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const inputRef = useRef<HTMLInputElement | null>(null)
+
+  // Auto-close chat modal if user navigates to an admin or student portal route
+  useEffect(() => {
+    if (isHiddenPortal && isOpen) {
+      setIsOpen(false)
+    }
+  }, [isHiddenPortal, isOpen])
 
   // Initialize with welcoming greeting
   useEffect(() => {
@@ -206,6 +231,11 @@ export function ChatBot() {
         })}
       </div>
     )
+  }
+
+  // Hide AI chat agent on both admin and student portals
+  if (isHiddenPortal) {
+    return null
   }
 
   return (
