@@ -195,9 +195,64 @@ async function verifyAndActivateTransaction(
         studentId: student.id,
         resourceId: resolvedResourceId,
         status: 'Active',
-        transactionRef: tx_ref,
       }
     }
+  }
+
+  // Also auto-record or update Registration record so it appears in Self-Paced Enrollments
+  try {
+    const existingReg = await (prisma as any).registration.findFirst({
+      where: {
+        OR: [
+          { transactionRef: tx_ref },
+          {
+            studentId: student.id,
+            courseTitle: title,
+          },
+        ],
+      },
+    })
+
+    if (existingReg) {
+      await (prisma as any).registration.update({
+        where: { id: existingReg.id },
+        data: {
+          status: 'Enrolled',
+          transactionRef: tx_ref,
+          paymentMethod: recordedPaymentMethod,
+          finalPrice: amount,
+          approvedAt: new Date(),
+          approvedBy: 'Chapa Online Verification',
+        },
+      })
+    } else {
+      const rand = Math.floor(1000 + Math.random() * 9000)
+      const year = new Date().getFullYear().toString().slice(-2)
+      const registrationNumber = `ENR-${year}-${rand}`
+      await (prisma as any).registration.create({
+        data: {
+          registrationNumber,
+          studentId: student.id,
+          institutionalEmail: student.institutionalEmail,
+          fullName: student.fullName,
+          phone: student.phone,
+          email: student.personalEmail || student.institutionalEmail,
+          courseTitle: title,
+          shift: '100% Self-Paced (24/7 Access)',
+          paymentPlan: 'full',
+          paymentMethod: recordedPaymentMethod,
+          basePrice: amount,
+          discount: 0,
+          finalPrice: amount,
+          transactionRef: tx_ref,
+          status: 'Enrolled',
+          approvedAt: new Date(),
+          approvedBy: 'Chapa Online Verification',
+        },
+      })
+    }
+  } catch (regErr) {
+    console.warn('Auto-enrolling registration on Chapa verify non-blocking error:', regErr)
   }
 
   return {

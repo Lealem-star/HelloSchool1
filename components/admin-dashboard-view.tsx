@@ -456,7 +456,7 @@ export function AdminDashboardView({
             </div>
 
             <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
-              {data?.metrics.approvedRegistrations} Approved / Active
+              ⚡ Instant Access Active
             </span>
           </div>
         </div>

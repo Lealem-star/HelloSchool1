@@ -104,6 +104,18 @@ export async function GET(request: Request) {
       })
     }
 
+    // Auto-promote any legacy 'Pending' registrations to 'Enrolled'
+    try {
+      await p.registration.updateMany({
+        where: { status: 'Pending' },
+        data: {
+          status: 'Enrolled',
+          approvedAt: new Date(),
+          approvedBy: 'Instant Online Enrollment',
+        },
+      })
+    } catch {}
+
     let items: any[] = []
     try {
       items = await p.registration.findMany({
@@ -150,22 +162,68 @@ export async function GET(request: Request) {
       } catch {}
     }
 
-    const counts = await p.$transaction([
-      p.registration.count(),
-      p.registration.count({ where: { status: 'Pending' } }),
-      p.registration.count({ where: { status: 'Approved' } }),
-      p.registration.count({ where: { status: 'Rejected' } }),
-      p.registration.count({ where: { status: 'Enrolled' } }),
-    ])
+    // Also load digital purchases so online book & course purchases are visible under Self-Paced Enrollments
+    try {
+      const digitalPurchases = await p.digitalPurchase.findMany({
+        include: {
+          student: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 300,
+      })
+
+      const existingRefs = new Set(items.map((i) => i.transactionRef).filter(Boolean))
+
+      const dpItems = digitalPurchases
+        .filter((dp: any) => !dp.transactionRef || !existingRefs.has(dp.transactionRef))
+        .map((dp: any) => ({
+          id: `dp_${dp.id}`,
+          registrationNumber: dp.transactionRef || `ENR-${dp.id.slice(-6).toUpperCase()}`,
+          fullName: dp.student?.fullName || 'Online Student',
+          phone: dp.student?.phone || '',
+          email: dp.student?.personalEmail || dp.student?.institutionalEmail || null,
+          telegramUsername: dp.student?.telegramUsername || null,
+          city: dp.student?.city || 'Online',
+          courseTitle: dp.title || dp.resourceId,
+          shift: dp.resourceType === 'manual' || dp.resourceType === 'book' ? 'Digital Book / Manual' : '100% Self-Paced Video Course',
+          education: null,
+          experienceYears: null,
+          paymentPlan: 'full',
+          paymentMethod: dp.paymentMethod || 'chapa',
+          basePrice: dp.amount || 0,
+          discount: 0,
+          finalPrice: dp.amount || 0,
+          couponCode: null,
+          transactionRef: dp.transactionRef,
+          receiptUrl: null,
+          confirmationLink: null,
+          status: 'Enrolled', // Online Chapa payments are automatically enrolled
+          adminNotes: `Instant Online ${dp.resourceType === 'manual' || dp.resourceType === 'book' ? 'Book Purchase' : 'Course Enrollment'} via Chapa (Auto-Approved)`,
+          approvedAt: dp.createdAt,
+          approvedBy: 'Chapa Instant Online Verification',
+          createdAt: dp.createdAt,
+          updatedAt: dp.updatedAt,
+          batchId: null,
+          batch: null,
+        }))
+
+      items = [...items, ...dpItems].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    } catch (e) {
+      console.warn('Error loading digital purchases into registrations view:', e)
+    }
+
+    const totalCount = items.length
+    const enrolledCount = items.filter((i) => i.status === 'Enrolled' || i.status === 'Approved').length
+    const chapaCount = items.filter((i) => i.paymentMethod?.toLowerCase().includes('chapa') || i.transactionRef).length
 
     return NextResponse.json({
       items,
       overview: {
-        total: counts[0],
-        pending: counts[1],
-        approved: counts[2],
-        rejected: counts[3],
-        enrolled: counts[4],
+        total: totalCount,
+        pending: 0, // No admin approval needed for automated online enrollments
+        approved: chapaCount,
+        rejected: items.filter((i) => i.status === 'Rejected').length,
+        enrolled: enrolledCount,
       },
     })
   } catch (err: any) {
@@ -191,7 +249,7 @@ export async function PUT(request: Request) {
     const data: any = {}
     if (status) {
       data.status = status
-      if (status === 'Approved') {
+      if (status === 'Approved' || status === 'Enrolled') {
         data.approvedAt = new Date()
         data.approvedBy = user.email || 'Admin'
       }
@@ -205,15 +263,36 @@ export async function PUT(request: Request) {
 
     // Bulk update
     if (Array.isArray(ids) && ids.length > 0) {
-      await p.registration.updateMany({
-        where: { id: { in: ids } },
-        data,
-      })
+      const regIds = ids.filter((x: string) => !x.startsWith('dp_'))
+      const dpIds = ids.filter((x: string) => x.startsWith('dp_')).map((x: string) => x.replace('dp_', ''))
+      if (regIds.length > 0) {
+        await p.registration.updateMany({
+          where: { id: { in: regIds } },
+          data,
+        })
+      }
+      if (dpIds.length > 0 && status) {
+        await p.digitalPurchase.updateMany({
+          where: { id: { in: dpIds } },
+          data: { status: status === 'Enrolled' ? 'Active' : status },
+        })
+      }
       return NextResponse.json({ success: true, count: ids.length, status, batchId })
     }
 
     if (!id) {
       return NextResponse.json({ error: 'id or ids required' }, { status: 400 })
+    }
+
+    if (id.startsWith('dp_')) {
+      const realId = id.replace('dp_', '')
+      if (status) {
+        await p.digitalPurchase.update({
+          where: { id: realId },
+          data: { status: status === 'Enrolled' ? 'Active' : status },
+        })
+      }
+      return NextResponse.json({ success: true, id })
     }
 
     let updated: any
@@ -250,6 +329,8 @@ export async function DELETE(request: Request) {
   const user = await getCurrentUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const p = getPrismaClient()
+
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
@@ -257,7 +338,14 @@ export async function DELETE(request: Request) {
 
     if (idsParam) {
       const ids = idsParam.split(',').filter(Boolean)
-      await prisma.registration.deleteMany({ where: { id: { in: ids } } })
+      const regIds = ids.filter((x: string) => !x.startsWith('dp_'))
+      const dpIds = ids.filter((x: string) => x.startsWith('dp_')).map((x: string) => x.replace('dp_', ''))
+      if (regIds.length > 0) {
+        await p.registration.deleteMany({ where: { id: { in: regIds } } })
+      }
+      if (dpIds.length > 0) {
+        await p.digitalPurchase.deleteMany({ where: { id: { in: dpIds } } })
+      }
       return NextResponse.json({ success: true, count: ids.length })
     }
 
@@ -265,7 +353,12 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'id or ids required' }, { status: 400 })
     }
 
-    await prisma.registration.delete({ where: { id } })
+    if (id.startsWith('dp_')) {
+      await p.digitalPurchase.delete({ where: { id: id.replace('dp_', '') } })
+      return NextResponse.json({ success: true })
+    }
+
+    await p.registration.delete({ where: { id } })
     return NextResponse.json({ success: true })
   } catch (e: any) {
     console.error('Error deleting registration:', e)

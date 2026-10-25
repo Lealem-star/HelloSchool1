@@ -96,6 +96,7 @@ export async function GET(request: Request) {
         where: {
           createdAt: { gte: startDate, lte: endDate },
         },
+        include: { student: true },
       }).catch(() => []) || [],
       db.digitalPurchase?.findMany({
         where: {
@@ -105,12 +106,10 @@ export async function GET(request: Request) {
     ])
 
     // Calculate Registrations metrics
-    const totalRegCount = registrations.length
-    const pendingRegCount = registrations.filter((r: any) => r.status === 'Pending').length
-    const approvedRegCount = registrations.filter(
-      (r: any) => r.status === 'Approved' || r.status === 'Enrolled'
-    ).length
-    const prevRegCount = prevRegistrations.length
+    const totalRegCount = registrations.length + digitalPurchases.length
+    const pendingRegCount = 0 // Automated online instant access, 0 pending approval
+    const approvedRegCount = registrations.length + digitalPurchases.length
+    const prevRegCount = prevRegistrations.length + prevPurchases.length
 
     // Revenue calculations (ETB)
     const regRevenue = registrations.reduce((sum: number, r: any) => {
@@ -311,18 +310,32 @@ export async function GET(request: Request) {
     ]
 
     // 6. Recent transactions feed
-    const sourceRegs = registrations.length > 0 ? registrations : allRegistrations
-    const recentTransactions = sourceRegs.slice(0, 8).map((r: any) => ({
-      id: r.id,
-      registrationNumber: r.registrationNumber || 'REG-2026-001',
-      fullName: r.fullName,
-      phone: r.phone,
-      courseTitle: r.courseTitle,
-      amount: Number(r.finalPrice) || 2999,
-      paymentMethod: r.paymentMethod || 'telebirr',
-      status: r.status,
-      createdAt: r.createdAt,
-    }))
+    const allRecentItems = [
+      ...(registrations.length > 0 ? registrations : allRegistrations).map((r: any) => ({
+        id: r.id,
+        registrationNumber: r.registrationNumber || 'ENR-2026-001',
+        fullName: r.fullName,
+        phone: r.phone,
+        courseTitle: r.courseTitle,
+        amount: Number(r.finalPrice) || 2999,
+        paymentMethod: r.paymentMethod || 'Chapa Online',
+        status: r.status === 'Pending' ? 'Enrolled' : r.status,
+        createdAt: r.createdAt,
+      })),
+      ...digitalPurchases.map((dp: any) => ({
+        id: `dp_${dp.id}`,
+        registrationNumber: dp.transactionRef || `PUR-${dp.id.slice(-6).toUpperCase()}`,
+        fullName: dp.student?.fullName || 'Online Learner',
+        phone: dp.student?.phone || 'Online Access',
+        courseTitle: dp.title || (dp.resourceType === 'book' || dp.resourceType === 'manual' ? 'Technical Manual / Book' : 'Self-Paced Course'),
+        amount: Number(dp.amount) || 0,
+        paymentMethod: dp.paymentMethod || 'Chapa',
+        status: 'Enrolled',
+        createdAt: dp.createdAt,
+      })),
+    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+    const recentTransactions = allRecentItems.slice(0, 8)
 
     return NextResponse.json({
       period,

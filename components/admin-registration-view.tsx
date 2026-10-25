@@ -72,28 +72,34 @@ const STATUS_CONFIG: Record<
   string,
   { label: string; badge: string; border: string; icon: any }
 > = {
-  Pending: {
-    label: 'Pending Approval',
-    badge: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300',
-    border: 'border-amber-300 dark:border-amber-800',
-    icon: Clock,
-  },
-  Approved: {
-    label: 'Approved',
-    badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300',
+  Enrolled: {
+    label: '⚡ Instant Access Active',
+    badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
     border: 'border-emerald-300 dark:border-emerald-800',
     icon: CheckCircle2,
   },
-  Enrolled: {
-    label: 'Enrolled / Paid',
-    badge: 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300',
+  Active: {
+    label: '⚡ Instant Access Active',
+    badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
+    border: 'border-emerald-300 dark:border-emerald-800',
+    icon: CheckCircle2,
+  },
+  Approved: {
+    label: 'Access Verified',
+    badge: 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border-blue-300 dark:border-blue-800',
     border: 'border-blue-300 dark:border-blue-800',
     icon: GraduationCap,
   },
+  Pending: {
+    label: 'Auto-Enrolling',
+    badge: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-300',
+    border: 'border-slate-300',
+    icon: Clock,
+  },
   Rejected: {
-    label: 'Rejected',
-    badge: 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300',
-    border: 'border-rose-300 dark:border-rose-800',
+    label: 'Cancelled / Refunded',
+    badge: 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border-rose-300',
+    border: 'border-rose-300',
     icon: XCircle,
   },
 }
@@ -151,12 +157,8 @@ export function RegistrationsView({
     const matchesStatus =
       statusFilter === 'All'
         ? true
-        : statusFilter === 'Pending'
-        ? r.status === 'Pending'
-        : statusFilter === 'Approved'
-        ? r.status === 'Approved'
-        : statusFilter === 'Enrolled'
-        ? r.status === 'Enrolled'
+        : statusFilter === 'Enrolled' || statusFilter === 'Approved'
+        ? r.status === 'Enrolled' || r.status === 'Approved' || r.status === 'Active'
         : statusFilter === 'Rejected'
         ? r.status === 'Rejected'
         : true
@@ -176,7 +178,7 @@ export function RegistrationsView({
 
   return (
     <div className="space-y-6">
-      {/* ── METRICS OVERVIEW ── */}
+      {/* ── AUTOMATED ENROLLMENT OVERVIEW ── */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div
           onClick={() => setStatusFilter('All')}
@@ -185,64 +187,68 @@ export function RegistrationsView({
           }`}
         >
           <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            <span>Total Enrollments</span>
-            <FileText className="size-4 text-blue-600 dark:text-sky-400" />
+            <span>Total Online Learners</span>
+            <GraduationCap className="size-4 text-blue-600 dark:text-sky-400" />
           </div>
           <p className="mt-2 text-2xl font-black text-foreground">{overview.total}</p>
-          <p className="mt-1 text-xs text-muted-foreground">All self-paced learners</p>
-        </div>
-
-        <div
-          onClick={() => setStatusFilter('Pending')}
-          className={`cursor-pointer rounded-2xl border bg-card p-5 shadow-sm transition hover:border-amber-500/50 ${
-            statusFilter === 'Pending' ? 'ring-2 ring-amber-500' : ''
-          }`}
-        >
-          <div className="flex items-center justify-between text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-            <span>Pending Activation</span>
-            <Clock className="size-4 text-amber-500" />
-          </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <p className="text-2xl font-black text-amber-600 dark:text-amber-400">{overview.pending}</p>
-            {overview.pending > 0 && (
-              <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-300">
-                Action required
-              </span>
-            )}
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">Awaiting activation / review</p>
-        </div>
-
-        <div
-          onClick={() => setStatusFilter('Approved')}
-          className={`cursor-pointer rounded-2xl border bg-card p-5 shadow-sm transition hover:border-emerald-500/50 ${
-            statusFilter === 'Approved' ? 'ring-2 ring-emerald-500' : ''
-          }`}
-        >
-          <div className="flex items-center justify-between text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-            <span>Approved</span>
-            <CheckCircle2 className="size-4 text-emerald-500" />
-          </div>
-          <p className="mt-2 text-2xl font-black text-emerald-600 dark:text-emerald-400">
-            {overview.approved}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">Access granted & verified</p>
+          <p className="mt-1 text-xs text-muted-foreground">Self-paced courses & digital books</p>
         </div>
 
         <div
           onClick={() => setStatusFilter('Enrolled')}
-          className={`cursor-pointer rounded-2xl border bg-card p-5 shadow-sm transition hover:border-blue-500/50 ${
-            statusFilter === 'Enrolled' ? 'ring-2 ring-blue-500' : ''
+          className={`cursor-pointer rounded-2xl border bg-card p-5 shadow-sm transition hover:border-emerald-500/50 ${
+            statusFilter === 'Enrolled' ? 'ring-2 ring-emerald-500' : ''
           }`}
         >
-          <div className="flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
-            <span>Active Learners</span>
-            <GraduationCap className="size-4 text-blue-500" />
+          <div className="flex items-center justify-between text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+            <span>Instant Access Active</span>
+            <CheckCircle2 className="size-4 text-emerald-500" />
           </div>
-          <p className="mt-2 text-2xl font-black text-blue-600 dark:text-blue-400">
-            {overview.enrolled}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">Lifetime self-paced access</p>
+          <div className="mt-2 flex items-baseline gap-2">
+            <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+              {overview.enrolled}
+            </p>
+            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-300">
+              ⚡ 100% Automated
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">Lifetime 24/7 access granted</p>
+        </div>
+
+        <div
+          onClick={() => setStatusFilter('All')}
+          className="rounded-2xl border bg-card p-5 shadow-sm transition hover:border-sky-500/50 cursor-pointer"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold text-sky-600 dark:text-sky-400 uppercase tracking-wider">
+            <span>Paid Online (Chapa)</span>
+            <CreditCard className="size-4 text-sky-500" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <p className="text-2xl font-black text-foreground">
+              {overview.approved > 0 ? overview.approved : overview.total}
+            </p>
+            <span className="rounded-full bg-sky-500/15 px-2 py-0.5 text-[11px] font-bold text-sky-600 dark:text-sky-300">
+              Auto-Verified
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">Instant access on payment</p>
+        </div>
+
+        <div
+          onClick={() => setStatusFilter('Enrolled')}
+          className="rounded-2xl border bg-card p-5 shadow-sm transition hover:border-purple-500/50 cursor-pointer"
+        >
+          <div className="flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
+            <span>Admin Approvals</span>
+            <Sparkles className="size-4 text-purple-500" />
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <p className="text-2xl font-black text-purple-600 dark:text-purple-400">0 Needed</p>
+            <span className="rounded-full bg-purple-500/15 px-2 py-0.5 text-[11px] font-bold text-purple-600 dark:text-purple-300">
+              Zero-Touch
+            </span>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">Online registrants unlock immediately</p>
         </div>
       </div>
 
@@ -250,22 +256,30 @@ export function RegistrationsView({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Status Filter Tabs */}
         <div className="flex flex-wrap gap-1.5 rounded-xl border bg-card p-1">
-          {['All', 'Pending', 'Approved', 'Enrolled', 'Rejected'].map((st) => (
+          {[
+            { id: 'All', label: 'All Enrollments', count: overview.total },
+            { id: 'Enrolled', label: 'Active & Instant Access', count: overview.enrolled },
+            { id: 'Rejected', label: 'Cancelled / Revoked', count: overview.rejected },
+          ].map((tab) => (
             <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
+              key={tab.id}
+              onClick={() => setStatusFilter(tab.id)}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                statusFilter === st
+                statusFilter === tab.id
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               }`}
             >
-              {st}
-              {st === 'Pending' && overview.pending > 0 && (
-                <span className="ml-1.5 rounded-full bg-amber-500 px-1.5 py-0.2 text-[10px] font-black text-white">
-                  {overview.pending}
-                </span>
-              )}
+              {tab.label}
+              <span
+                className={`ml-1.5 rounded-full px-1.5 py-0.2 text-[10px] font-bold ${
+                  statusFilter === tab.id
+                    ? 'bg-white/20 text-white'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                {tab.count}
+              </span>
             </button>
           ))}
         </div>
@@ -300,23 +314,19 @@ export function RegistrationsView({
             <span className="font-bold text-blue-600 dark:text-sky-400">
               {selectedIds.length} registration{selectedIds.length > 1 ? 's' : ''} selected
             </span>
+            <span className="text-[11px] text-muted-foreground hidden sm:inline">
+              (Paid enrollments automatically have instant self-paced access)
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={() => onBulkUpdateStatus(selectedIds, 'Approved')}
-              className="h-8 bg-emerald-600 text-white hover:bg-emerald-500 text-xs font-semibold"
-            >
-              <CheckCircle2 className="size-3.5 mr-1" /> Approve Selected
-            </Button>
             <Button
               size="sm"
               variant="outline"
               onClick={() => onBulkUpdateStatus(selectedIds, 'Rejected')}
               className="h-8 border-rose-300 text-rose-600 hover:bg-rose-50 dark:border-rose-900 dark:text-rose-400 text-xs"
             >
-              <XCircle className="size-3.5 mr-1" /> Reject
+              <XCircle className="size-3.5 mr-1" /> Revoke Access
             </Button>
             <Button
               size="sm"
@@ -348,8 +358,8 @@ export function RegistrationsView({
                 <th className="px-4 py-3.5">Applicant & Contact</th>
                 <th className="px-4 py-3.5">Course & Learning Mode</th>
                 <th className="px-4 py-3.5">Payment & Proof</th>
-                <th className="px-4 py-3.5">Workflow Status</th>
-                <th className="px-4 py-3.5 text-right">Approval Actions</th>
+                <th className="px-4 py-3.5">Access Status</th>
+                <th className="px-4 py-3.5 text-right">Learner Access & Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -497,7 +507,7 @@ export function RegistrationsView({
                         </div>
                       </td>
 
-                      {/* Workflow Status */}
+                      {/* Access Status */}
                       <td className="px-4 py-4">
                         <div className="flex flex-col gap-1">
                           <span
@@ -507,55 +517,40 @@ export function RegistrationsView({
                             {statusConf.label}
                           </span>
 
-                          {item.status === 'Approved' && item.approvedAt && (
-                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400">
-                              Approved {new Date(item.approvedAt).toLocaleDateString()}
-                            </span>
-                          )}
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400">
+                            Auto-granted instant access
+                          </span>
                         </div>
                       </td>
 
-                      {/* Approval Actions */}
+                      {/* Learner Access & Actions */}
                       <td className="px-4 py-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
-                          {item.status !== 'Approved' && (
+                          {item.status === 'Rejected' ? (
                             <Button
                               size="sm"
                               disabled={isSaving}
-                              onClick={() => onUpdateStatus(item.id, 'Approved')}
+                              onClick={() => onUpdateStatus(item.id, 'Enrolled')}
                               className="h-8 bg-emerald-600 text-white hover:bg-emerald-500 font-semibold px-2.5 text-xs shadow-sm"
                             >
                               {isSaving ? (
                                 <Loader2 className="size-3.5 animate-spin" />
                               ) : (
                                 <>
-                                  <CheckCircle2 className="size-3.5 mr-1" /> Approve
+                                  <CheckCircle2 className="size-3.5 mr-1" /> Restore Access
                                 </>
                               )}
                             </Button>
-                          )}
-
-                          {item.status === 'Approved' && (
+                          ) : (
                             <Button
                               size="sm"
                               variant="outline"
-                              disabled={isSaving}
-                              onClick={() => onUpdateStatus(item.id, 'Enrolled')}
-                              className="h-8 border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 px-2.5 text-xs font-semibold"
+                              onClick={() => setInspectItem(item)}
+                              className="h-8 px-2.5 text-xs font-semibold border-border hover:bg-muted"
                             >
-                              <GraduationCap className="size-3.5 mr-1" /> Enroll
+                              <Eye className="size-3.5 mr-1 text-muted-foreground" /> Details
                             </Button>
                           )}
-
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setInspectItem(item)}
-                            className="h-8 px-2 text-muted-foreground hover:text-foreground"
-                            title="Inspect application details"
-                          >
-                            <Eye className="size-4" />
-                          </Button>
 
                           <Button
                             size="sm"
@@ -563,7 +558,7 @@ export function RegistrationsView({
                             disabled={isSaving}
                             onClick={() => onDelete(item.id)}
                             className="h-8 px-2 text-rose-500 hover:text-rose-600"
-                            title="Delete registration"
+                            title="Delete or revoke record"
                           >
                             <Trash2 className="size-4" />
                           </Button>
@@ -674,6 +669,19 @@ function RegistrationDetailsModal({
 
         {/* Content */}
         <div className="max-h-[75vh] overflow-y-auto p-6 space-y-6">
+          {/* Automated Access Guarantee Banner */}
+          <div className="flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+            <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div className="text-xs">
+              <p className="font-bold text-emerald-800 dark:text-emerald-300">
+                ⚡ Instant Online Access Active • No Admin Approval Needed
+              </p>
+              <p className="text-emerald-700/90 dark:text-emerald-400/90 mt-0.5">
+                The learner paid online via Chapa and was instantly granted 24/7 access to self-paced videos, course materials, and the DRM Studio player.
+              </p>
+            </div>
+          </div>
+
           {/* Status & Quick Actions Bar */}
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 bg-muted/20">
             <div>
@@ -682,30 +690,20 @@ function RegistrationDetailsModal({
               </span>
               <span
                 className={`mt-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
-                  STATUS_CONFIG[item.status]?.badge || 'bg-slate-100'
+                  STATUS_CONFIG[item.status]?.badge || 'bg-emerald-100 text-emerald-800'
                 }`}
               >
-                {item.status}
+                {STATUS_CONFIG[item.status]?.label || '⚡ Instant Access Active'}
               </span>
               {item.approvedAt && (
                 <span className="ml-2 text-xs text-muted-foreground">
-                  (by {item.approvedBy || 'Admin'} on {new Date(item.approvedAt).toLocaleDateString()})
+                  (Auto-verified via {item.approvedBy || 'Chapa Online Payment'} on {new Date(item.approvedAt).toLocaleDateString()})
                 </span>
               )}
             </div>
 
             <div className="flex items-center gap-2">
-              {item.status !== 'Approved' && (
-                <Button
-                  size="sm"
-                  disabled={actionLoading}
-                  onClick={() => handleStatusChange('Approved')}
-                  className="bg-emerald-600 text-white hover:bg-emerald-500 font-semibold text-xs"
-                >
-                  <CheckCircle2 className="size-3.5 mr-1" /> Approve & Unlock Access
-                </Button>
-              )}
-              {item.status !== 'Rejected' && (
+              {item.status !== 'Rejected' ? (
                 <Button
                   size="sm"
                   variant="outline"
@@ -713,18 +711,16 @@ function RegistrationDetailsModal({
                   onClick={() => handleStatusChange('Rejected')}
                   className="border-rose-300 text-rose-600 hover:bg-rose-50 dark:border-rose-900 text-xs"
                 >
-                  <XCircle className="size-3.5 mr-1" /> Reject
+                  <XCircle className="size-3.5 mr-1" /> Revoke Access
                 </Button>
-              )}
-              {item.status !== 'Enrolled' && (
+              ) : (
                 <Button
                   size="sm"
-                  variant="outline"
                   disabled={actionLoading}
                   onClick={() => handleStatusChange('Enrolled')}
-                  className="border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-900 text-xs"
+                  className="bg-emerald-600 text-white hover:bg-emerald-500 font-semibold text-xs"
                 >
-                  <GraduationCap className="size-3.5 mr-1" /> Mark Active Learner
+                  <CheckCircle2 className="size-3.5 mr-1" /> Restore Instant Access
                 </Button>
               )}
             </div>

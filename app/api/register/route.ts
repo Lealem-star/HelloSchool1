@@ -137,7 +137,9 @@ export async function POST(request: Request) {
       transactionRef: body.transactionRef?.trim() || null,
       receiptUrl: body.receiptUrl?.trim() || null,
       confirmationLink: body.confirmationLink?.trim() || null,
-      status: 'Pending', // Pending approval by admission admin
+      status: 'Enrolled', // Automatic instant enrollment - no admin approval required
+      approvedAt: new Date(),
+      approvedBy: 'Instant Online Registration',
     }
 
     let registration: any

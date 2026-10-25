@@ -1474,7 +1474,7 @@ export default function AdminPage() {
           shortLabel: 'Enrollments',
           icon: GraduationCap,
           count: registrations.length,
-          badge: regOverview.pending > 0 ? `${regOverview.pending} New` : null,
+          badge: null,
         },
       ],
     },

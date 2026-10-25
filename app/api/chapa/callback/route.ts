@@ -21,6 +21,17 @@ export async function POST(request: Request) {
           updatedAt: new Date(),
         },
       }).catch(() => {})
+
+      // Also mark registration as Enrolled
+      await (prisma as any).registration.updateMany({
+        where: { transactionRef: tx_ref },
+        data: {
+          status: 'Enrolled',
+          approvedAt: new Date(),
+          approvedBy: 'Chapa Webhook',
+          updatedAt: new Date(),
+        },
+      }).catch(() => {})
     }
 
     return NextResponse.json({ received: true })
