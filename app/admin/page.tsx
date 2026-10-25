@@ -163,13 +163,6 @@ type User = {
   name: string | null
   avatarUrl?: string | null
 }
-type Category = {
-  id: string
-  name: string
-  type: string
-  sortOrder: number
-  createdAt: string
-}
 
 const STATUS_COLORS: Record<string, string> = {
   New: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800',
@@ -261,7 +254,6 @@ export default function AdminPage() {
     | 'trusted-partners'
     | 'courses'
     | 'library'
-    | 'categories'
     | 'instructors'
     | 'facilities'
     | 'projects'
@@ -345,8 +337,6 @@ export default function AdminPage() {
   const [libraryOpen, setLibraryOpen] = useState(false)
   const [editingLibrary, setEditingLibrary] = useState<LibraryItem | null>(null)
 
-  // Categories state (used for course and library dropdowns)
-  const [categories, setCategories] = useState<Category[]>([])
 
   /* ─── Session check ─── */
   useEffect(() => {
@@ -374,7 +364,6 @@ export default function AdminPage() {
   /* ─── Load data on tab change ─── */
   useEffect(() => {
     if (!user) return
-    loadCategories()
     loadRegistrations()
     loadInquiries()
     loadCompanyInquiries()
@@ -456,16 +445,6 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/library')
       const d = await res.json()
       if (res.ok) setLibrary(d.items || [])
-    } finally {
-      setLoading(false)
-    }
-  }
-  async function loadCategories() {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/admin/categories')
-      const d = await res.json()
-      if (res.ok) setCategories(d.items || [])
     } finally {
       setLoading(false)
     }
@@ -770,13 +749,11 @@ export default function AdminPage() {
 
   /* ─── Course operations ─── */
   function openNewCourse() {
-    const defaultCat =
-      categories.find((c) => c.type === 'course')?.name || 'Mobile Repair'
     setEditingCourse({
       id: '',
       slug: '',
       title: '',
-      category: defaultCat,
+      category: 'General',
       level: null,
       description: null,
       icon: null,
@@ -842,13 +819,11 @@ export default function AdminPage() {
 
   /* ─── Library operations ─── */
   function openNewLibrary() {
-    const defaultCat =
-      categories.find((c) => c.type === 'library')?.name || 'Technical Hardware'
     setEditingLibrary({
       id: '',
       title: '',
       subtitle: '',
-      category: defaultCat,
+      category: 'General',
       description: null,
       format: 'Technical Repair Manual',
       level: 'All Skill Levels',
@@ -1772,7 +1747,6 @@ export default function AdminPage() {
           {tab === 'library' && (
             <AdminLibraryView
               items={library as any}
-              categories={categories.filter((c) => c.type === 'library').map((c) => c.name)}
               onRefresh={loadLibrary}
               onEdit={(item) => openEditLibrary(item as any)}
               onCreate={openNewLibrary}
@@ -1860,7 +1834,6 @@ export default function AdminPage() {
           onSave={saveCourse}
           saving={savingId === 'course'}
           existingSlugs={courses.map((c) => c.slug)}
-          categoryOptions={categories.filter((c) => c.type === 'course').map((c) => c.name)}
         />
       )}
       {editingLibrary && (
@@ -1873,7 +1846,6 @@ export default function AdminPage() {
           initial={editingLibrary}
           onSave={saveLibrary}
           saving={savingId === 'library'}
-          categoryOptions={categories.filter((c) => c.type === 'library').map((c) => c.name)}
         />
       )}
       {seoPreviewCourse && (
@@ -3551,7 +3523,6 @@ function CourseEditor({
   onSave,
   saving,
   existingSlugs,
-  categoryOptions = [],
 }: {
   open: boolean
   onClose: () => void
@@ -3559,10 +3530,10 @@ function CourseEditor({
   onSave: (data: Course) => void
   saving: boolean
   existingSlugs: string[]
-  categoryOptions?: string[]
 }) {
   const [form, setForm] = useState<Course>({
     ...initial,
+    category: initial.category || 'General',
     skills: initial.skills || [],
     syllabus: initial.syllabus || [],
   })
@@ -3570,21 +3541,6 @@ function CourseEditor({
   const [skillInput, setSkillInput] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const isEdit = !!initial.id
-
-  const defaultCourseCats = [
-    'Mobile Repair',
-    'Computer Repair',
-    'General Electronics',
-    'TV Repair',
-    'Business & Management',
-    'Short Course',
-  ]
-  const availableCats = Array.from(
-    new Set([
-      ...(categoryOptions.length > 0 ? categoryOptions : defaultCourseCats),
-      form.category,
-    ].filter(Boolean))
-  )
 
   useEffect(() => {
     setForm({
@@ -3838,10 +3794,12 @@ function CourseEditor({
       existingSlugs.includes(form.slug.trim())
     )
       e.slug = 'Slug already exists'
-    if (!form.category.trim()) e.category = 'Category required'
     setErrors(e)
     if (Object.keys(e).length > 0) return
-    onSave(form)
+    onSave({
+      ...form,
+      category: form.category || 'General',
+    })
   }
 
   return (
@@ -3887,25 +3845,7 @@ function CourseEditor({
           </Field>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Category *">
-            <select
-              className={inputCls}
-              value={form.category}
-              onChange={(e) => update('category', e.target.value)}
-            >
-              {availableCats.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
-            {errors.category && (
-              <span className="text-xs text-destructive">
-                {errors.category}
-              </span>
-            )}
-          </Field>
+        <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Level">
             <input
               className={inputCls}
@@ -4289,36 +4229,20 @@ function LibraryEditor({
   initial,
   onSave,
   saving,
-  categoryOptions = [],
 }: {
   open: boolean
   onClose: () => void
   initial: LibraryItem
   onSave: (data: LibraryItem) => void
   saving: boolean
-  categoryOptions?: string[]
 }) {
-  const [form, setForm] = useState<LibraryItem>(initial)
+  const [form, setForm] = useState<LibraryItem>({
+    ...initial,
+    category: initial.category || 'General',
+  })
   const [uploadingPdf, setUploadingPdf] = useState(false)
   const [uploadingVideoIdx, setUploadingVideoIdx] = useState<number | null>(null)
   const isEdit = !!initial.id
-
-  const defaultLibCats = [
-    'Smartphone Hardware',
-    'Laptop Hardware',
-    'Electronics Diagnostics',
-    'Software & Firmware',
-    'Tools & Equipment',
-    'Technical Hardware',
-    'PDF Guides',
-    'Schematics',
-  ]
-  const availableCats = Array.from(
-    new Set([
-      ...(categoryOptions.length > 0 ? categoryOptions : defaultLibCats),
-      form.category,
-    ].filter(Boolean))
-  )
 
   useEffect(() => {
     let parsedLessons = []
@@ -4415,10 +4339,11 @@ function LibraryEditor({
   }
 
   function submit() {
-    if (!form.title.trim() || !form.category.trim()) return
+    if (!form.title.trim()) return
     const pETB = typeof form.priceETB === 'number' ? form.priceETB : 0
     onSave({
       ...form,
+      category: form.category || 'General',
       priceETB: pETB,
       price: form.price?.trim() || (pETB === 0 ? 'Free' : `${pETB} ETB`),
     })
@@ -4444,29 +4369,14 @@ function LibraryEditor({
           <h4 className="text-xs font-bold uppercase tracking-wider text-primary">
             1. Resource Overview &amp; Categorization
           </h4>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Title *">
-              <input
-                className={inputCls}
-                value={form.title}
-                onChange={(e) => update('title', e.target.value)}
-                placeholder="e.g. Complete Mobile Phone Hardware Diagnostic Manual"
-              />
-            </Field>
-            <Field label="Category *">
-              <select
-                className={inputCls}
-                value={form.category}
-                onChange={(e) => update('category', e.target.value)}
-              >
-                {availableCats.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
+          <Field label="Title *">
+            <input
+              className={inputCls}
+              value={form.title}
+              onChange={(e) => update('title', e.target.value)}
+              placeholder="e.g. Complete Mobile Phone Hardware Diagnostic Manual"
+            />
+          </Field>
 
           <Field label="Subtitle / Tagline">
             <input

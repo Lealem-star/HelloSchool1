@@ -93,7 +93,7 @@ export type AdminDigitalPurchase = {
 
 type AdminLibraryViewProps = {
   items: AdminLibraryItem[]
-  categories: string[]
+  categories?: string[]
   onRefresh: () => void
   onEdit: (item: AdminLibraryItem) => void
   onCreate: () => void
@@ -803,7 +803,7 @@ export function AdminLibraryView({
 // ─────────────────────────────────────────────────────────────
 type AdminLibraryModalProps = {
   item: Partial<AdminLibraryItem> | null
-  categories: string[]
+  categories?: string[]
   isOpen: boolean
   onClose: () => void
   onSave: (data: Partial<AdminLibraryItem>) => Promise<void>
@@ -850,7 +850,7 @@ export function AdminLibraryModal({
     if (item) {
       setTitle(item.title || '')
       setSubtitle(item.subtitle || '')
-      setCategory(item.category || categories[0] || 'Smartphone Hardware')
+      setCategory(item.category || 'General')
       setFormat(item.format || 'Video Masterclass')
       const calculatedPrice =
         item.priceETB ??
@@ -1045,37 +1045,21 @@ export function AdminLibraryModal({
                 />
               </div>
 
-              {/* Format & Category */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Resource Format *
-                  </label>
-                  <select
-                    value={format}
-                    onChange={(e) => setFormat(e.target.value)}
-                    className="w-full h-10 rounded-xl border border-input bg-background px-3 text-xs outline-none focus:border-blue-500 font-semibold"
-                  >
-                    <option value="Video Masterclass">🎥 Video Masterclass</option>
-                    <option value="Technical Repair Manual">📘 Technical Repair Manual</option>
-                    <option value="Schematic & Circuit Handbook">⚡ Schematic &amp; Circuit Handbook</option>
-                    <option value="Quick Reference Guide">🛠️ Quick Reference Guide</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">
-                    Category *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder="e.g. Smartphone Hardware or Computer Maintenance"
-                    className="w-full h-10 rounded-xl border border-input bg-background px-3 text-xs outline-none focus:border-blue-500 font-semibold"
-                  />
-                </div>
+              {/* Format */}
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">
+                  Resource Format *
+                </label>
+                <select
+                  value={format}
+                  onChange={(e) => setFormat(e.target.value)}
+                  className="w-full h-10 rounded-xl border border-input bg-background px-3 text-xs outline-none focus:border-blue-500 font-semibold"
+                >
+                  <option value="Video Masterclass">🎥 Video Masterclass</option>
+                  <option value="Technical Repair Manual">📘 Technical Repair Manual</option>
+                  <option value="Schematic & Circuit Handbook">⚡ Schematic &amp; Circuit Handbook</option>
+                  <option value="Quick Reference Guide">🛠️ Quick Reference Guide</option>
+                </select>
               </div>
 
               {/* Pricing & Status */}
