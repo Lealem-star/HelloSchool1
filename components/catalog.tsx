@@ -1027,31 +1027,6 @@ export function LibraryCatalog({
         )}
       </main>
 
-      {/* ── REQUEST A SCHEMATIC OR GUIDE BANNER ── */}
-      <section className="border-y bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] px-5 py-16 text-white lg:px-8">
-        <div className="container mx-auto max-w-4xl text-center">
-          <span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30 shadow-md">
-            <BookOpen className="size-6" />
-          </span>
-          <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-white md:text-4xl">
-            {isAm
-              ? 'ልዩ የሰርኪዩት ንድፍ ወይም የቦርድ ሌይአውት ይፈልጋሉ?'
-              : 'Need a specific circuit schematic or board layout?'}
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-blue-100">
-            {isAm
-              ? 'የእኛ ወርክሾፕ የላፕቶፕ ቦርድ ቪው፣ የስማርትፎን ፒንአውት ዲያግራም እና የSMPS ፓወር ሰርኪዩት ንድፎች አሉት። ውስብስብ ብልሽት እየጠገኑ ከሆነ በቀጥታ ከመምህራን ዴስክ ይጠይቁ።'
-              : 'Our workshop maintains an extensive repository of laptop board views, smartphone pinout diagrams, and SMPS power schematics. If you are troubleshooting a tricky board, request it directly from our instructor desk.'}
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href="/contact">
-              <Button className="rounded-xl bg-white px-6 font-bold text-[#155DFC] hover:bg-blue-50 shadow-xl transition-all duration-300 hover:scale-[1.02]">
-                {isAm ? 'ንድፍ ወይም ማኑዋል ይጠይቁ' : 'Request a schematic or manual'} <ArrowRight data-icon="inline-end" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* ── MODALS ── */}
       <ResourceModal
