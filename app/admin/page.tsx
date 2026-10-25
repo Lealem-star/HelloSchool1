@@ -81,6 +81,11 @@ import {
   AdminTrustedPartner,
 } from '@/components/admin-company-views'
 import { AdminLibraryView } from '@/components/admin-library-view'
+import {
+  AdminInquiriesNotification,
+  AdminInquiryReaderModal,
+  UnifiedInquiry,
+} from '@/components/admin-inquiries-notification'
 
 /* ──────────────────────────────────────────────────────────────
    Shared types
@@ -258,8 +263,6 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('')
   const [tab, setTab] = useState<
     | 'registrations'
-    | 'inquiries'
-    | 'company-inquiries'
     | 'trusted-partners'
     | 'courses'
     | 'gallery'
@@ -273,6 +276,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [savingId, setSavingId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+
+  // Selected Inquiry for Detailed Reader Modal
+  const [readerInquiry, setReaderInquiry] = useState<UnifiedInquiry | null>(null)
 
   // Company Inquiries state
   const [companyInquiries, setCompanyInquiries] = useState<AdminCompanyInquiry[]>([])
@@ -367,8 +373,6 @@ export default function AdminPage() {
     loadCompanyInquiries()
     loadTrustedPartners()
     if (tab === 'registrations') loadRegistrations()
-    if (tab === 'inquiries') loadInquiries()
-    if (tab === 'company-inquiries') loadCompanyInquiries()
     if (tab === 'trusted-partners') loadTrustedPartners()
     if (tab === 'courses') loadCourses()
     if (tab === 'gallery') loadGallery()
@@ -1257,6 +1261,84 @@ export default function AdminPage() {
     }
   }
 
+  /* ─── Unified Inquiries helpers for Notification Bell & Reader Modal ─── */
+  const allUnifiedInquiries: UnifiedInquiry[] = useMemo(() => {
+    const list: UnifiedInquiry[] = []
+    for (const item of inquiries) {
+      list.push({
+        kind: 'student',
+        id: item.id,
+        title: item.studentName,
+        subtitle: item.course || 'General Technical Training',
+        contactPhone: item.phone,
+        contactEmail: item.email,
+        message: item.message,
+        status: item.status,
+        createdAt: item.createdAt,
+        data: item,
+      })
+    }
+    for (const item of companyInquiries) {
+      list.push({
+        kind: 'company',
+        id: item.id,
+        title: item.companyName,
+        subtitle: `${item.contactPerson}${item.jobTitle ? ` (${item.jobTitle})` : ''} · ${item.trainingFocus || item.institutionType}`,
+        contactPhone: item.phone,
+        contactEmail: item.email,
+        message: item.message,
+        status: item.status,
+        createdAt: item.createdAt,
+        data: item,
+      })
+    }
+    return list.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+  }, [inquiries, companyInquiries])
+
+  async function handleReaderUpdateStatus(id: string, kind: 'student' | 'company', status: string) {
+    if (kind === 'student') {
+      await updateInquiryStatus(id, status)
+      setReaderInquiry((prev) =>
+        prev && prev.kind === 'student' && prev.id === id
+          ? { ...prev, status, data: { ...prev.data, status } }
+          : prev
+      )
+    } else {
+      await updateCompanyInquiryStatus(id, status)
+      setReaderInquiry((prev) =>
+        prev && prev.kind === 'company' && prev.id === id
+          ? { ...prev, status, data: { ...prev.data, status } }
+          : prev
+      )
+    }
+  }
+
+  async function handleReaderDelete(id: string, kind: 'student' | 'company') {
+    if (kind === 'student') {
+      await deleteInquiry(id)
+    } else {
+      await deleteCompanyInquiry(id)
+    }
+  }
+
+  async function markAllInquiriesAsRead() {
+    const unreadStudentIds = inquiries.filter((i) => i.status === 'New').map((i) => i.id)
+    const unreadCompanyIds = companyInquiries.filter((i) => i.status === 'New').map((i) => i.id)
+    if (unreadStudentIds.length > 0) {
+      await bulkUpdateInquiryStatus(unreadStudentIds, 'Contacted')
+    }
+    if (unreadCompanyIds.length > 0) {
+      await fetch('/api/admin/company-inquiries', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: unreadCompanyIds, status: 'Contacted' }),
+      })
+      loadCompanyInquiries()
+    }
+  }
+
   /* ─── Trusted Partners operations ─── */
   async function loadTrustedPartners() {
     setLoading(true)
@@ -1304,9 +1386,9 @@ export default function AdminPage() {
 
   /* ─── Shared refresh per tab ─── */
   function refreshCurrent() {
+    loadInquiries()
+    loadCompanyInquiries()
     if (tab === 'registrations') loadRegistrations()
-    if (tab === 'inquiries') loadInquiries()
-    if (tab === 'company-inquiries') loadCompanyInquiries()
     if (tab === 'trusted-partners') loadTrustedPartners()
     if (tab === 'courses') loadCourses()
     if (tab === 'gallery') loadGallery()
@@ -1399,8 +1481,6 @@ export default function AdminPage() {
      ────────────────────────────────────────────────────────── */
   type AdminTabId =
     | 'registrations'
-    | 'inquiries'
-    | 'company-inquiries'
     | 'trusted-partners'
     | 'courses'
     | 'gallery'
@@ -1441,14 +1521,6 @@ export default function AdminPage() {
           count: registrations.length,
           badge: regOverview.pending > 0 ? `${regOverview.pending} New` : null,
         },
-        {
-          id: 'inquiries',
-          label: 'Student Inquiries',
-          shortLabel: 'Inquiries',
-          icon: Mail,
-          count: inquiries.length,
-          badge: overview.new > 0 ? `${overview.new} New` : null,
-        },
       ],
     },
     {
@@ -1477,14 +1549,6 @@ export default function AdminPage() {
       title: 'Corporate & Partners',
       icon: Building2,
       items: [
-        {
-          id: 'company-inquiries',
-          label: 'Company Training',
-          shortLabel: 'Corporate Training',
-          icon: Building2,
-          count: companyInquiries.length,
-          badge: companyOverview.new > 0 ? `${companyOverview.new} New` : null,
-        },
         { id: 'trusted-partners', label: 'Trusted Partners', shortLabel: 'Partners', icon: ShieldCheck, count: trustedPartners.length, badge: null },
       ],
     },
@@ -1657,6 +1721,14 @@ export default function AdminPage() {
             </div>
 
             <div className="flex items-center gap-2">
+              <AdminInquiriesNotification
+                inquiries={inquiries}
+                companyInquiries={companyInquiries}
+                onOpenReader={(item) => setReaderInquiry(item)}
+                onMarkAllAsRead={markAllInquiriesAsRead}
+                onUpdateStudentStatus={updateInquiryStatus}
+                onUpdateCompanyStatus={updateCompanyInquiryStatus}
+              />
               <ThemeToggle size="sm" />
               <Button
                 variant="outline"
@@ -1728,41 +1800,7 @@ export default function AdminPage() {
             />
           )}
 
-          {/* ─── TAB: INQUIRIES ─── */}
-          {tab === 'inquiries' && (
-            <InquiriesView
-              loading={loading}
-              inquiries={inquiries}
-              search={search}
-              setSearch={setSearch}
-              statusFilter={statusFilter}
-              setStatusFilter={setStatusFilter}
-              savingId={savingId}
-              updateStatus={updateInquiryStatus}
-              bulkUpdateStatus={bulkUpdateInquiryStatus}
-              remove={deleteInquiry}
-              bulkRemove={bulkDeleteInquiries}
-              overview={overview}
-            />
-          )}
 
-          {/* ─── TAB: COMPANY INQUIRIES ─── */}
-          {tab === 'company-inquiries' && (
-            <CompanyInquiriesView
-              inquiries={companyInquiries}
-              overview={companyOverview}
-              loading={loading}
-              search={search}
-              setSearch={setSearch}
-              statusFilter={companyStatusFilter}
-              setStatusFilter={setCompanyStatusFilter}
-              savingId={savingId}
-              updateStatus={updateCompanyInquiryStatus}
-              updateNotes={updateCompanyInquiryNotes}
-              deleteInquiry={deleteCompanyInquiry}
-              refresh={loadCompanyInquiries}
-            />
-          )}
 
           {/* ─── TAB: TRUSTED PARTNERS ─── */}
           {tab === 'trusted-partners' && (
@@ -2069,6 +2107,17 @@ export default function AdminPage() {
           onSave={saveProject}
         />
       )}
+      {/* ── Unified Inquiry Reader Modal ── */}
+      <AdminInquiryReaderModal
+        inquiry={readerInquiry}
+        open={!!readerInquiry}
+        onClose={() => setReaderInquiry(null)}
+        onUpdateStatus={handleReaderUpdateStatus}
+        onSaveCompanyNotes={updateCompanyInquiryNotes}
+        onDelete={handleReaderDelete}
+        allInquiries={allUnifiedInquiries}
+        onSelectInquiry={(item) => setReaderInquiry(item)}
+      />
     </div>
   )
 }
