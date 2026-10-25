@@ -236,7 +236,7 @@ model Student {
   telegramUsername   String?
   password           String           // bcrypt hash
   city               String?
-  avatarUrl          String?
+  avatarUrl          String?          @db.MediumText
   status             String           @default("Active") // 'Active', 'Suspended'
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt

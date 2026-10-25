@@ -1,6 +1,7 @@
 // School configuration and static promotional data
-// Note: Courses, Categories, Training Gallery, and Digital Library items are now 
+// Note: Courses, Categories, and Digital Library items are now 
 // synchronized to the real database and managed dynamically via Prisma / Admin portal.
+
 
 export const schoolConfig = {
   name: 'ሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል',

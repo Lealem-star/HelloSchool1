@@ -19,102 +19,29 @@ import {
   Briefcase,
   X,
   CheckCircle2,
-  Eye,
   Globe,
   MessageCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { CourseIcon, CTASection, GalleryCard, SectionHeading, SiteShell, StatStrip } from '@/components/site'
+import { CourseIcon, CTASection, SectionHeading, SiteShell, StatStrip } from '@/components/site'
 import { CompanyTrainingCTA } from '@/components/company-training-cta'
 import { TrustedBySection } from '@/components/trusted-by-marquee'
 import { TestimonialsSection } from '@/components/testimonials-section'
 import { useLanguage } from '@/components/language-provider'
-import type { PublicCourse, PublicGalleryItem, PublicTrustedPartner } from '@/lib/content'
+import type { PublicCourse, PublicTrustedPartner } from '@/lib/content'
 
 interface HomePageClientProps {
   courses: PublicCourse[]
-  trainingGallery: PublicGalleryItem[]
   trustedPartners: PublicTrustedPartner[]
 }
 
 export function HomePageClient({
   courses,
-  trainingGallery,
   trustedPartners,
 }: HomePageClientProps) {
   const { language } = useLanguage()
   const isAm = language === 'am'
-  const [selectedPhoto, setSelectedPhoto] = useState<{
-    id: string
-    title: string
-    category: string
-    description: string
-    image: string
-    badge: string
-  } | null>(null)
 
-  const realWorkshopPhotos = [
-    {
-      id: 'ws-soldering-bench',
-      title: isAm
-        ? 'የኤሌክትሮኒክስ ሰርኪውት ሶልደሪንግ እና የቦርድ ጥገና ስልጠና'
-        : 'Multi-Station Soldering & PCB Assembly Workshop',
-      category: isAm ? 'የኤሌክትሮኒክስ ላብራቶሪ' : 'Soldering & Electronics Lab',
-      description: isAm
-        ? 'በሄሎ ቴክኖሎጂ ላብራቶሪ እያንዳንዱ ሰልጣኝ በራሱ የሙቀት መቆጣጠሪያ ሶልደር እና ሰሌዳ በመያዝ የኮምፖነንት መገጣጠም፣ ጃምፐር ማገናኘት እና የቦርድ ጥገናን በተግባር ሲለማመዱ።'
-        : 'Dedicated personal soldering stations where trainees master component placement, jumper routing, and multi-layer circuit board rework.',
-      image: '/images/studentathellobench3.png',
-      badge: isAm ? 'የተሟላ የግል ወንበር' : 'Dedicated Stations',
-    },
-    {
-      id: 'ws-mobile-microsoldering',
-      title: isAm
-        ? 'የስማርትፎን ሃርድዌር እና ማይክሮ-ሶልደሪንግ ጥገና'
-        : 'Smartphone Motherboard Hardware & Micro-Soldering Workbench',
-      category: isAm ? 'የሞባይል ጥገና' : 'Mobile Diagnostics',
-      description: isAm
-        ? 'የሞባይል ስልኮችን ቻርጅንግ ፖርት፣ ማዘርቦርድ እና የማይክሮ-ኤሌክትሮኒክስ ክፍሎችን በቅርበት የመመርመርና የመበየድ የተግባር ልምምድ።'
-        : 'Hands-on micro-soldering on real smartphone motherboards, charging flex cables, and precision surface-mount components.',
-      image: '/images/studentathellobench4.png',
-      badge: isAm ? 'ማይክሮ-ሶልደሪንግ' : 'Micro-Soldering',
-    },
-    {
-      id: 'ws-photocopier-printer',
-      title: isAm
-        ? 'የፎቶኮፒ፣ ፕሪንተርና የቢሮ ማሽነሪዎች ጥገና'
-        : 'Photocopier, Laser Printer & Office Equipment Diagnostics',
-      category: isAm ? 'የቢሮ ማሽኖች' : 'Office Machinery',
-      description: isAm
-        ? 'ተማሪዎችና አሰልጣኙ የፎቶኮፒና የፕሪንተር ማሽኖችን መካኒካል ክፍሎች፣ ሮለሮች፣ ስካነር እና የፓወር ቦርድ ብልሽቶችን በተግባር ሲፈቱ።'
-        : 'Live teardown, optical scanner calibration, and power circuit board troubleshooting on commercial office photocopiers and laser printers.',
-      image: '/images/studentathellobench2.png',
-      badge: isAm ? 'የማሽን ጥገና' : 'Machinery Teardown',
-    },
-    {
-      id: 'ws-electrical-wiring',
-      title: isAm
-        ? 'የህንፃዎች ኤሌክትሪክ መስመር ዝርጋታ እና የቁጥጥር ሰሌዳዎች'
-        : 'Electrical Installation & Distribution Panel Wiring Lab',
-      category: isAm ? 'የኤሌክትሪክ ዝርጋታ' : 'Electrical Installation',
-      description: isAm
-        ? 'በተግባር ሰሌዳዎች ላይ የሰርኪውት ብሬከሮች፣ የኮንትሮል ስዊቾች እና የኢንዱስትሪ መስመሮች የዝርጋታና ፍተሻ ስልጠና።'
-        : 'Hands-on wiring drills covering distribution panels, circuit breakers, conduit routing, and national COC examination board simulations.',
-      image: '/images/studentathellobench.png',
-      badge: isAm ? 'የCOC ልምምድ' : 'COC Panel Drills',
-    },
-    {
-      id: 'ws-satellite-dish',
-      title: isAm
-        ? 'የዲሽ ተከላ፣ የሳተላይት ምልክት መፈለጊያ (LNB) እና ሪሲቨር ጥገና'
-        : 'Satellite Dish Alignment, LNB Calibration & Receiver Servicing',
-      category: isAm ? 'የዲሽ ተከላና ሲግናል' : 'Satellite Systems',
-      description: isAm
-        ? 'የሳተላይት ዲሽ አንቴናዎችን በትክክለኛ ዲግሪ ማስተካከል፣ የLNB ፍሪኩዌንሲ መለካት እና የዲጂታል ሪሲቨር ሶፍትዌርና ሃርድዌር ጥገና።'
-        : 'Field-aligned parabolic dish tracking, multi-satellite LNB calibration, spectrum signal alignment, and digital decoder servicing.',
-      image: '/images/studentathellobench5.png',
-      badge: isAm ? 'የሲግናል መለኪያ' : 'Signal Alignment',
-    },
-  ]
 
   const whyChooseUsUsps = [
     {
@@ -542,143 +469,6 @@ export function HomePageClient({
           </div>
         </section>
 
-        {/* ── WORKSHOP GALLERY SECTION ── */}
-        <section className="px-5 py-20 lg:px-8 bg-slate-50/50 dark:bg-card/20 border-b border-border/60">
-          <div className="container mx-auto max-w-7xl">
-            <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-              <div>
-                <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-primary mb-3">
-                  <Wrench className="size-3.5" />
-                  <span>{isAm ? 'በተግባር ማሰልጠኛ ላብራቶሪ ውስጥ' : 'Inside the workshop'}</span>
-                </span>
-                <h2 className="text-3xl font-extrabold tracking-tight text-foreground md:text-4xl">
-                  {isAm ? 'የተግባር ስልጠናችንን በቅርበት ይመልከቱ' : 'A closer look at practical training'}
-                </h2>
-                <p className="mt-3 max-w-2xl text-base text-muted-foreground">
-                  {isAm
-                    ? 'ከንድፈ-ሀሳብ ባሻገር፤ በባህር ዳር ማዕከላችን በእውነተኛ የጥገና ወንበሮች፣ ማይክሮስኮፖች፣ ማሽኖችና የኤሌክትሪክ ሰሌዳዎች ላይ የሚሰሩ ሰልጣኞቻችን የቀጥታ ምስሎች።'
-                    : 'Authentic photos from our Bahir Dar training institute: students actively diagnosing and repairing motherboards, office machinery, electrical distribution panels, and satellite systems.'}
-                </p>
-              </div>
-              <Link
-                href="/courses"
-                className="inline-flex items-center gap-2 text-sm font-bold text-primary group hover:underline shrink-0 mb-2"
-              >
-                {isAm ? 'ሁሉንም ስልጠናዎች ይመልከቱ' : 'Explore all courses'}{' '}
-                <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
-              </Link>
-            </div>
-
-            {/* 5-Photo Responsive Grid (Row 1: 3 cards, Row 2: 2 cards on lg) */}
-            <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-6">
-              {realWorkshopPhotos.map((item, index) => {
-                const colSpanClass = index < 3 ? 'lg:col-span-2' : 'lg:col-span-3'
-                return (
-                  <article
-                    key={item.id}
-                    onClick={() => setSelectedPhoto(item)}
-                    className={`card-hover-lift group cursor-pointer overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-blue-950/10 flex flex-col justify-between ${colSpanClass}`}
-                  >
-                    <div>
-                      {/* Image container with gradient and badges */}
-                      <div className="relative aspect-[4/3] overflow-hidden bg-slate-900">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-85 transition-opacity" />
-
-                        {/* Top Badge */}
-                        <div className="absolute top-3 left-3">
-                          <span className="inline-flex items-center gap-1 rounded-full bg-black/65 backdrop-blur-md border border-white/20 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
-                            <Sparkles className="size-3 text-amber-400" />
-                            {item.badge}
-                          </span>
-                        </div>
-
-                        {/* Inspect / Zoom Hint on Hover */}
-                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span className="flex size-7 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow-md backdrop-blur-sm">
-                            <Eye className="size-3.5" />
-                          </span>
-                        </div>
-
-                        {/* Category label bottom */}
-                        <div className="absolute bottom-3 left-3 right-3">
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-sky-300 drop-shadow">
-                            {item.category}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="p-5">
-                        <h3 className="text-base font-bold text-foreground transition-colors group-hover:text-primary leading-snug">
-                          {item.title}
-                        </h3>
-                        <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground line-clamp-2">
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="px-5 pb-5 pt-0">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary group-hover:underline">
-                        <span>{isAm ? 'ምስሉን በሙሉ ስክሪን ይመልከቱ' : 'View full photo'}</span>
-                        <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
-                      </span>
-                    </div>
-                  </article>
-                )
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* Lightbox Preview Modal for Real Workshop Photos */}
-        {selectedPhoto && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-fade-in"
-            onClick={() => setSelectedPhoto(null)}
-          >
-            <div
-              className="relative max-w-3xl w-full overflow-hidden rounded-3xl bg-card border border-border shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="relative aspect-[16/10] bg-slate-950 overflow-hidden flex items-center justify-center">
-                <img
-                  src={selectedPhoto.image}
-                  alt={selectedPhoto.title}
-                  className="size-full object-contain"
-                />
-                <button
-                  onClick={() => setSelectedPhoto(null)}
-                  className="absolute top-4 right-4 flex size-9 items-center justify-center rounded-full bg-black/70 text-white hover:bg-black transition border border-white/20 shadow-lg cursor-pointer"
-                  aria-label="Close modal"
-                >
-                  <X className="size-5" />
-                </button>
-                <div className="absolute bottom-4 left-4 flex items-center gap-2">
-                  <span className="rounded-full bg-[#155DFC] px-3 py-1 text-xs font-bold text-white shadow-md">
-                    {selectedPhoto.category}
-                  </span>
-                  <span className="rounded-full bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1 text-xs font-semibold text-white">
-                    {selectedPhoto.badge}
-                  </span>
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-foreground">
-                  {selectedPhoto.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {selectedPhoto.description}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ── TESTIMONIALS & SUCCESS STORIES SECTION ── */}
         <TestimonialsSection />

@@ -110,12 +110,43 @@ export function ProfileDashboardClient({ initialTab = 'dashboard' }: ProfileDash
     }
   }
 
-  const handleAvatarFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = (file: File, maxDim = 400, quality = 0.82): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onload = () => {
+          let { width, height } = img
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width)
+              width = maxDim
+            } else {
+              width = Math.round((width * maxDim) / height)
+              height = maxDim
+            }
+          }
+          const canvas = document.createElement('canvas')
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          if (!ctx) return resolve(e.target?.result as string)
+          ctx.drawImage(img, 0, 0, width, height)
+          resolve(canvas.toDataURL('image/jpeg', quality))
+        }
+        img.onerror = reject
+        img.src = e.target?.result as string
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const handleAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string
+      try {
+        const dataUrl = await compressImage(file)
         if (dataUrl) {
           setAvatarPreview(dataUrl)
           try {
@@ -137,8 +168,9 @@ export function ProfileDashboardClient({ initialTab = 'dashboard' }: ProfileDash
             body: JSON.stringify({ avatarUrl: dataUrl }),
           }).catch(() => {})
         }
+      } catch (err) {
+        console.error('Image compression failed:', err)
       }
-      reader.readAsDataURL(file)
     }
   }
 
@@ -183,7 +215,41 @@ export function ProfileDashboardClient({ initialTab = 'dashboard' }: ProfileDash
     setTimeout(() => setSaveSuccessMsg(null), 4000)
   }
 
-  const handleSaveSecurity = (section: string) => {
+  const handleSaveSecurity = async (section: 'Password' | 'Phone Number' | 'Email Address') => {
+    try {
+      if (section === 'Password') {
+        if (newPassword && newPassword !== '••••••••••••••••') {
+          await fetch('/api/student/me', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ newPassword }),
+          })
+        }
+      } else if (section === 'Phone Number') {
+        if (newPhone) {
+          await fetch('/api/student/me', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: newPhone }),
+          })
+          setCurrentPhone(newPhone)
+          setPhone(newPhone)
+        }
+      } else if (section === 'Email Address') {
+        if (newEmail) {
+          await fetch('/api/student/me', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ personalEmail: newEmail }),
+          })
+          setCurrentEmail(newEmail)
+          setEmail(newEmail)
+        }
+      }
+    } catch (err) {
+      console.error('Error saving security setting:', err)
+    }
+
     setSecuritySuccessMsg(
       isAm ? `${section} በተሳካ ሁኔታ ተቀይሯል!` : `${section} updated successfully!`
     )

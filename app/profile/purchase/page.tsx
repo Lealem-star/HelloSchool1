@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { ProfileDashboardClient } from '@/components/profile-dashboard-client'
 
 export const metadata: Metadata = {
-  title: 'Purchase History | Donkey Academy',
+  title: 'Purchase History',
   description: 'View your purchased courses, receipts, and digital resources.',
   alternates: {
     canonical: '/profile/purchase',

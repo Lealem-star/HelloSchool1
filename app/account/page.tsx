@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { ProfileDashboardClient } from '@/components/profile-dashboard-client'
 
 export const metadata: Metadata = {
-  title: 'Account Settings | Donkey Academy',
+  title: 'Account Settings',
   description: 'Manage your student account settings and credentials.',
   alternates: {
     canonical: '/account',

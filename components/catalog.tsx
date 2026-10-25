@@ -290,7 +290,7 @@ export function CoursesCatalog({
           })}
         </div>
 
-        {/* 3-Column Courses Grid (matching Donkey Academy /learn screenshot) */}
+        {/* 3-Column Courses Grid */}
         {filtered.length ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((course) => {
@@ -1206,7 +1206,7 @@ export function LibraryCatalog({
           </div>
         </div>
 
-        {/* ── RESOURCE CARDS GRID (EXACT DONKEY ACADEMY STYLE FROM SCREENSHOT 2 & 3) ── */}
+        {/* ── RESOURCE CARDS GRID ── */}
         {filtered.length ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filtered.map((resource) => {

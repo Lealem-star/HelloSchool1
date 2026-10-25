@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { getCurrentStudent } from '@/lib/student-auth'
+import { getCurrentStudent, hashPassword } from '@/lib/student-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -140,13 +140,18 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json()
-    const { fullName, personalEmail, phone, city, avatarUrl } = body
+    const { fullName, personalEmail, phone, city, avatarUrl, newPassword } = body
 
     if (!student) {
       return NextResponse.json({
         success: true,
         student: { fullName, personalEmail, phone, city, avatarUrl },
       })
+    }
+
+    let passwordHash: string | undefined = undefined
+    if (newPassword && typeof newPassword === 'string' && newPassword.trim().length >= 4) {
+      passwordHash = await hashPassword(newPassword.trim())
     }
 
     const updated = await (prisma as any).student.update({
@@ -157,6 +162,7 @@ export async function PATCH(req: Request) {
         ...(phone ? { phone } : {}),
         ...(city !== undefined ? { city } : {}),
         ...(avatarUrl !== undefined ? { avatarUrl } : {}),
+        ...(passwordHash ? { password: passwordHash } : {}),
       },
     })
 

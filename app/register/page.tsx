@@ -81,7 +81,7 @@ function RegisterContent() {
         </Link>
       </div>
 
-      {/* Main White Card Exactly Like Donkey Academy */}
+      {/* Main White Card */}
       <div className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-card p-8 sm:p-9 shadow-sm">
         <div className="text-center mb-7">
           <h1 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-foreground leading-snug">
@@ -169,7 +169,7 @@ function RegisterContent() {
             </div>
           </div>
 
-          {/* Next Button in Donkey Academy vibrant blue */}
+          {/* Next Button in vibrant blue */}
           <button
             type="submit"
             disabled={loading || !fullName.trim() || !identifier.trim() || !password}

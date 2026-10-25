@@ -14,7 +14,6 @@ import {
   Pencil,
   X,
   BookOpen,
-  ImageIcon,
   Folder,
   Users,
   User as UserIcon,
@@ -130,14 +129,6 @@ type Course = {
   image: string | null
   skills: string[]
   syllabus?: SyllabusModule[]
-  published: boolean
-  sortOrder: number
-}
-type GalleryItem = {
-  id: string
-  title: string
-  description: string | null
-  image: string
   published: boolean
   sortOrder: number
 }
@@ -270,7 +261,6 @@ export default function AdminPage() {
     | 'registrations'
     | 'trusted-partners'
     | 'courses'
-    | 'gallery'
     | 'library'
     | 'categories'
     | 'instructors'
@@ -351,11 +341,6 @@ export default function AdminPage() {
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
   const [seoPreviewCourse, setSeoPreviewCourse] = useState<Course | null>(null)
 
-  // Gallery state
-  const [gallery, setGallery] = useState<GalleryItem[]>([])
-  const [galleryOpen, setGalleryOpen] = useState(false)
-  const [editingGallery, setEditingGallery] = useState<GalleryItem | null>(null)
-
   // Library state
   const [library, setLibrary] = useState<LibraryItem[]>([])
   const [libraryOpen, setLibraryOpen] = useState(false)
@@ -401,7 +386,6 @@ export default function AdminPage() {
     if (tab === 'registrations') loadRegistrations()
     if (tab === 'trusted-partners') loadTrustedPartners()
     if (tab === 'courses') loadCourses()
-    if (tab === 'gallery') loadGallery()
     if (tab === 'library') loadLibrary()
     if (tab === 'categories') {
       loadCategories()
@@ -471,16 +455,6 @@ export default function AdminPage() {
       const res = await fetch('/api/admin/courses')
       const d = await res.json()
       if (res.ok) setCourses(d.items || [])
-    } finally {
-      setLoading(false)
-    }
-  }
-  async function loadGallery() {
-    setLoading(true)
-    try {
-      const res = await fetch('/api/admin/gallery')
-      const d = await res.json()
-      if (res.ok) setGallery(d.items || [])
     } finally {
       setLoading(false)
     }
@@ -870,65 +844,6 @@ export default function AdminPage() {
     try {
       await fetch(`/api/admin/courses?id=${id}`, { method: 'DELETE' })
       loadCourses()
-    } finally {
-      setSavingId(null)
-    }
-  }
-
-  /* ─── Gallery operations ─── */
-  function openNewGallery() {
-    setEditingGallery({
-      id: '',
-      title: '',
-      description: null,
-      image: '',
-      published: true,
-      sortOrder: gallery.length,
-    })
-    setGalleryOpen(true)
-  }
-  function openEditGallery(g: GalleryItem) {
-    setEditingGallery({ ...g })
-    setGalleryOpen(true)
-  }
-  async function saveGallery(formData: GalleryItem) {
-    setSavingId('gallery')
-    try {
-      const isNew = !editingGallery?.id
-      const body = isNew ? { ...formData } : { ...formData, id: editingGallery!.id }
-      const res = await fetch('/api/admin/gallery', {
-        method: isNew ? 'POST' : 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      if (!res.ok) {
-        const d = await res.json()
-        await alert({
-          title: 'Save Failed',
-          message: d.error || 'Failed to save gallery item',
-          variant: 'danger',
-        })
-        return
-      }
-      setGalleryOpen(false)
-      setEditingGallery(null)
-      loadGallery()
-    } finally {
-      setSavingId(null)
-    }
-  }
-  async function deleteGallery(id: string) {
-    const ok = await confirm({
-      title: 'Delete Gallery Item',
-      message: 'Are you sure you want to delete this gallery item?',
-      confirmText: 'Delete',
-      variant: 'danger',
-    })
-    if (!ok) return
-    setSavingId(id)
-    try {
-      await fetch(`/api/admin/gallery?id=${id}`, { method: 'DELETE' })
-      loadGallery()
     } finally {
       setSavingId(null)
     }
@@ -1417,7 +1332,6 @@ export default function AdminPage() {
     if (tab === 'registrations') loadRegistrations()
     if (tab === 'trusted-partners') loadTrustedPartners()
     if (tab === 'courses') loadCourses()
-    if (tab === 'gallery') loadGallery()
     if (tab === 'library') loadLibrary()
     if (tab === 'categories') {
       loadCategories()
@@ -1510,7 +1424,6 @@ export default function AdminPage() {
     | 'registrations'
     | 'trusted-partners'
     | 'courses'
-    | 'gallery'
     | 'library'
     | 'categories'
     | 'instructors'
@@ -1572,7 +1485,6 @@ export default function AdminPage() {
       items: [
         { id: 'courses', label: 'Courses & Tracks', shortLabel: 'Courses', icon: BookOpen, count: courses.length, badge: null },
         { id: 'library', label: 'Digital Library & DRM', shortLabel: 'Library & DRM', icon: Folder, count: library.length, badge: null },
-        { id: 'gallery', label: 'Workshop Gallery', shortLabel: 'Gallery', icon: ImageIcon, count: gallery.length, badge: null },
         { id: 'categories', label: 'Categories & Depts', shortLabel: 'Categories', icon: Tag, count: categories.length, badge: null },
       ],
     },
@@ -2032,63 +1944,6 @@ export default function AdminPage() {
             />
           )}
 
-          {/* ─── TAB: GALLERY ─── */}
-          {tab === 'gallery' && (
-            <ListView<GalleryItem>
-              title="Training Gallery"
-              subtitle="Manage practical workshop photos and captions"
-              loading={loading}
-              search={search}
-              setSearch={setSearch}
-              items={gallery}
-              searchableFields={['title', 'description']}
-              onAdd={openNewGallery}
-              onEdit={openEditGallery}
-              onDelete={deleteGallery}
-              savingId={savingId}
-              columns={[
-                {
-                  key: 'image',
-                  label: 'Preview',
-                  render: (v: any) => (
-                    <img
-                      src={String(v)}
-                      alt=""
-                      className="size-14 rounded-lg border object-cover"
-                      onError={(e) =>
-                        ((e.target as any).src =
-                          'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23e5e7eb%22 width=%22100%22 height=%22100%22/></svg>')
-                      }
-                    />
-                  ),
-                },
-                { key: 'title', label: 'Title', className: 'font-semibold' },
-                { key: 'description', label: 'Description' },
-                {
-                  key: 'published',
-                  label: 'Status',
-                  render: (v) => (
-                    <span
-                      className={`rounded-lg border px-2 py-0.5 text-xs font-semibold ${
-                        v
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                          : 'bg-slate-100 text-slate-600 border-slate-200'
-                      }`}
-                    >
-                      {v ? 'Live' : 'Hidden'}
-                    </span>
-                  ),
-                },
-                {
-                  key: 'sortOrder',
-                  label: 'Order',
-                  className: 'text-center text-muted-foreground',
-                },
-              ]}
-              addLabel="Add gallery item"
-            />
-          )}
-
           {/* ─── TAB: LIBRARY ─── */}
           {tab === 'library' && (
             <AdminLibraryView
@@ -2199,18 +2054,6 @@ export default function AdminPage() {
           saving={savingId === 'course'}
           existingSlugs={courses.map((c) => c.slug)}
           categoryOptions={categories.filter((c) => c.type === 'course').map((c) => c.name)}
-        />
-      )}
-      {editingGallery && (
-        <GalleryEditor
-          open={galleryOpen}
-          onClose={() => {
-            setGalleryOpen(false)
-            setEditingGallery(null)
-          }}
-          initial={editingGallery}
-          onSave={saveGallery}
-          saving={savingId === 'gallery'}
         />
       )}
       {editingLibrary && (
@@ -4642,127 +4485,6 @@ function CourseEditor({
 }
 
 /* ──────────────────────────────────────────────────────────────
-   Gallery editor modal
-   ────────────────────────────────────────────────────────────── */
-function GalleryEditor({
-  open,
-  onClose,
-  initial,
-  onSave,
-  saving,
-}: {
-  open: boolean
-  onClose: () => void
-  initial: GalleryItem
-  onSave: (data: GalleryItem) => void
-  saving: boolean
-}) {
-  const [form, setForm] = useState<GalleryItem>(initial)
-  const isEdit = !!initial.id
-
-  useEffect(() => {
-    setForm(initial)
-  }, [initial, open])
-
-  function update<K extends keyof GalleryItem>(k: K, v: GalleryItem[K]) {
-    setForm((p) => ({ ...p, [k]: v }))
-  }
-
-  function submit() {
-    if (!form.title.trim() || !form.image.trim()) return
-    onSave(form)
-  }
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={isEdit ? 'Edit Gallery Item' : 'Add Gallery Item'}
-    >
-      <div className="space-y-5">
-        {form.image && (
-          <div>
-            <p className="mb-2 text-xs font-semibold text-muted-foreground">
-              Preview
-            </p>
-            <img
-              src={form.image}
-              alt="Preview"
-              className="max-h-60 w-full rounded-2xl border object-cover"
-              onError={(e) =>
-                ((e.target as any).style.display = 'none')
-              }
-            />
-          </div>
-        )}
-        <Field label="Title *">
-          <input
-            className={inputCls}
-            value={form.title}
-            onChange={(e) => update('title', e.target.value)}
-            placeholder="Workshop activity title"
-          />
-        </Field>
-        <Field label="Image URL *">
-          <input
-            className={inputCls}
-            value={form.image}
-            onChange={(e) => update('image', e.target.value)}
-            placeholder="https://images.unsplash.com/..."
-          />
-        </Field>
-        <Field label="Description / Caption">
-          <textarea
-            rows={3}
-            className={textareaCls}
-            value={form.description || ''}
-            onChange={(e) => update('description', e.target.value || null)}
-            placeholder="What does this photo show?"
-          />
-        </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Sort Order">
-            <input
-              type="number"
-              className={inputCls}
-              value={form.sortOrder}
-              onChange={(e) =>
-                update('sortOrder', Number(e.target.value) || 0)
-              }
-            />
-          </Field>
-          <Field label="Status">
-            <div className="flex h-11 items-center">
-              <label className="inline-flex cursor-pointer items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.published}
-                  onChange={(e) => update('published', e.target.checked)}
-                  className="size-4 accent-primary"
-                />
-                <span className="text-sm font-normal">Visible on website</span>
-              </label>
-            </div>
-          </Field>
-        </div>
-        <div className="flex justify-end gap-3 border-t pt-5">
-          <Button variant="outline" onClick={onClose} disabled={saving}>
-            Cancel
-          </Button>
-          <Button onClick={submit} disabled={saving}>
-            {saving && <Loader2 className="mr-2 size-4 animate-spin" />}
-            {saving
-              ? 'Saving...'
-              : isEdit
-              ? 'Save Changes'
-              : 'Create Gallery Item'}
-          </Button>
-        </div>
-      </div>
-    </Modal>
-  )
-}
-
 /* ──────────────────────────────────────────────────────────────
    Library editor modal
    ────────────────────────────────────────────────────────────── */

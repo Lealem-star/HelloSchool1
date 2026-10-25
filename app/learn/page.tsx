@@ -6,7 +6,7 @@ import { getCourseListSchema, JsonLd } from '@/lib/schema'
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: 'All Courses & Masterclasses | Donkey Academy',
+  title: 'All Courses & Masterclasses',
   description:
     'Explore hands-on masterclasses and technical courses in video editing, smartphone repair, computer maintenance, and electronics.',
   alternates: {

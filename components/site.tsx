@@ -1286,43 +1286,6 @@ export function CTASection() {
   )
 }
 
-export function GalleryCard({
-  title,
-  description,
-  image,
-  className,
-}: {
-  title: string
-  description?: string | null
-  image: string
-  className?: string
-}) {
-  return (
-    <article
-      className={cn(
-        'group overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/40 hover:shadow-xl hover:shadow-blue-950/10',
-        className
-      )}
-    >
-      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 dark:bg-slate-800">
-        <img
-          src={image}
-          alt={title}
-          className="size-full object-cover transition duration-700 ease-out group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0b1d47]/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      </div>
-      <div className="p-5">
-        <h3 className="font-semibold text-foreground transition-colors group-hover:text-primary">
-          {title}
-        </h3>
-        {description ? (
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
-        ) : null}
-      </div>
-    </article>
-  )
-}
 
 export { ChevronRight, ChevronDown, Clock3, Play, Phone, Mail, MapPin }
 

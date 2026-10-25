@@ -207,7 +207,7 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-foreground flex flex-col justify-between">
-      {/* ──── TOP HEADER (EXACT DONKEY ACADEMY STYLE) ──── */}
+      {/* ──── TOP HEADER ──── */}
       <header className="w-full bg-white dark:bg-card border-b border-border/70 sticky top-0 z-40 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           {/* Logo */}
