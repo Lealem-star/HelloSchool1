@@ -17,7 +17,9 @@ import {
   ImageIcon,
   Folder,
   Users,
+  User as UserIcon,
   UserCog,
+  ExternalLink,
   Check,
   KeyRound,
   Camera,
@@ -52,6 +54,7 @@ import {
   Play,
   DollarSign,
   Star,
+  LayoutDashboard,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/components/ui/dialog-modal'
@@ -86,6 +89,7 @@ import {
   AdminInquiryReaderModal,
   UnifiedInquiry,
 } from '@/components/admin-inquiries-notification'
+import { AdminDashboardView } from '@/components/admin-dashboard-view'
 
 /* ──────────────────────────────────────────────────────────────
    Shared types
@@ -262,6 +266,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
   const [tab, setTab] = useState<
+    | 'dashboard'
     | 'registrations'
     | 'trusted-partners'
     | 'courses'
@@ -272,10 +277,16 @@ export default function AdminPage() {
     | 'facilities'
     | 'projects'
     | 'profile'
-  >('registrations')
+  >('dashboard')
   const [loading, setLoading] = useState(false)
   const [savingId, setSavingId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+
+  // Profile dropdown menu states
+  const [sidebarProfileOpen, setSidebarProfileOpen] = useState(false)
+  const [headerProfileOpen, setHeaderProfileOpen] = useState(false)
+  const sidebarProfileRef = useRef<HTMLDivElement>(null)
+  const headerProfileRef = useRef<HTMLDivElement>(null)
 
   // Selected Inquiry for Detailed Reader Modal
   const [readerInquiry, setReaderInquiry] = useState<UnifiedInquiry | null>(null)
@@ -362,6 +373,21 @@ export default function AdminPage() {
       .then((r) => r.json())
       .then((d) => d.user && setUser(d.user))
       .catch(() => {})
+  }, [])
+
+  /* ─── Close profile dropdowns on click outside ─── */
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node
+      if (sidebarProfileRef.current && !sidebarProfileRef.current.contains(target)) {
+        setSidebarProfileOpen(false)
+      }
+      if (headerProfileRef.current && !headerProfileRef.current.contains(target)) {
+        setHeaderProfileOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   /* ─── Load data on tab change ─── */
@@ -1480,6 +1506,7 @@ export default function AdminPage() {
      DASHBOARD (Grouped Navigation)
      ────────────────────────────────────────────────────────── */
   type AdminTabId =
+    | 'dashboard'
     | 'registrations'
     | 'trusted-partners'
     | 'courses'
@@ -1508,6 +1535,21 @@ export default function AdminPage() {
   }
 
   const adminNavGroups: AdminNavGroup[] = [
+    {
+      id: 'analytics',
+      title: 'Executive Intelligence',
+      icon: LayoutDashboard,
+      items: [
+        {
+          id: 'dashboard',
+          label: 'Executive Dashboard',
+          shortLabel: 'Dashboard',
+          icon: LayoutDashboard,
+          count: 0,
+          badge: 'Live',
+        },
+      ],
+    },
     {
       id: 'admissions',
       title: 'Learners & Enrollments',
@@ -1629,41 +1671,22 @@ export default function AdminPage() {
               </div>
             )
           })}
-
-          {/* Quick stats divider */}
-          <div className="border-t border-blue-900/40 pt-4 px-1">
-            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-blue-300/70">
-              Live Pipeline Overview
-            </p>
-            <div className="flex flex-col gap-1.5 rounded-xl bg-white/5 p-2.5 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-blue-200/70">Total Inquiries</span>
-                <span className="font-semibold text-white">{overview.total}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-blue-200/70">Pending Activation</span>
-                <span className="font-semibold text-amber-300">{regOverview.pending}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-blue-200/70">Active Learners</span>
-                <span className="font-semibold text-emerald-300">{regOverview.approved + regOverview.enrolled}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-blue-200/70">Company Training</span>
-                <span className="font-semibold text-sky-300">{companyOverview.total}</span>
-              </div>
-            </div>
-          </div>
         </nav>
 
-        {/* Bottom user strip */}
-        <div className="shrink-0 border-t border-blue-900/40 p-3 bg-[#081533]">
-          <div className="flex items-center gap-3 rounded-xl bg-white/10 px-3 py-2.5">
+        {/* Bottom user strip with profile popover */}
+        <div className="relative shrink-0 border-t border-blue-900/40 p-3 bg-[#081533]" ref={sidebarProfileRef}>
+          <button
+            type="button"
+            onClick={() => setSidebarProfileOpen((prev) => !prev)}
+            className="w-full flex items-center gap-3 rounded-xl bg-white/10 hover:bg-white/15 px-3 py-2.5 text-left transition cursor-pointer group border border-white/5 hover:border-white/20 focus:outline-none focus:ring-2 focus:ring-sky-400/30"
+            aria-expanded={sidebarProfileOpen}
+            aria-label="Admin Profile Menu"
+          >
             {user.avatarUrl ? (
               <img
                 src={user.avatarUrl}
                 alt=""
-                className="size-8 shrink-0 rounded-full object-cover border border-white/20"
+                className="size-8 shrink-0 rounded-full object-cover border border-white/20 group-hover:border-white/40 transition"
               />
             ) : (
               <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-[#155DFC]">
@@ -1671,26 +1694,79 @@ export default function AdminPage() {
               </span>
             )}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-semibold text-white">{user.name || 'Admin'}</p>
-              <p className="truncate text-[10px] text-blue-200">{user.email}</p>
+              <p className="truncate text-xs font-semibold text-white group-hover:text-sky-200 transition">{user.name || 'Admin'}</p>
+              <p className="truncate text-[10px] text-blue-200/80">{user.email}</p>
             </div>
-          </div>
-          <div className="mt-2 flex items-center gap-1.5">
-            <a
-              href="/"
-              target="_blank"
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-blue-200 transition hover:bg-white/10 hover:text-white"
-            >
-              <ArrowLeft className="size-3" /> View site
-            </a>
-            <ThemeToggle size="sm" className="border-blue-900/50 bg-white/10 text-white hover:bg-white/20 hover:border-white/30" />
-            <button
-              onClick={handleLogout}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-blue-200 transition hover:bg-white/10 hover:text-red-300 cursor-pointer"
-            >
-              <LogOut className="size-3" /> Logout
-            </button>
-          </div>
+            <ChevronUp className={`size-3.5 text-blue-300 transition-transform duration-200 shrink-0 ${sidebarProfileOpen ? 'rotate-180 text-white' : ''}`} />
+          </button>
+
+          {/* Floating upward popover menu */}
+          {sidebarProfileOpen && (
+            <div className="absolute bottom-full left-3 right-3 mb-2 rounded-2xl bg-[#081533] border border-blue-800/80 shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="px-3 py-2.5 border-b border-blue-900/60">
+                <div className="flex items-center gap-2.5">
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" className="size-8 rounded-full object-cover border border-sky-400/40" />
+                  ) : (
+                    <span className="flex size-8 items-center justify-center rounded-full bg-sky-500/20 text-sky-400 text-xs font-bold">
+                      {(user.name || user.email).charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-white truncate">{user.name || 'Admin'}</p>
+                    <p className="text-[10px] text-blue-200 truncate">{user.email}</p>
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center justify-between">
+                  <span className="rounded-full bg-sky-500/20 border border-sky-500/30 px-2 py-0.5 text-[9px] font-semibold text-sky-300 uppercase tracking-wider">
+                    {user.role || 'Administrator'}
+                  </span>
+                  <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+                    <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-1 space-y-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTab('profile')
+                    setSidebarProfileOpen(false)
+                  }}
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-blue-100 hover:text-white hover:bg-white/10 transition cursor-pointer text-left"
+                >
+                  <UserCog className="size-4 text-sky-400 shrink-0" />
+                  <span>Profile & Picture</span>
+                </button>
+
+                <a
+                  href="/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-blue-100 hover:text-white hover:bg-white/10 transition cursor-pointer text-left"
+                  onClick={() => setSidebarProfileOpen(false)}
+                >
+                  <ExternalLink className="size-4 text-blue-300 shrink-0" />
+                  <span>View Public Site</span>
+                </a>
+              </div>
+
+              <div className="p-1 border-t border-blue-900/60">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSidebarProfileOpen(false)
+                    handleLogout()
+                  }}
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-rose-300 hover:text-rose-200 hover:bg-rose-500/15 transition cursor-pointer text-left"
+                >
+                  <LogOut className="size-4 text-rose-400 shrink-0" />
+                  <span className="font-semibold">Log out</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -1740,6 +1816,81 @@ export default function AdminPage() {
                 <RefreshCw className={`size-3.5 ${loading ? 'animate-spin' : ''}`} />
                 <span>Refresh</span>
               </Button>
+
+              {/* Header profile dropdown trigger */}
+              <div className="relative ml-1" ref={headerProfileRef}>
+                <button
+                  type="button"
+                  onClick={() => setHeaderProfileOpen((prev) => !prev)}
+                  className="flex items-center gap-2 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 p-1 pr-2.5 transition cursor-pointer"
+                  aria-expanded={headerProfileOpen}
+                  aria-label="Admin Profile"
+                >
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt=""
+                      className="size-7 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
+                    />
+                  ) : (
+                    <span className="flex size-7 items-center justify-center rounded-lg bg-[#155DFC] text-[11px] font-bold text-white shadow-xs">
+                      {(user.name || user.email).charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 hidden sm:inline truncate max-w-[110px]">
+                    {user.name || 'Admin'}
+                  </span>
+                  <ChevronDown className={`size-3.5 text-slate-400 transition-transform duration-200 ${headerProfileOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {headerProfileOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xl p-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+                      <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{user.name || 'Admin'}</p>
+                      <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
+                      <span className="mt-1 inline-block rounded-md bg-blue-50 dark:bg-blue-950/60 px-1.5 py-0.5 text-[9px] font-semibold text-blue-600 dark:text-sky-400 uppercase">
+                        {user.role}
+                      </span>
+                    </div>
+                    <div className="p-1 space-y-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTab('profile')
+                          setHeaderProfileOpen(false)
+                        }}
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer text-left"
+                      >
+                        <UserCog className="size-4 text-blue-600 dark:text-sky-400 shrink-0" />
+                        <span>Profile & Picture</span>
+                      </button>
+                      <a
+                        href="/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer text-left"
+                        onClick={() => setHeaderProfileOpen(false)}
+                      >
+                        <ExternalLink className="size-4 text-slate-400 shrink-0" />
+                        <span>View Public Site</span>
+                      </a>
+                    </div>
+                    <div className="p-1 border-t border-slate-100 dark:border-slate-800">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setHeaderProfileOpen(false)
+                          handleLogout()
+                        }}
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl text-xs font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer text-left"
+                      >
+                        <LogOut className="size-4 shrink-0" />
+                        <span className="font-semibold">Log out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -1780,6 +1931,13 @@ export default function AdminPage() {
 
         {/* Scrollable content */}
         <main className="flex-1 overflow-y-auto px-6 py-7">
+
+          {/* ─── TAB: EXECUTIVE DASHBOARD & REPORTS ─── */}
+          {tab === 'dashboard' && (
+            <AdminDashboardView
+              onNavigateToRegistrations={() => setTab('registrations')}
+            />
+          )}
 
           {/* ─── TAB: REGISTRATIONS / ENROLLMENTS ─── */}
           {tab === 'registrations' && (
@@ -2149,6 +2307,10 @@ function ProfileView({
   const [avatarMsg, setAvatarMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  useEffect(() => {
+    setAvatarUrl(user.avatarUrl || '')
+  }, [user.avatarUrl])
+
   // Name form
   const [name, setName] = useState(user.name || '')
   const [nameSaving, setNameSaving] = useState(false)
@@ -2198,6 +2360,16 @@ function ProfileView({
 
     setAvatarMsg(null)
     setUploading(true)
+
+    // Instant local preview
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      if (ev.target?.result) {
+        setAvatarUrl(ev.target.result as string)
+      }
+    }
+    reader.readAsDataURL(file)
+
     try {
       const formData = new FormData()
       formData.append('file', file)
@@ -2328,7 +2500,7 @@ function ProfileView({
         </div>
       </div>
 
-      {/* ── Avatar & Profile Picture Card ── */}
+      {/* ── Avatar & Profile Picture Card (Matching Student Portal) ── */}
       <div className={cardCls}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -2342,22 +2514,45 @@ function ProfileView({
               type="button"
               onClick={() => saveAvatar(null)}
               disabled={avatarSaving || uploading}
-              className="text-xs font-semibold text-rose-500 hover:underline disabled:opacity-50"
+              className="text-xs font-semibold text-rose-500 hover:underline disabled:opacity-50 cursor-pointer"
             >
               Reset to initials
             </button>
           )}
         </div>
         <p className="mt-1 text-xs text-slate-400">
-          Upload your technician picture, pick a preset avatar, or enter an image link.
+          Upload your profile photo, pick a preset avatar, or enter an image link.
         </p>
 
-        {/* ── Direct File Upload Drag & Drop Zone ── */}
-        <div className="mt-5">
+        {avatarMsg && (
+          <div
+            className={`mt-4 rounded-xl p-3 text-xs font-medium flex items-center justify-between ${
+              avatarMsg.type === 'ok'
+                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
+            }`}
+          >
+            <span>{avatarMsg.text}</span>
+            <button
+              type="button"
+              onClick={() => setAvatarMsg(null)}
+              className="text-slate-400 hover:text-slate-600 ml-2 cursor-pointer"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+        )}
+
+        {/* Circular Upload Area matching Student Portal */}
+        <div className="mt-6 flex flex-col items-center">
+          <span className="self-center text-xs font-semibold text-slate-700 dark:text-slate-300 mb-3">
+            Avatar
+          </span>
+
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/png,image/jpeg,image/webp,image/gif"
+            accept="image/*"
             className="hidden"
             onChange={(e) => {
               const file = e.target.files?.[0]
@@ -2366,7 +2561,9 @@ function ProfileView({
             }}
           />
 
+          {/* Circular Upload Box matching Student Portal */}
           <div
+            onClick={() => fileInputRef.current?.click()}
             onDragOver={(e) => {
               e.preventDefault()
               setDragOver(true)
@@ -2378,27 +2575,77 @@ function ProfileView({
               const file = e.dataTransfer.files?.[0]
               if (file) handleFileUpload(file)
             }}
-            onClick={() => fileInputRef.current?.click()}
-            className={`group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-7 text-center transition ${
+            className={`size-44 md:size-52 rounded-full border transition cursor-pointer flex flex-col items-center justify-center p-4 text-center overflow-hidden relative group shadow-xs ${
               dragOver
-                ? 'border-blue-500 bg-blue-500/10'
-                : 'border-slate-200 bg-slate-50/60 hover:border-blue-500/60 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-blue-400/40'
+                ? 'border-sky-500 bg-sky-500/10 ring-4 ring-sky-500/20'
+                : 'border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-800/60'
             }`}
           >
-            <div className="flex size-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-600 transition group-hover:scale-105 dark:text-sky-400">
-              {uploading || avatarSaving ? (
-                <Loader2 className="size-6 animate-spin" />
-              ) : (
-                <Upload className="size-6" />
-              )}
-            </div>
-            <p className="mt-3.5 text-sm font-semibold text-slate-800 dark:text-slate-100">
-              {uploading ? 'Uploading and optimizing photo...' : 'Click to upload or drag & drop photo'}
-            </p>
-            <p className="mt-1 text-xs text-slate-400">
-              Supports PNG, JPG, WebP or GIF up to 5MB (Stored in server uploads)
-            </p>
+            {uploading ? (
+              <div className="flex flex-col items-center justify-center gap-2">
+                <Loader2 className="size-10 text-sky-500 animate-spin" />
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  Uploading...
+                </p>
+              </div>
+            ) : avatarUrl ? (
+              <>
+                <img
+                  src={avatarUrl}
+                  alt="Avatar Preview"
+                  className="size-full object-cover rounded-full"
+                />
+                {/* Hover overlay for changing picture */}
+                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center text-white p-3">
+                  <Camera className="size-7 mb-1 text-sky-300" />
+                  <span className="text-xs font-semibold">Change Picture</span>
+                  <span className="text-[10px] text-slate-300 mt-0.5">Click or drop file</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <UserIcon className="size-16 text-sky-400 stroke-1 mb-2" />
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-[120px] leading-tight">
+                  Click here or drag image to add
+                </p>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    fileInputRef.current?.click()
+                  }}
+                  className="mt-3 rounded-lg border border-sky-400 text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-950/40 px-3.5 py-1 text-xs font-semibold transition cursor-pointer"
+                >
+                  Select File
+                </button>
+              </>
+            )}
           </div>
+
+          <p className="mt-3 text-[11px] text-slate-400">
+            Supports PNG, JPG, WebP or GIF up to 5MB
+          </p>
+
+          {avatarUrl && (
+            <div className="mt-3 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || avatarSaving}
+                className="rounded-lg border border-sky-400 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-950/40 px-3.5 py-1.5 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
+              >
+                <Camera className="size-3.5" /> Select File
+              </button>
+              <button
+                type="button"
+                onClick={() => saveAvatar(null)}
+                disabled={uploading || avatarSaving}
+                className="rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 px-3 py-1.5 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
+              >
+                <Trash2 className="size-3.5" /> Remove
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Preset Avatars Grid */}
