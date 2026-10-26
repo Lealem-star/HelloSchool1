@@ -25,6 +25,8 @@ import {
   Video,
   FileText,
   Loader2,
+  HelpCircle,
+  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SiteShell } from '@/components/site'
@@ -50,15 +52,20 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
 
   // State
   const [isPlayingVideo, setIsPlayingVideo] = useState(false)
+  const [currentVideoUrl, setCurrentVideoUrl] = useState<string | null>(null)
+  const [selectedActivityId, setSelectedActivityId] = useState<string>('act-3')
+  const [quizModalActivity, setQuizModalActivity] = useState<any | null>(null)
   const [copiedShare, setCopiedShare] = useState(false)
   const [openModules, setOpenModules] = useState<Record<string, boolean>>({
     'mod-1': true,
+    'mod-2': true,
     'custom-mod-1': true,
     'custom-ch-1': true,
   })
   const [student, setStudent] = useState<any>(null)
   const [hasPurchased, setHasPurchased] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
+  const videoContainerRef = React.useRef<HTMLDivElement>(null)
 
   // Check student auth state and existing purchase
   useEffect(() => {
@@ -121,6 +128,56 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
       if (isVideo && resource.lessons) {
         const raw = typeof resource.lessons === 'string' ? JSON.parse(resource.lessons) : resource.lessons
         if (Array.isArray(raw) && raw.length > 0) {
+          // Check if raw contains multi-module structure
+          const isModuleArray = raw.some(
+            (item: any) =>
+              item &&
+              (Array.isArray(item.lessons) ||
+                Array.isArray(item.activities) ||
+                (typeof item.title === 'string' &&
+                  (item.title.toLowerCase().includes('module') ||
+                    item.title.toLowerCase().includes('chapter') ||
+                    item.title.toLowerCase().includes('ምዕራፍ'))))
+          )
+
+          if (isModuleArray) {
+            return raw.map((mod: any, mIdx: number) => {
+              const items = Array.isArray(mod.lessons)
+                ? mod.lessons
+                : Array.isArray(mod.activities)
+                ? mod.activities
+                : []
+              return {
+                id: mod.id || `mod-${mIdx + 1}`,
+                title: mod.title || `Module ${mIdx + 1}`,
+                activities: items.map((act: any, aIdx: number) => {
+                  if (typeof act === 'string') {
+                    const isQ =
+                      act.toLowerCase().includes('quiz') ||
+                      act.toLowerCase().includes('test') ||
+                      act.toLowerCase().includes('exam')
+                    return {
+                      id: `act-${mIdx}-${aIdx}`,
+                      title: act,
+                      type: isQ ? 'quiz' : 'video',
+                      duration: isQ ? '15 min' : '30 min',
+                    }
+                  }
+                  return {
+                    id: act.id || `act-${mIdx}-${aIdx}`,
+                    title: act.title || `Activity ${aIdx + 1}`,
+                    type: act.type === 'quiz' ? 'quiz' : 'video',
+                    duration: act.duration || (act.type === 'quiz' ? '15 min' : '30 min'),
+                    videoUrl: act.videoUrl || '',
+                    labExercise: act.labExercise || '',
+                    quizNotes: act.quizNotes || '',
+                  }
+                }),
+              }
+            })
+          }
+
+          // Flat list of lessons: wrap in Module 1
           return [
             {
               id: 'custom-mod-1',
@@ -128,10 +185,25 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
                 ? 'ምዕራፍ 1፡ የላብራቶሪ የቪዲዮ ትምህርቶች (Practical Video Lessons)'
                 : 'Module 1: Structured Hands-On Workbench Lessons',
               activities: raw.map((les: any, i: number) => {
-                const title = les.title || `Lesson ${i + 1}`
-                const dur = les.duration ? ` (${les.duration})` : ''
-                const lab = les.labExercise ? ` · [Lab: ${les.labExercise}]` : ''
-                return `${title}${dur}${lab}`
+                if (typeof les === 'string') {
+                  const isQ = les.toLowerCase().includes('quiz')
+                  return {
+                    id: `les-${i}`,
+                    title: les,
+                    type: isQ ? 'quiz' : 'video',
+                    duration: '30 min',
+                  }
+                }
+                const isQ = les.type === 'quiz'
+                return {
+                  id: les.id || `les-${i}`,
+                  title: les.title || `Lesson ${i + 1}`,
+                  type: isQ ? 'quiz' : 'video',
+                  duration: les.duration || '30 min',
+                  videoUrl: les.videoUrl || '',
+                  labExercise: les.labExercise || '',
+                  quizNotes: les.quizNotes || '',
+                }
               }),
             },
           ]
@@ -146,10 +218,21 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
                 ? 'ምዕራፍ 1፡ የመጽሐፉ ይዘቶችና የሰርኪዩት ማውጫ'
                 : 'Chapter 1: Diagnostic Reading Sections & Schematics',
               activities: raw.map((ch: any, i: number) => {
-                const title = ch.title || `Chapter ${i + 1}`
-                const pages = ch.pageRange ? ` (${ch.pageRange})` : ''
-                const sum = ch.summary ? ` · ${ch.summary}` : ''
-                return `${title}${pages}${sum}`
+                if (typeof ch === 'string') {
+                  return {
+                    id: `ch-${i}`,
+                    title: ch,
+                    type: 'activity',
+                    duration: '',
+                  }
+                }
+                return {
+                  id: ch.id || `ch-${i}`,
+                  title: ch.title || `Chapter ${i + 1}`,
+                  type: 'activity',
+                  duration: ch.pageRange || '',
+                  labExercise: ch.summary || '',
+                }
               }),
             },
           ]
@@ -161,6 +244,7 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
     return null
   }, [isVideo, resource.lessons, resource.chapters, isAm])
 
+  // Standard 6-Module Curriculum with 20 Activities matching Screenshot
   const defaultModules = isVideo
     ? [
         {
@@ -169,10 +253,34 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
             ? 'ምዕራፍ 1፡ የላብራቶሪ መሣሪያዎች አጠቃቀምና የደህንነት መርሆዎች'
             : 'Module 1: Professional Bench Safety & Diagnostic Setup',
           activities: [
-            isAm ? 'ክፍል 1፡ የስቴሪዮ ማይክሮስኮፕ አቀማመጥ እና የብርሃን ማስተካከያ' : 'Activity 1: Stereo Microscope Focal Alignment & Optical Calibration',
-            isAm ? 'ክፍል 2፡ የዲጂታል መልቲሜትር የዳዮድ ሞድ መለኪያ መርሆዎች' : 'Activity 2: Multimeter Diode Mode Voltage Drop Fundamentals',
-            isAm ? 'ክፍል 3፡ የዲሲ ፓወር ሰፕላይ እና የሾርት መለያ ቴክኒኮች' : 'Activity 3: DC Bench Power Supply Current Profiling & Short Isolation',
-            isAm ? 'ክፍል 4፡ የESD ፀረ-ስታቲክ እና የጭስ መሳቢያ ደህንነት' : 'Activity 4: ESD Static Protection & Fume Extraction Protocols',
+            {
+              id: 'act-1',
+              title: isAm ? 'ክፍል 1፡ የስቴሪዮ ማይክሮስኮፕ አቀማመጥ እና የብርሃን ማስተካከያ' : 'Activity 1: Stereo Microscope Focal Alignment & Optical Calibration',
+              type: 'video',
+              duration: '25 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-2',
+              title: isAm ? 'ክፍል 2፡ የዲጂታል መልቲሜትር የዳዮድ ሞድ መለኪያ መርሆዎች' : 'Activity 2: Multimeter Diode Mode Voltage Drop Fundamentals',
+              type: 'video',
+              duration: '30 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-3',
+              title: isAm ? 'ክፍል 3፡ የዲሲ ፓወር ሰፕላይ እና የሾርት መለያ ቴክኒኮች' : 'Activity 3: DC Bench Power Supply Current Profiling & Short Isolation',
+              type: 'video',
+              duration: '40 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-4',
+              title: isAm ? 'ክፍል 4፡ የESD ፀረ-ስታቲክ እና የጭስ መሳቢያ ደህንነት ፈተና' : 'Activity 4: ESD Static Protection & Fume Extraction Protocols',
+              type: 'quiz',
+              duration: '15 min',
+              quizNotes: 'Workbench ESD safety, ground integrity and fume extraction safety test.',
+            },
           ],
         },
         {
@@ -181,10 +289,34 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
             ? 'ምዕራፍ 2፡ የሰርኪዩት ንድፍ (Schematics) ንባብና የቦርድ ቪው ዳሰሳ'
             : 'Module 2: Boardview Navigation & Power Rail Schematics',
           activities: [
-            isAm ? 'ክፍል 5፡ የዋናው ፓወር መስመር (VDD_MAIN / VBAT) ፍተሻ' : 'Activity 5: Primary Power Rail Tracing (VDD_MAIN / VPH_PWR)',
-            isAm ? 'ክፍል 6፡ የሰከንዳሪ BUCK ኢንደክተሮችና LDO ሬጉሌተሮች' : 'Activity 6: Secondary Buck Converters & LDO Voltage Drops',
-            isAm ? 'ክፍል 7፡ የሲግናል ክፍተቶችና የኦፕን መስመሮች መለያ' : 'Activity 7: High-Z Line Testing & Open Circuit Detection',
-            isAm ? 'ክፍል 8፡ የI2C እና SPI ኮሙኒኬሽን መስመሮች ፍተሻ' : 'Activity 8: I2C & SPI Protocol Bus Resistance Diagnostics',
+            {
+              id: 'act-5',
+              title: isAm ? 'ክፍል 5፡ የዋናው ፓወር መስመር (VDD_MAIN / VBAT) ፍተሻ' : 'Activity 5: Primary Power Rail Tracing (VDD_MAIN / VPH_PWR)',
+              type: 'video',
+              duration: '35 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-6',
+              title: isAm ? 'ክፍል 6፡ የሰከንዳሪ BUCK ኢንደክተሮችና LDO ሬጉሌተሮች' : 'Activity 6: Secondary Buck Converters & LDO Voltage Drops',
+              type: 'video',
+              duration: '30 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-7',
+              title: isAm ? 'ክፍል 7፡ የሲግናል ክፍተቶችና የኦፕን መስመሮች መለያ' : 'Activity 7: High-Z Line Testing & Open Circuit Detection',
+              type: 'video',
+              duration: '25 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-8',
+              title: isAm ? 'ክፍል 8፡ የI2C እና SPI ኮሙኒኬሽን መስመሮች ፍተሻ ፈተና' : 'Activity 8: I2C & SPI Protocol Bus Resistance Diagnostics',
+              type: 'quiz',
+              duration: '20 min',
+              quizNotes: 'Serial data/clock bus pull-up resistors and short-circuit diagnosis quiz.',
+            },
           ],
         },
         {
@@ -193,9 +325,27 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
             ? 'ምዕራፍ 3፡ የቻርጅ ሰርኪዩት እና የባትሪ አያያዝ'
             : 'Module 3: Fast Charging Architecture & Handshake Protocols',
           activities: [
-            isAm ? 'ክፍል 9፡ የVBUS 5.0V እና OVP ፕሮቴክሽን ቺፕ ፍተሻ' : 'Activity 9: VBUS 5V Ingestion & OVP MOSFET Bypass Analysis',
-            isAm ? 'ክፍል 10፡ የType-C CC መስመሮች እና የቻርጅ ቺፕ አሰራር' : 'Activity 10: Type-C CC Orientation & PMIC Handshake Testing',
-            isAm ? 'ክፍል 11፡ የባትሪ ቴርሚስተር (NTC) የሙቀት ስህተት አፈታት' : 'Activity 11: Battery NTC Thermistor & Fake-Charging Resolution',
+            {
+              id: 'act-9',
+              title: isAm ? 'ክፍል 9፡ የVBUS 5.0V እና OVP ፕሮቴክሽን ቺፕ ፍተሻ' : 'Activity 9: VBUS 5V Ingestion & OVP MOSFET Bypass Analysis',
+              type: 'video',
+              duration: '30 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-10',
+              title: isAm ? 'ክፍል 10፡ የType-C CC መስመሮች እና የቻርጅ ቺፕ አሰራር' : 'Activity 10: Type-C CC Orientation & PMIC Handshake Testing',
+              type: 'video',
+              duration: '25 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-11',
+              title: isAm ? 'ክፍል 11፡ የባትሪ ቴርሚስተር (NTC) የሙቀት ስህተት አፈታት ፈተና' : 'Activity 11: Battery NTC Thermistor & Fake-Charging Resolution',
+              type: 'quiz',
+              duration: '15 min',
+              quizNotes: 'NTC thermistor resistance curves and temperature warning troubleshooting quiz.',
+            },
           ],
         },
         {
@@ -204,9 +354,27 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
             ? 'ምዕራፍ 4፡ ንዑስ ብየዳ (Micro-Soldering) እና ጃምፐር ሽቦ ዝርጋታ'
             : 'Module 4: Precision Micro-Soldering & 0.01mm Jumper Routing',
           activities: [
-            isAm ? 'ክፍል 12፡ የተበላሹ የሰርኪዩት መስመሮችን በ0.01mm ጃምፐር ማገናኘት' : 'Activity 12: Micro-Jumper Bridging across Torn Motherboard Vias',
-            isAm ? 'ክፍል 13፡ የUV ግሪን ማስክ ማድረቅና የፓድ መጠገን' : 'Activity 13: UV Solder Mask Curing & SMT Pad Reconstruction',
-            isAm ? 'ክፍል 14፡ BGA ቺፖችን በስቴንስል ዳግም ማዘጋጀት (Reballing)' : 'Activity 14: BGA Stencil Reballing & Low-Temp Alloy Melting',
+            {
+              id: 'act-12',
+              title: isAm ? 'ክፍል 12፡ የተበላሹ የሰርኪዩት መስመሮችን በ0.01mm ጃምፐር ማገናኘት' : 'Activity 12: Micro-Jumper Bridging across Torn Motherboard Vias',
+              type: 'video',
+              duration: '45 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-13',
+              title: isAm ? 'ክፍል 13፡ የUV ግሪን ማስክ ማድረቅና የፓድ መጠገን' : 'Activity 13: UV Solder Mask Curing & SMT Pad Reconstruction',
+              type: 'video',
+              duration: '30 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-14',
+              title: isAm ? 'ክፍል 14፡ BGA ቺፖችን በስቴንስል ዳግም ማዘጋጀት ተግባራዊ ፈተና' : 'Activity 14: BGA Stencil Reballing & Low-Temp Alloy Melting',
+              type: 'quiz',
+              duration: '20 min',
+              quizNotes: 'Thermal profiles, stencil alignment and BGA reballing quality inspection assessment.',
+            },
           ],
         },
         {
@@ -215,8 +383,27 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
             ? 'ምዕራፍ 5፡ የዲስፕሌይ እና የጀርባ ብርሃን (Backlight) ጥገና'
             : 'Module 5: Display Backlight Boost Circuit Reconstruction',
           activities: [
-            isAm ? 'ክፍል 15፡ የከፍተኛ ቮልቴጅ ቡስት ኢንደክተር እና ዳዮድ ፍተሻ' : 'Activity 15: High-Voltage Boost Diode & Inductor Testing',
-            isAm ? 'ክፍል 16፡ የOLED እና LCD ስክሪን ኬብል ግንኙነት ጥገና' : 'Activity 16: OLED Display Power Rail Diagnostics & FPC Rework',
+            {
+              id: 'act-15',
+              title: isAm ? 'ክፍል 15፡ የከፍተኛ ቮልቴጅ ቡስት ኢንደክተር እና ዳዮድ ፍተሻ' : 'Activity 15: High-Voltage Boost Diode & Inductor Testing',
+              type: 'video',
+              duration: '35 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-16',
+              title: isAm ? 'ክፍል 16፡ የOLED እና LCD ስክሪን ኬብል ግንኙነት ጥገና' : 'Activity 16: OLED Display Power Rail Diagnostics & FPC Rework',
+              type: 'video',
+              duration: '40 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-17',
+              title: isAm ? 'ክፍል 17፡ የጀርባ ብርሃን ቺፕ እና የPWM ማደብዘዣ መስመሮች ፈተና' : 'Activity 17: Backlight Driver PWM Dimming & Anode Rail Assessment',
+              type: 'quiz',
+              duration: '15 min',
+              quizNotes: 'OLED / LCD backlight circuit troubleshooting and driver IC diagnostics quiz.',
+            },
           ],
         },
         {
@@ -225,8 +412,27 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
             ? 'ምዕራፍ 6፡ የመጨረሻ የጥራት ፍተሻ (QA) እና የCOC ፈተና ዝግጅት'
             : 'Module 6: Bench QA Verification & National COC Readiness',
           activities: [
-            isAm ? 'ክፍል 17፡ የተጠገኑ መሳሪያዎች የሙሉ ተግባር ማረጋገጫ ቼክሊስት' : 'Activity 17: Multi-Point Diagnostic QA Checklist',
-            isAm ? 'ክፍል 18፡ የብሔራዊ የሙያ ብቃት (COC) ተግባራዊ ፈተና ዝግጅት' : 'Activity 18: National TVET Practical COC Simulation Drills',
+            {
+              id: 'act-18',
+              title: isAm ? 'ክፍል 18፡ የተጠገኑ መሳሪያዎች የሙሉ ተግባር ማረጋገጫ ቼክሊስት' : 'Activity 18: Multi-Point Diagnostic QA Checklist',
+              type: 'video',
+              duration: '30 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-19',
+              title: isAm ? 'ክፍል 19፡ የሙቀት ካሜራ ፍተሻ እና የአጭር ሰርኪውት መለያ' : 'Activity 19: Thermal Camera Secondary Diagnostics & Current Leak Detection',
+              type: 'video',
+              duration: '35 min',
+              videoUrl: resource.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+            },
+            {
+              id: 'act-20',
+              title: isAm ? 'ክፍል 20፡ የብሔራዊ የሙያ ብቃት (COC) ተግባራዊ ፈተና ዝግጅት' : 'Activity 20: National TVET Practical COC Simulation Drills',
+              type: 'quiz',
+              duration: '45 min',
+              quizNotes: 'Comprehensive TVET Level IV Hardware COC practical exam simulation.',
+            },
           ],
         },
       ]
@@ -237,9 +443,9 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
             ? 'ምዕራፍ 1፡ የሃርድዌር ሰርኪዩት ንድፍ እና የመለኪያ መመሪያዎች'
             : 'Chapter 1: Power Sequencing & Voltage Test Points',
           activities: [
-            isAm ? 'ክፍል 1፡ የዋናው ሰሌዳ ቮልቴጅ ሰንጠረዥ እና የመቋቋም አቅም' : 'Topic 1: Motherboard Diode Drop Reading Reference Chart',
-            isAm ? 'ክፍል 2፡ የባትሪ እና የቻርጅ ሰርኪዩት ፍሰት ዲያግራም' : 'Topic 2: Battery & VBUS Step-by-Step Circuit Flowchart',
-            isAm ? 'ክፍል 3፡ የሾርት ሰርኪውት መለያ ቼክሊስት' : 'Topic 3: Systematic Dead-Short Elimination Matrix',
+            { id: 'ch-1', title: isAm ? 'ክፍል 1፡ የዋናው ሰሌዳ ቮልቴጅ ሰንጠረዥ እና የመቋቋም አቅም' : 'Topic 1: Motherboard Diode Drop Reading Reference Chart', type: 'activity', duration: 'pp. 1-25' },
+            { id: 'ch-2', title: isAm ? 'ክፍል 2፡ የባትሪ እና የቻርጅ ሰርኪዩት ፍሰት ዲያግራም' : 'Topic 2: Battery & VBUS Step-by-Step Circuit Flowchart', type: 'activity', duration: 'pp. 26-50' },
+            { id: 'ch-3', title: isAm ? 'ክፍል 3፡ የሾርት ሰርኪውት መለያ ቼክሊስት' : 'Topic 3: Systematic Dead-Short Elimination Matrix', type: 'quiz', duration: 'Assessment Quiz' },
           ],
         },
         {
@@ -248,29 +454,42 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
             ? 'ምዕራፍ 2፡ የላፕቶፕ እና የስማርትፎን ቺፖች ማውጫ'
             : 'Chapter 2: Component Identification & Pinout Handbooks',
           activities: [
-            isAm ? 'ክፍል 4፡ የSMD ኮዶችና የቺፕ ማርኪንግ ዲኮደር' : 'Topic 4: SMD Package Codes & Capacitor Marking Lookups',
-            isAm ? 'ክፍል 5፡ የPower Management IC (PMIC) ፒንአውቶች' : 'Topic 5: Power Management IC Pin Function Diagnostic Maps',
-            isAm ? 'ክፍል 6፡ የኢንዱስትሪ ደረጃ የሙያ COC ሰነዶች' : 'Topic 6: National Occupational Skill Standards (NOSS) Blueprint',
+            { id: 'ch-4', title: isAm ? 'ክፍል 4፡ የSMD ኮዶችና የቺፕ ማርኪንግ ዲኮደር' : 'Topic 4: SMD Package Codes & Capacitor Marking Lookups', type: 'activity', duration: 'pp. 51-85' },
+            { id: 'ch-5', title: isAm ? 'ክፍል 5፡ የPower Management IC (PMIC) ፒንአውቶች' : 'Topic 5: Power Management IC Pin Function Diagnostic Maps', type: 'activity', duration: 'pp. 86-130' },
+            { id: 'ch-6', title: isAm ? 'ክፍል 6፡ የኢንዱስትሪ ደረጃ የሙያ COC ሰነዶች' : 'Topic 6: National Occupational Skill Standards (NOSS) Blueprint', type: 'quiz', duration: 'Assessment Quiz' },
           ],
         },
       ]
 
   const activeModules = dynamicCurriculum || defaultModules
 
-  // Duration / Page count & activity count
-  let durationOrPages = resource.pages || (isVideo ? '6:00' : '250 Pages')
-  let activityCount = dynamicCurriculum
-    ? `${dynamicCurriculum[0]?.activities?.length || 0}`
-    : (isVideo ? '43' : '18')
+  // Duration & total activities sum across all modules
+  const totalActivities = activeModules.reduce((sum, mod) => sum + (mod.activities?.length || 0), 0)
+  let durationOrPages = resource.pages || (isVideo ? '7:15:00' : '250 Pages')
+  let activityCount = `${totalActivities || (isVideo ? 20 : 18)}`
 
   if (resource.pages && resource.pages.includes('·')) {
     const parts = resource.pages.split('·')
     durationOrPages = parts[0].trim().replace(/Hours?/i, '').trim()
-    activityCount = parts[1].trim().replace(/[^0-9]/g, '') || activityCount
+    const parsedActivities = parts[1].trim().replace(/[^0-9]/g, '')
+    if (parsedActivities) activityCount = parsedActivities
   }
 
   const toggleModule = (id: string) => {
     setOpenModules((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  const handleActivityClick = (act: any) => {
+    setSelectedActivityId(act.id)
+    if (act.type === 'quiz') {
+      setQuizModalActivity(act)
+    } else {
+      if (act.videoUrl) {
+        setCurrentVideoUrl(act.videoUrl)
+      }
+      setIsPlayingVideo(true)
+      videoContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
   }
 
   const handleShare = async () => {
@@ -355,10 +574,11 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
           {/* ──── LEFT MAIN COLUMN (8 cols) ──── */}
           <div className="space-y-10 lg:col-span-8">
             {/* 1. Featured Media Container */}
-            <div className="overflow-hidden rounded-3xl border border-border/80 bg-slate-950 shadow-xl relative group">
+            <div ref={videoContainerRef} className="overflow-hidden rounded-3xl border border-border/80 bg-slate-950 shadow-xl relative group">
               {isPlayingVideo ? (
                 <div className="relative aspect-video w-full bg-black">
                   <video
+                    key={videoSrc}
                     src={videoSrc}
                     controls
                     autoPlay
@@ -580,20 +800,75 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
                         </button>
 
                         {isOpen && (
-                          <div className="border-t border-border/60 bg-card p-4 space-y-2">
-                            {mod.activities.map((act, aIdx) => (
-                              <div
-                                key={aIdx}
-                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/40 text-xs text-muted-foreground transition-colors"
-                              >
-                                {isVideo ? (
-                                  <Play className="size-3 text-sky-500 fill-sky-500/20 shrink-0" />
-                                ) : (
-                                  <FileText className="size-3 text-indigo-500 shrink-0" />
-                                )}
-                                <span>{act}</span>
-                              </div>
-                            ))}
+                          <div className="border-t border-border/60 bg-card p-3 sm:p-4 space-y-1.5">
+                            {mod.activities.map((act: any, aIdx: number) => {
+                              const actObj = typeof act === 'string'
+                                ? {
+                                    id: `act-${mod.id}-${aIdx}`,
+                                    title: act,
+                                    type: act.toLowerCase().includes('quiz') ? 'quiz' : 'video',
+                                    duration: '',
+                                  }
+                                : act
+                              const isActSelected = selectedActivityId === actObj.id
+                              const isQuiz = actObj.type === 'quiz'
+
+                              return (
+                                <button
+                                  type="button"
+                                  key={actObj.id || aIdx}
+                                  onClick={() => handleActivityClick(actObj)}
+                                  className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-left text-xs transition-all ${
+                                    isActSelected
+                                      ? 'bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800 text-sky-950 dark:text-sky-200 font-semibold shadow-sm'
+                                      : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3 min-w-0">
+                                    {isQuiz ? (
+                                      <div className="flex size-6 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+                                        <HelpCircle className="size-3.5" />
+                                      </div>
+                                    ) : isVideo ? (
+                                      <div
+                                        className={`flex size-6 items-center justify-center rounded-lg shrink-0 ${
+                                          isActSelected
+                                            ? 'bg-sky-500 text-white'
+                                            : 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
+                                        }`}
+                                      >
+                                        <Play className="size-3 fill-current ml-0.5" />
+                                      </div>
+                                    ) : (
+                                      <div className="flex size-6 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shrink-0">
+                                        <FileText className="size-3.5" />
+                                      </div>
+                                    )}
+                                    <div className="truncate">
+                                      <span className="truncate">{actObj.title}</span>
+                                      {actObj.labExercise && (
+                                        <span className="block text-[11px] text-muted-foreground/80 font-normal truncate mt-0.5">
+                                          {actObj.labExercise}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    {isQuiz && (
+                                      <span className="rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                                        {isAm ? 'ፈተና (Quiz)' : 'Quiz / Activity'}
+                                      </span>
+                                    )}
+                                    {actObj.duration && (
+                                      <span className="text-[11px] text-muted-foreground font-medium">
+                                        {actObj.duration}
+                                      </span>
+                                    )}
+                                  </div>
+                                </button>
+                              )
+                            })}
                           </div>
                         )}
                       </div>
@@ -735,6 +1010,81 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
           </div>
         </div>
       </main>
+
+      {/* ── Interactive Quiz & Practical Assessment Modal ── */}
+      {quizModalActivity && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in-0 duration-200">
+          <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-border/80 bg-card p-6 md:p-8 shadow-2xl">
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setQuizModalActivity(null)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="size-4" />
+            </button>
+
+            {/* Header Badge */}
+            <div className="flex items-center gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                <HelpCircle className="size-3.5" />
+                {isAm ? 'ተግባራዊ የፈተና ክፍል' : 'Interactive Assessment Activity'}
+              </span>
+              {quizModalActivity.duration && (
+                <span className="inline-flex items-center gap-1 text-xs text-muted-foreground font-semibold">
+                  <Clock className="size-3.5" />
+                  {quizModalActivity.duration}
+                </span>
+              )}
+            </div>
+
+            {/* Title */}
+            <h3 className="text-xl font-bold tracking-tight text-foreground mb-3">
+              {quizModalActivity.title}
+            </h3>
+
+            {/* Details & Instructions */}
+            <div className="rounded-2xl bg-muted/40 p-4 border border-border/60 text-xs text-muted-foreground leading-relaxed space-y-2 mb-6">
+              <p className="font-semibold text-foreground flex items-center gap-1.5">
+                <Sparkles className="size-3.5 text-amber-500" />
+                {isAm ? 'የፈተናው ይዘትና መመሪያዎች' : 'Assessment Overview & Objectives'}
+              </p>
+              <p>
+                {quizModalActivity.quizNotes ||
+                  (isAm
+                    ? 'ይህ የተግባር ፈተና በዚህ ክፍል የተማሩትን የደህንነት፣ የመሳሪያ አጠቃቀምና የሰርኪዩት መለያ እውቀትዎን ይፈትናል።'
+                    : 'This hands-on quiz assesses your mastery of bench diagnostics, safety protocols, and multimeter circuit verification.')}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setQuizModalActivity(null)}
+                className="rounded-xl text-xs font-semibold"
+              >
+                {isAm ? 'ዝጋ' : 'Close'}
+              </Button>
+              <Button
+                onClick={() => {
+                  setQuizModalActivity(null)
+                  handleGetStarted()
+                }}
+                className="rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-500/20"
+              >
+                {hasPurchased
+                  ? isAm
+                    ? 'ፈተናውን አሁኑኑ ጀምር'
+                    : 'Start Assessment Now'
+                  : isAm
+                  ? 'ተመዝግበው ፈተናውን ይውሰዱ'
+                  : 'Enroll to Access Assessment'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </SiteShell>
   )

@@ -53,6 +53,7 @@ import {
   DollarSign,
   Star,
   LayoutDashboard,
+  HelpCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/components/ui/dialog-modal'
@@ -4227,6 +4228,303 @@ function CourseEditor({
 /* ──────────────────────────────────────────────────────────────
    Library editor modal
    ────────────────────────────────────────────────────────────── */
+export type CourseCurriculumActivity = {
+  id: string
+  title: string
+  type: 'video' | 'quiz' | 'activity'
+  duration: string
+  videoUrl?: string
+  labExercise?: string
+  quizNotes?: string
+}
+
+export type CourseCurriculumModule = {
+  id: string
+  title: string
+  lessons: CourseCurriculumActivity[]
+}
+
+export const STANDARD_WORKSHOP_MODULES: CourseCurriculumModule[] = [
+  {
+    id: 'mod-1',
+    title: 'Module 1: Professional Bench Safety & Diagnostic Setup',
+    lessons: [
+      {
+        id: 'act-1',
+        title: 'Activity 1: Stereo Microscope Focal Alignment & Optical Calibration',
+        type: 'video',
+        duration: '25 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Set 45x optical zoom on 0402 SMD pads and verify focal plane sharpness.',
+      },
+      {
+        id: 'act-2',
+        title: 'Activity 2: Multimeter Diode Mode Voltage Drop Fundamentals',
+        type: 'video',
+        duration: '30 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Red probe to chassis ground, black probe to signal line to measure forward voltage drop.',
+      },
+      {
+        id: 'act-3',
+        title: 'Activity 3: DC Bench Power Supply Current Profiling & Short Isolation',
+        type: 'video',
+        duration: '40 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Inject 1.0V with 2A current limit on VDD_MAIN and observe heat signature under rosin.',
+      },
+      {
+        id: 'act-4',
+        title: 'Activity 4: ESD Static Protection & Fume Extraction Protocols',
+        type: 'quiz',
+        duration: '15 min · 10 Questions',
+        quizNotes: 'Workbench ESD grounding mats, wrist strap resistance check & active carbon fume evacuation safety questions.',
+      },
+    ],
+  },
+  {
+    id: 'mod-2',
+    title: 'Module 2: Boardview Navigation & Power Rail Schematics',
+    lessons: [
+      {
+        id: 'act-5',
+        title: 'Activity 5: Primary Power Rail Tracing (VDD_MAIN / VPH_PWR)',
+        type: 'video',
+        duration: '35 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Locate primary DC-DC converter inductor and trace rail across bypass capacitors.',
+      },
+      {
+        id: 'act-6',
+        title: 'Activity 6: Secondary Buck Converters & LDO Voltage Drops',
+        type: 'video',
+        duration: '30 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Measure 0.8V core, 1.2V DRAM, and 1.8V IO rails in diode mode and live boot.',
+      },
+      {
+        id: 'act-7',
+        title: 'Activity 7: High-Z Line Testing & Open Circuit Detection',
+        type: 'video',
+        duration: '25 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Identify broken vias and trace line impedance to uncover cracked solder balls.',
+      },
+      {
+        id: 'act-8',
+        title: 'Activity 8: I2C & SPI Protocol Bus Resistance Diagnostics',
+        type: 'quiz',
+        duration: '20 min · 8 Questions',
+        quizNotes: '4.7kΩ pull-up resistor verification, SDA/SCL clock line testing and master-slave handshake verification.',
+      },
+    ],
+  },
+  {
+    id: 'mod-3',
+    title: 'Module 3: Fast Charging Architecture & Handshake Protocols',
+    lessons: [
+      {
+        id: 'act-9',
+        title: 'Activity 9: VBUS 5V Ingestion & OVP MOSFET Bypass Analysis',
+        type: 'video',
+        duration: '30 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Check Over-Voltage Protection (OVP) IC input/output voltage and gate trigger signals.',
+      },
+      {
+        id: 'act-10',
+        title: 'Activity 10: Type-C CC Orientation & PMIC Handshake Testing',
+        type: 'video',
+        duration: '25 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Verify CC1 and CC2 pull-down 5.1kΩ resistors for cable orientation recognition.',
+      },
+      {
+        id: 'act-11',
+        title: 'Activity 11: Battery NTC Thermistor & Fake-Charging Resolution',
+        type: 'quiz',
+        duration: '15 min · 10 Questions',
+        quizNotes: 'Negative Temperature Coefficient sensor circuit testing, voltage divider calculation, and battery error message diagnosis.',
+      },
+    ],
+  },
+  {
+    id: 'mod-4',
+    title: 'Module 4: Precision Micro-Soldering & 0.01mm Jumper Routing',
+    lessons: [
+      {
+        id: 'act-12',
+        title: 'Activity 12: Micro-Jumper Bridging across Torn Motherboard Vias',
+        type: 'video',
+        duration: '45 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Run 0.01mm enameled copper wire beneath ripped BGA pads under 45x magnification.',
+      },
+      {
+        id: 'act-13',
+        title: 'Activity 13: UV Solder Mask Curing & SMT Pad Reconstruction',
+        type: 'video',
+        duration: '30 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Apply green UV solder mask curable resin and harden for 10 seconds with 365nm lamp.',
+      },
+      {
+        id: 'act-14',
+        title: 'Activity 14: BGA Stencil Reballing & Low-Temp Alloy Melting',
+        type: 'quiz',
+        duration: '20 min · Practical Evaluation',
+        quizNotes: '138°C vs 183°C vs 217°C solder paste melting curve assessment and stencil flatness alignment protocols.',
+      },
+    ],
+  },
+  {
+    id: 'mod-5',
+    title: 'Module 5: Display Backlight Boost Circuit Reconstruction',
+    lessons: [
+      {
+        id: 'act-15',
+        title: 'Activity 15: High-Voltage Boost Diode & Inductor Testing',
+        type: 'video',
+        duration: '35 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Diagnose 15V-40V boost converter step-up loop and replace shorted Schottky diode.',
+      },
+      {
+        id: 'act-16',
+        title: 'Activity 16: OLED Display Power Rail Diagnostics & FPC Rework',
+        type: 'video',
+        duration: '40 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Check +4.6V (ELVDD) and -4.4V (ELVSS) negative charge pump outputs on OLED FPC connector.',
+      },
+      {
+        id: 'act-17',
+        title: 'Activity 17: Backlight IC Enable & PWM Dimming Diagnostic',
+        type: 'quiz',
+        duration: '15 min · 8 Questions',
+        quizNotes: 'PWM duty-cycle modulation, backlight driver IC enable signal flow, and LED anode string continuity checks.',
+      },
+    ],
+  },
+  {
+    id: 'mod-6',
+    title: 'Module 6: Bench QA Verification & National COC Readiness',
+    lessons: [
+      {
+        id: 'act-18',
+        title: 'Activity 18: Multi-Point Diagnostic QA Checklist',
+        type: 'video',
+        duration: '30 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Perform 24-point pre-delivery benchmark testing: sensors, audio IC, baseband, charging current.',
+      },
+      {
+        id: 'act-19',
+        title: 'Activity 19: Thermal Camera Secondary Diagnostics & Current Leak Detection',
+        type: 'video',
+        duration: '35 min',
+        videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        labExercise: 'Detect milliamp parasitic sleep-state battery drains and isolate warm ceramic capacitors.',
+      },
+      {
+        id: 'act-20',
+        title: 'Activity 20: National TVET Practical COC Simulation Drills',
+        type: 'quiz',
+        duration: '45 min · National COC Simulation',
+        quizNotes: 'Ethiopian TVET Occupational Qualification Level IV Hardware Assessment comprehensive evaluation test.',
+      },
+    ],
+  },
+]
+
+function parseCourseModules(rawInput: any): CourseCurriculumModule[] {
+  if (!rawInput) return []
+  let data = rawInput
+  if (typeof rawInput === 'string') {
+    try {
+      data = JSON.parse(rawInput)
+    } catch {
+      return []
+    }
+  }
+  if (!Array.isArray(data) || data.length === 0) return []
+
+  const isModuleArray = data.some(
+    (item: any) =>
+      item &&
+      (Array.isArray(item.lessons) ||
+        Array.isArray(item.activities) ||
+        (typeof item.title === 'string' &&
+          (item.title.toLowerCase().includes('module') ||
+            item.title.toLowerCase().includes('chapter') ||
+            item.title.toLowerCase().includes('ምዕራፍ'))))
+  )
+
+  if (isModuleArray) {
+    return data.map((mod: any, mIdx: number) => {
+      const items = Array.isArray(mod.lessons) ? mod.lessons : Array.isArray(mod.activities) ? mod.activities : []
+      return {
+        id: mod.id || `mod-${mIdx + 1}`,
+        title: mod.title || `Module ${mIdx + 1}: Diagnostic Setup & Workbench Skills`,
+        lessons: items.map((act: any, aIdx: number) => {
+          if (typeof act === 'string') {
+            const isQ =
+              act.toLowerCase().includes('quiz') ||
+              act.toLowerCase().includes('test') ||
+              act.toLowerCase().includes('exam')
+            return {
+              id: `act-${mIdx}-${aIdx}-${Date.now()}`,
+              title: act,
+              type: isQ ? 'quiz' : 'video',
+              duration: isQ ? '15 min' : '30 min',
+              videoUrl: '',
+              labExercise: '',
+              quizNotes: '',
+            }
+          }
+          return {
+            id: act.id || `act-${mIdx}-${aIdx}-${Date.now()}`,
+            title: act.title || `Activity ${aIdx + 1}`,
+            type: act.type === 'quiz' ? 'quiz' : 'video',
+            duration: act.duration || (act.type === 'quiz' ? '15 min' : '30 min'),
+            videoUrl: act.videoUrl || '',
+            labExercise: act.labExercise || '',
+            quizNotes: act.quizNotes || '',
+          }
+        }),
+      }
+    })
+  }
+
+  // Flat list of lessons: wrap into Module 1
+  return [
+    {
+      id: 'mod-1',
+      title: 'Module 1: Professional Bench Safety & Diagnostic Setup',
+      lessons: data.map((item: any, idx: number) => {
+        if (typeof item === 'string') {
+          return {
+            id: `les-${idx}-${Date.now()}`,
+            title: item,
+            type: 'video',
+            duration: '30 min',
+            videoUrl: '',
+          }
+        }
+        return {
+          id: item.id || `les-${idx}-${Date.now()}`,
+          title: item.title || `Lesson ${idx + 1}`,
+          type: item.type === 'quiz' ? 'quiz' : 'video',
+          duration: item.duration || '30 min',
+          videoUrl: item.videoUrl || '',
+          labExercise: item.labExercise || '',
+          quizNotes: item.quizNotes || '',
+        }
+      }),
+    },
+  ]
+}
+
 function LibraryEditor({
   open,
   onClose,
@@ -4246,19 +4544,34 @@ function LibraryEditor({
   })
   const [uploadingCover, setUploadingCover] = useState(false)
   const [uploadingMedia, setUploadingMedia] = useState(false)
-  const [uploadingVideoIdx, setUploadingVideoIdx] = useState<number | null>(null)
+  const [uploadingActivityMedia, setUploadingActivityMedia] = useState<{ mIdx: number; aIdx: number } | null>(null)
   const [showVideoPreview, setShowVideoPreview] = useState(false)
   const isEdit = !!initial.id
 
+  // Multi-Module & Activity/Quiz Curriculum State
+  const [modules, setModules] = useState<CourseCurriculumModule[]>([])
+  const [expandedModules, setExpandedModules] = useState<Record<string, boolean>>({
+    'mod-1': true,
+  })
+
   useEffect(() => {
-    let parsedLessons = []
-    try {
-      parsedLessons = typeof initial.lessons === 'string' ? JSON.parse(initial.lessons) : (initial.lessons || [])
-    } catch {}
     let parsedChapters = []
     try {
       parsedChapters = typeof initial.chapters === 'string' ? JSON.parse(initial.chapters) : (initial.chapters || [])
     } catch {}
+
+    const parsedMods = parseCourseModules(initial.lessons)
+    if (parsedMods.length > 0) {
+      setModules(parsedMods)
+      const openMap: Record<string, boolean> = {}
+      parsedMods.forEach((m, idx) => {
+        openMap[m.id] = idx === 0 || idx === 1
+      })
+      setExpandedModules(openMap)
+    } else {
+      setModules([])
+      setExpandedModules({})
+    }
 
     const pETB = typeof initial.priceETB === 'number'
       ? initial.priceETB
@@ -4274,14 +4587,14 @@ function LibraryEditor({
       fileUrl: initial.fileUrl || '',
       format: initial.format || 'Video Masterclass',
       level: initial.level || 'All Skill Levels',
-      pages: initial.pages || '6:00 Hours · 18 Lessons',
+      pages: initial.pages || '7:15:00 · 20 Activities',
       instructor: initial.instructor || 'Hello Technology Academy',
       instructorRole: initial.instructorRole || 'Lead Hardware Diagnostic Instructor',
       rating: initial.rating ?? 4.9,
       reviewCount: initial.reviewCount ?? 100,
       badgeText: initial.badgeText || (pETB === 0 ? 'Free Gift' : 'Popular'),
       skillsLearned: initial.skillsLearned || '',
-      lessons: parsedLessons,
+      lessons: parsedMods,
       chapters: parsedChapters,
     })
     setShowVideoPreview(false)
@@ -4298,32 +4611,150 @@ function LibraryEditor({
     })
   }
 
-  // Lesson helpers for Video courses
-  function addLesson() {
-    const currentLessons = Array.isArray(form.lessons) ? [...form.lessons] : []
-    const newLesson = {
-      id: `les-${Date.now()}`,
-      title: `Lesson ${currentLessons.length + 1}: Diagnostic Procedure & Bench Testing`,
-      duration: '30 min',
-      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-      summary: 'Practical hands-on multimeter analysis and workbench demonstration.',
-      labExercise: 'Execute diode mode voltage drop measurement on battery connector.',
-      keyTakeaways: ['Power sequencing', 'Multimeter readings'],
+  // Multi-Module manipulation helpers
+  function addModule() {
+    const nextIdx = modules.length + 1
+    const newMod: CourseCurriculumModule = {
+      id: `mod-${Date.now()}`,
+      title: `Module ${nextIdx}: Professional Procedures & Circuit Analysis`,
+      lessons: [
+        {
+          id: `act-${Date.now()}-1`,
+          title: `Activity 1: Bench Equipment Calibration & Voltage Verification`,
+          type: 'video',
+          duration: '30 min',
+          videoUrl: form.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+          labExercise: 'Measure voltage drop and inspect solder joints under microscope.',
+        },
+        {
+          id: `act-${Date.now()}-2`,
+          title: `Activity 2: Safety & Short Circuit Diagnostics Assessment`,
+          type: 'quiz',
+          duration: '15 min · 10 Questions',
+          quizNotes: 'Review ESD safety, diode mode readings, and power rail isolation rules.',
+        },
+      ],
     }
-    update('lessons', [...currentLessons, newLesson])
+    const updated = [...modules, newMod]
+    setModules(updated)
+    setExpandedModules((prev) => ({ ...prev, [newMod.id]: true }))
+    syncPagesMeta(updated)
   }
 
-  function updateLesson(index: number, field: string, val: any) {
-    const currentLessons = Array.isArray(form.lessons) ? [...form.lessons] : []
-    if (!currentLessons[index]) return
-    currentLessons[index] = { ...currentLessons[index], [field]: val }
-    update('lessons', currentLessons)
+  function removeModule(mIdx: number) {
+    const updated = [...modules]
+    updated.splice(mIdx, 1)
+    setModules(updated)
+    syncPagesMeta(updated)
   }
 
-  function removeLesson(index: number) {
-    const currentLessons = Array.isArray(form.lessons) ? [...form.lessons] : []
-    currentLessons.splice(index, 1)
-    update('lessons', currentLessons)
+  function moveModule(mIdx: number, direction: 'up' | 'down') {
+    if (direction === 'up' && mIdx === 0) return
+    if (direction === 'down' && mIdx === modules.length - 1) return
+    const updated = [...modules]
+    const targetIdx = direction === 'up' ? mIdx - 1 : mIdx + 1
+    const [moved] = updated.splice(mIdx, 1)
+    updated.splice(targetIdx, 0, moved)
+    setModules(updated)
+  }
+
+  function updateModuleTitle(mIdx: number, title: string) {
+    const updated = [...modules]
+    if (!updated[mIdx]) return
+    updated[mIdx] = { ...updated[mIdx], title }
+    setModules(updated)
+  }
+
+  function toggleModuleExpanded(modId: string) {
+    setExpandedModules((prev) => ({ ...prev, [modId]: !prev[modId] }))
+  }
+
+  function setAllModulesExpanded(expand: boolean) {
+    const map: Record<string, boolean> = {}
+    modules.forEach((m) => {
+      map[m.id] = expand
+    })
+    setExpandedModules(map)
+  }
+
+  // Activity (Video Lesson or Quiz) helpers
+  function addActivity(mIdx: number, type: 'video' | 'quiz') {
+    const updated = [...modules]
+    if (!updated[mIdx]) return
+    const currentLessons = updated[mIdx].lessons || []
+    const totalActs = updated.reduce((sum, m) => sum + (m.lessons?.length || 0), 0) + 1
+    const isQ = type === 'quiz'
+    const newAct: CourseCurriculumActivity = {
+      id: `act-${Date.now()}`,
+      title: isQ
+        ? `Activity ${totalActs}: Practical Safety & Diagnostic Assessment`
+        : `Activity ${totalActs}: Hands-On Bench Testing & Circuit Analysis`,
+      type,
+      duration: isQ ? '15 min · 10 Questions' : '30 min',
+      videoUrl: isQ ? '' : form.fileUrl || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      labExercise: isQ ? '' : 'Measure diode mode voltage drop on test pads.',
+      quizNotes: isQ ? 'Technical multiple-choice questions on safety and circuit verification.' : '',
+    }
+    updated[mIdx] = {
+      ...updated[mIdx],
+      lessons: [...currentLessons, newAct],
+    }
+    setModules(updated)
+    setExpandedModules((prev) => ({ ...prev, [updated[mIdx].id]: true }))
+    syncPagesMeta(updated)
+  }
+
+  function updateActivity(mIdx: number, aIdx: number, field: keyof CourseCurriculumActivity, val: any) {
+    const updated = [...modules]
+    if (!updated[mIdx] || !updated[mIdx].lessons[aIdx]) return
+    const lessons = [...updated[mIdx].lessons]
+    lessons[aIdx] = { ...lessons[aIdx], [field]: val }
+    updated[mIdx] = { ...updated[mIdx], lessons }
+    setModules(updated)
+  }
+
+  function removeActivity(mIdx: number, aIdx: number) {
+    const updated = [...modules]
+    if (!updated[mIdx]) return
+    const lessons = [...updated[mIdx].lessons]
+    lessons.splice(aIdx, 1)
+    updated[mIdx] = { ...updated[mIdx], lessons }
+    setModules(updated)
+    syncPagesMeta(updated)
+  }
+
+  function moveActivity(mIdx: number, aIdx: number, direction: 'up' | 'down') {
+    const updated = [...modules]
+    if (!updated[mIdx]) return
+    const lessons = [...updated[mIdx].lessons]
+    if (direction === 'up' && aIdx === 0) return
+    if (direction === 'down' && aIdx === lessons.length - 1) return
+    const targetIdx = direction === 'up' ? aIdx - 1 : aIdx + 1
+    const [moved] = lessons.splice(aIdx, 1)
+    lessons.splice(targetIdx, 0, moved)
+    updated[mIdx] = { ...updated[mIdx], lessons }
+    setModules(updated)
+  }
+
+  function loadStandardCurriculum() {
+    setModules(STANDARD_WORKSHOP_MODULES)
+    const map: Record<string, boolean> = {}
+    STANDARD_WORKSHOP_MODULES.forEach((m, idx) => {
+      map[m.id] = idx === 0 || idx === 1
+    })
+    setExpandedModules(map)
+    update('pages', '7:15:00 · 20 Activities')
+  }
+
+  function syncPagesMeta(curModules = modules) {
+    const totalActs = curModules.reduce((sum, m) => sum + (m.lessons?.length || 0), 0)
+    let curDuration = '7:15:00'
+    if (form.pages && form.pages.includes('·')) {
+      curDuration = form.pages.split('·')[0].trim()
+    } else if (form.pages) {
+      curDuration = form.pages.trim()
+    }
+    update('pages', `${curDuration} · ${totalActs} Activities`)
   }
 
   // Chapter helpers for Manuals & Guides
@@ -4359,6 +4790,7 @@ function LibraryEditor({
       category: form.category || 'Online Course',
       priceETB: pETB,
       price: form.price?.trim() || (pETB === 0 ? 'Free' : `${pETB} ETB`),
+      lessons: modules, // Full multi-module curriculum with video lessons & quizzes!
     })
   }
 
@@ -4813,24 +5245,63 @@ function LibraryEditor({
           </Field>
         </div>
 
-        {/* ── 6. INTERACTIVE CURRICULUM BUILDER ── */}
-        <div className="rounded-2xl border bg-card p-5 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between border-b pb-3">
+        {/* ── 6. INTERACTIVE MULTI-MODULE CURRICULUM BUILDER ── */}
+        <div className="rounded-2xl border bg-card p-5 space-y-5 shadow-sm">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b pb-4">
             <div>
-              <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                {isVideoFormat ? <Video className="size-4 text-blue-600" /> : <BookOpen className="size-4 text-blue-600" />}
-                {isVideoFormat ? 'Video Lessons Curriculum' : 'Manual Chapters & Diagnostic Sections'}
-              </h4>
-              <p className="text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <h4 className="text-base font-bold text-foreground flex items-center gap-2">
+                  {isVideoFormat ? <Video className="size-5 text-blue-600" /> : <BookOpen className="size-5 text-blue-600" />}
+                  {isVideoFormat ? 'Course Modules, Video Lessons & Quiz Curriculum' : 'Manual Chapters & Diagnostic Sections'}
+                </h4>
+                {isVideoFormat && (
+                  <span className="rounded-full bg-blue-500/10 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:text-sky-400 border border-blue-500/20">
+                    {modules.length} Modules · {modules.reduce((sum, m) => sum + (m.lessons?.length || 0), 0)} Activities
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
                 {isVideoFormat
-                  ? 'Define the structured lessons students watch inside the course player.'
-                  : 'Define the reading chapters and diagnostic tables students study inside the platform reader.'}
+                  ? 'Structure this course into multiple modules. Under each module, add video lessons (with MP4 uploads) and interactive quizzes/activities.'
+                  : 'Define reading guide chapters, page intervals, and diagnostic summaries for this technical manual.'}
               </p>
             </div>
+
             {isVideoFormat ? (
-              <Button size="sm" type="button" onClick={addLesson} className="gap-1.5 rounded-xl text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold">
-                <Plus className="size-3.5" /> Add Lesson
-              </Button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAllModulesExpanded(true)}
+                  className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted transition"
+                >
+                  Expand All
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAllModulesExpanded(false)}
+                  className="rounded-xl border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:bg-muted transition"
+                >
+                  Collapse All
+                </button>
+                <Button
+                  size="sm"
+                  type="button"
+                  variant="outline"
+                  onClick={loadStandardCurriculum}
+                  className="gap-1.5 rounded-xl text-xs border-amber-500/40 text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 font-bold"
+                >
+                  <Sparkles className="size-3.5 text-amber-500" />
+                  Load Standard 6-Module Curriculum (20 Activities &amp; Quizzes)
+                </Button>
+                <Button
+                  size="sm"
+                  type="button"
+                  onClick={addModule}
+                  className="gap-1.5 rounded-xl text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold"
+                >
+                  <Plus className="size-3.5" /> Add Module
+                </Button>
+              </div>
             ) : (
               <Button size="sm" type="button" onClick={addChapter} className="gap-1.5 rounded-xl text-xs bg-blue-600 hover:bg-blue-500 text-white font-bold">
                 <Plus className="size-3.5" /> Add Chapter
@@ -4838,116 +5309,336 @@ function LibraryEditor({
             )}
           </div>
 
-          {/* Video Lessons list */}
+          {/* Video Multi-Module Builder */}
           {isVideoFormat && (
-            <div className="space-y-3">
-              {lessonsList.length === 0 ? (
-                <div className="rounded-xl border border-dashed p-6 text-center text-xs text-muted-foreground space-y-2">
-                  <Video className="size-8 mx-auto opacity-40 text-blue-600" />
-                  <p className="font-semibold text-foreground">No custom lessons defined yet</p>
-                  <p>Click &quot;Add Lesson&quot; above to configure individual course videos, duration, and lab exercises.</p>
+            <div className="space-y-4">
+              {modules.length === 0 ? (
+                <div className="rounded-2xl border border-dashed p-8 text-center text-xs text-muted-foreground space-y-3 bg-muted/10">
+                  <Video className="size-10 mx-auto opacity-40 text-blue-600" />
+                  <p className="font-bold text-sm text-foreground">No course modules configured yet</p>
+                  <p className="max-w-md mx-auto">
+                    Courses are organized into structured modules containing video lessons and hands-on quiz activities.
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                    <Button
+                      size="sm"
+                      type="button"
+                      onClick={loadStandardCurriculum}
+                      className="rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white gap-1.5 shadow-md"
+                    >
+                      <Sparkles className="size-3.5" />
+                      Load Standard 6-Module Curriculum (20 Activities &amp; Quizzes)
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      type="button"
+                      onClick={addModule}
+                      className="rounded-xl text-xs font-semibold gap-1.5"
+                    >
+                      <Plus className="size-3.5" /> Create Empty Module
+                    </Button>
+                  </div>
                 </div>
               ) : (
-                lessonsList.map((les, idx) => (
-                  <div key={les.id || idx} className="rounded-xl border bg-muted/30 p-4 space-y-3 text-xs">
-                    <div className="flex items-center justify-between gap-2 border-b pb-2">
-                      <span className="font-bold text-foreground flex items-center gap-2">
-                        <span className="size-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">
-                          {idx + 1}
-                        </span>
-                        Lesson #{idx + 1}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => removeLesson(idx)}
-                        className="text-muted-foreground hover:text-destructive p-1 rounded transition"
-                        title="Remove lesson"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </button>
-                    </div>
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      <div className="sm:col-span-2">
-                        <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Lesson Title</label>
-                        <input
-                          className={inputCls + ' h-9 text-xs'}
-                          value={les.title || ''}
-                          onChange={(e) => updateLesson(idx, 'title', e.target.value)}
-                          placeholder="e.g. Identifying Short Circuits with Thermal Camera & DC Bench Supply"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Duration</label>
-                        <input
-                          className={inputCls + ' h-9 text-xs'}
-                          value={les.duration || ''}
-                          onChange={(e) => updateLesson(idx, 'duration', e.target.value)}
-                          placeholder="e.g. 35 min"
-                        />
-                      </div>
-                    </div>
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-[11px] font-semibold text-muted-foreground block">
-                            Video Stream / Embed URL
-                          </label>
-                          <label className="cursor-pointer inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:underline">
-                            <Upload className="size-3" /> Upload MP4 Video
-                            <input
-                              type="file"
-                              accept="video/mp4,video/webm,video/quicktime"
-                              className="hidden"
-                              onChange={async (e) => {
-                                const f = e.target.files?.[0]
-                                if (!f) return
-                                const fd = new FormData()
-                                fd.append('file', f)
-                                fd.append('folder', 'videos')
-                                try {
-                                  setUploadingVideoIdx(idx)
-                                  const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-                                  const d = await res.json()
-                                  if (d.url) {
-                                    updateLesson(idx, 'videoUrl', d.url)
-                                  } else {
-                                    alert(d.error || 'Failed to upload video')
-                                  }
-                                } catch (err: any) {
-                                  alert(err.message || 'Error uploading video')
-                                } finally {
-                                  setUploadingVideoIdx(null)
-                                }
-                              }}
-                            />
-                          </label>
-                        </div>
-                        <div className="flex gap-2">
+                modules.map((mod, mIdx) => {
+                  const isExpanded = Boolean(expandedModules[mod.id])
+                  const modLessons = mod.lessons || []
+                  const videoCount = modLessons.filter((l) => l.type !== 'quiz').length
+                  const quizCount = modLessons.filter((l) => l.type === 'quiz').length
+
+                  return (
+                    <div
+                      key={mod.id || mIdx}
+                      className="rounded-2xl border border-border/80 bg-muted/20 overflow-hidden transition-all shadow-sm"
+                    >
+                      {/* Module Header Bar */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-muted/40 border-b border-border/60">
+                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                          {/* Module Reorder Up/Down */}
+                          <div className="flex flex-col shrink-0">
+                            <button
+                              type="button"
+                              disabled={mIdx === 0}
+                              onClick={() => moveModule(mIdx, 'up')}
+                              className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20"
+                              title="Move Module Up"
+                            >
+                              <ChevronUp className="size-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              disabled={mIdx === modules.length - 1}
+                              onClick={() => moveModule(mIdx, 'down')}
+                              className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20"
+                              title="Move Module Down"
+                            >
+                              <ChevronDown className="size-3.5" />
+                            </button>
+                          </div>
+
+                          <span className="rounded-lg bg-blue-600 text-white px-2 py-0.5 text-[11px] font-bold shrink-0">
+                            Module {mIdx + 1}
+                          </span>
+
                           <input
-                            className={inputCls + ' h-9 text-xs font-mono flex-1'}
-                            value={les.videoUrl || ''}
-                            onChange={(e) => updateLesson(idx, 'videoUrl', e.target.value)}
-                            placeholder="https://... or /uploads/videos/..."
+                            className="bg-transparent border-b border-dashed border-border/80 hover:border-blue-500 focus:border-blue-500 font-bold text-sm text-foreground px-1 py-0.5 flex-1 min-w-0 focus:outline-none transition"
+                            value={mod.title}
+                            onChange={(e) => updateModuleTitle(mIdx, e.target.value)}
+                            placeholder="Module Title (e.g. Module 1: Professional Bench Safety & Diagnostic Setup)"
                           />
-                          {uploadingVideoIdx === idx && (
-                            <span className="flex items-center text-[11px] text-blue-600 whitespace-nowrap">
-                              <Loader2 className="size-3 animate-spin mr-1" /> Uploading...
-                            </span>
-                          )}
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                          <span className="text-[11px] text-muted-foreground bg-background px-2.5 py-1 rounded-lg border border-border/60 font-medium">
+                            {videoCount} {videoCount === 1 ? 'Video' : 'Videos'} · {quizCount} {quizCount === 1 ? 'Quiz' : 'Quizzes'}
+                          </span>
+
+                          <button
+                            type="button"
+                            onClick={() => removeModule(mIdx)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition"
+                            title="Delete Module"
+                          >
+                            <Trash2 className="size-4" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => toggleModuleExpanded(mod.id)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition"
+                            title={isExpanded ? 'Collapse Module' : 'Expand Module'}
+                          >
+                            {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                          </button>
                         </div>
                       </div>
-                      <div>
-                        <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">Lab Practical Exercise</label>
-                        <input
-                          className={inputCls + ' h-9 text-xs'}
-                          value={les.labExercise || ''}
-                          onChange={(e) => updateLesson(idx, 'labExercise', e.target.value)}
-                          placeholder="e.g. Measure voltage drop on battery terminal pins"
-                        />
-                      </div>
+
+                      {/* Module Lessons & Quizzes List */}
+                      {isExpanded && (
+                        <div className="p-4 space-y-3 bg-card/60">
+                          {modLessons.length === 0 ? (
+                            <p className="text-xs text-muted-foreground py-2 italic text-center">
+                              No lessons or quizzes in this module. Click &quot;Add Video Lesson&quot; or &quot;Add Quiz&quot; below.
+                            </p>
+                          ) : (
+                            modLessons.map((act, aIdx) => {
+                              const isQuiz = act.type === 'quiz'
+                              const isUploading =
+                                uploadingActivityMedia?.mIdx === mIdx &&
+                                uploadingActivityMedia?.aIdx === aIdx
+
+                              return (
+                                <div
+                                  key={act.id || aIdx}
+                                  className={`rounded-xl border p-3.5 space-y-3 text-xs transition-all ${
+                                    isQuiz
+                                      ? 'border-amber-500/30 bg-amber-500/5'
+                                      : 'border-sky-500/30 bg-sky-500/5'
+                                  }`}
+                                >
+                                  {/* Activity Item Header */}
+                                  <div className="flex items-center justify-between gap-2 border-b border-border/60 pb-2">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      {/* Up/Down order within module */}
+                                      <div className="flex items-center gap-0.5 shrink-0">
+                                        <button
+                                          type="button"
+                                          disabled={aIdx === 0}
+                                          onClick={() => moveActivity(mIdx, aIdx, 'up')}
+                                          className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20"
+                                          title="Move Up"
+                                        >
+                                          <ChevronUp className="size-3" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={aIdx === modLessons.length - 1}
+                                          onClick={() => moveActivity(mIdx, aIdx, 'down')}
+                                          className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20"
+                                          title="Move Down"
+                                        >
+                                          <ChevronDown className="size-3" />
+                                        </button>
+                                      </div>
+
+                                      {isQuiz ? (
+                                        <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300 border border-amber-500/30 shrink-0">
+                                          <HelpCircle className="size-3" /> Quiz / Activity #{aIdx + 1}
+                                        </span>
+                                      ) : (
+                                        <span className="inline-flex items-center gap-1 rounded-md bg-sky-500/20 px-2 py-0.5 text-[10px] font-bold text-sky-700 dark:text-sky-300 border border-sky-500/30 shrink-0">
+                                          <Play className="size-3 fill-current ml-0.5" /> Video Lesson #{aIdx + 1}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <div className="flex items-center gap-1.5 shrink-0">
+                                      {/* Toggle Video vs Quiz */}
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          updateActivity(
+                                            mIdx,
+                                            aIdx,
+                                            'type',
+                                            isQuiz ? 'video' : 'quiz'
+                                          )
+                                        }
+                                        className="text-[10px] font-medium text-muted-foreground hover:text-foreground px-2 py-0.5 rounded border border-border/60 hover:bg-muted transition"
+                                      >
+                                        Switch to {isQuiz ? 'Video Lesson' : 'Quiz'}
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => removeActivity(mIdx, aIdx)}
+                                        className="text-muted-foreground hover:text-destructive p-1 rounded transition"
+                                        title="Delete Activity"
+                                      >
+                                        <Trash2 className="size-3.5" />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  {/* Title & Duration Row */}
+                                  <div className="grid gap-3 sm:grid-cols-3">
+                                    <div className="sm:col-span-2">
+                                      <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">
+                                        {isQuiz ? 'Quiz / Activity Title' : 'Video Lesson Title'}
+                                      </label>
+                                      <input
+                                        className={inputCls + ' h-9 text-xs'}
+                                        value={act.title || ''}
+                                        onChange={(e) => updateActivity(mIdx, aIdx, 'title', e.target.value)}
+                                        placeholder={
+                                          isQuiz
+                                            ? 'e.g. Activity 4: ESD Static Protection & Fume Extraction Protocols'
+                                            : 'e.g. Activity 1: Stereo Microscope Focal Alignment & Optical Calibration'
+                                        }
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">
+                                        Duration / Questions
+                                      </label>
+                                      <input
+                                        className={inputCls + ' h-9 text-xs'}
+                                        value={act.duration || ''}
+                                        onChange={(e) => updateActivity(mIdx, aIdx, 'duration', e.target.value)}
+                                        placeholder={isQuiz ? 'e.g. 15 min · 10 Questions' : 'e.g. 30 min'}
+                                      />
+                                    </div>
+                                  </div>
+
+                                  {/* Video Lesson Details */}
+                                  {!isQuiz && (
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                      <div>
+                                        <div className="flex items-center justify-between mb-1">
+                                          <label className="text-[11px] font-semibold text-muted-foreground block">
+                                            Video Stream / MP4 URL
+                                          </label>
+                                          <label className="cursor-pointer inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:underline">
+                                            <Upload className="size-3" /> Upload MP4
+                                            <input
+                                              type="file"
+                                              accept="video/mp4,video/webm,video/quicktime"
+                                              className="hidden"
+                                              onChange={async (e) => {
+                                                const f = e.target.files?.[0]
+                                                if (!f) return
+                                                const fd = new FormData()
+                                                fd.append('file', f)
+                                                fd.append('folder', 'videos')
+                                                try {
+                                                  setUploadingActivityMedia({ mIdx, aIdx })
+                                                  const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+                                                  const d = await res.json()
+                                                  if (d.url) {
+                                                    updateActivity(mIdx, aIdx, 'videoUrl', d.url)
+                                                  } else {
+                                                    alert(d.error || 'Failed to upload video')
+                                                  }
+                                                } catch (err: any) {
+                                                  alert(err.message || 'Error uploading video')
+                                                } finally {
+                                                  setUploadingActivityMedia(null)
+                                                }
+                                              }}
+                                            />
+                                          </label>
+                                        </div>
+                                        <div className="flex gap-2">
+                                          <input
+                                            className={inputCls + ' h-9 text-xs font-mono flex-1'}
+                                            value={act.videoUrl || ''}
+                                            onChange={(e) => updateActivity(mIdx, aIdx, 'videoUrl', e.target.value)}
+                                            placeholder="https://... or /uploads/videos/..."
+                                          />
+                                          {isUploading && (
+                                            <span className="flex items-center text-[11px] text-blue-600 whitespace-nowrap">
+                                              <Loader2 className="size-3 animate-spin mr-1" /> Uploading...
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+
+                                      <div>
+                                        <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">
+                                          Lab Practical Exercise / Objective
+                                        </label>
+                                        <input
+                                          className={inputCls + ' h-9 text-xs'}
+                                          value={act.labExercise || ''}
+                                          onChange={(e) => updateActivity(mIdx, aIdx, 'labExercise', e.target.value)}
+                                          placeholder="e.g. Set 45x optical zoom on 0402 SMD pads and verify focal plane sharpness."
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Quiz Details */}
+                                  {isQuiz && (
+                                    <div>
+                                      <label className="text-[11px] font-semibold text-muted-foreground mb-1 block">
+                                        Quiz Overview, Questions &amp; Topics Covered
+                                      </label>
+                                      <input
+                                        className={inputCls + ' h-9 text-xs'}
+                                        value={act.quizNotes || ''}
+                                        onChange={(e) => updateActivity(mIdx, aIdx, 'quizNotes', e.target.value)}
+                                        placeholder="e.g. Workbench ESD grounding mats, wrist strap resistance check & active carbon fume evacuation safety questions."
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })
+                          )}
+
+                          {/* Module Add Activity Buttons */}
+                          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/40">
+                            <button
+                              type="button"
+                              onClick={() => addActivity(mIdx, 'video')}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/10 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 border border-sky-500/20 transition"
+                            >
+                              <Plus className="size-3" /> Add Video Lesson
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => addActivity(mIdx, 'quiz')}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 border border-amber-500/20 transition"
+                            >
+                              <Plus className="size-3" /> Add Quiz / Activity
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
           )}

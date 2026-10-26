@@ -379,7 +379,16 @@ export function AdminLibraryView({
               let lessonsCount = 0
               let chaptersCount = 0
               try {
-                if (item.lessons) lessonsCount = JSON.parse(item.lessons).length
+                if (item.lessons) {
+                  const parsed = JSON.parse(item.lessons)
+                  if (Array.isArray(parsed)) {
+                    if (parsed.some((p: any) => p && (Array.isArray(p.lessons) || Array.isArray(p.activities)))) {
+                      lessonsCount = parsed.reduce((sum: number, m: any) => sum + (m.lessons?.length || m.activities?.length || 0), 0)
+                    } else {
+                      lessonsCount = parsed.length
+                    }
+                  }
+                }
                 if (item.chapters) chaptersCount = JSON.parse(item.chapters).length
               } catch {}
 
