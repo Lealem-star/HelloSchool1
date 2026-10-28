@@ -939,44 +939,44 @@ export function StatStrip() {
   const isAm = language === 'am'
 
   return (
-    <div className="border-y border-border bg-muted/20 py-8 backdrop-blur-sm">
+    <div className="py-8 bg-transparent">
       <div className="container mx-auto max-w-7xl px-5 lg:px-8">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-          <div className="group flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-6 text-center shadow-sm card-hover-lift">
-            <span className="flex size-12 items-center justify-center rounded-xl bg-blue-500/15 text-blue-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-110">
-              <Sparkles className="size-6" />
+          <div className="card-hover-lift group flex flex-col items-center justify-center rounded-2xl border border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-6 text-center text-white shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
+            <span className="flex size-12 items-center justify-center rounded-xl bg-white/20 text-white border border-white/30 shadow-md transition-transform duration-300 group-hover:scale-110">
+              <Sparkles className="size-6 text-amber-300" />
             </span>
-            <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">1,200+</p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">
+            <p className="mt-4 text-2xl font-bold tracking-tight text-white md:text-3xl">1,200+</p>
+            <p className="mt-1 text-xs font-semibold text-blue-100">
               {isAm ? 'የሰለጠኑ ቴክኒሻኖች' : 'Technicians Mentored'}
             </p>
           </div>
-          <div className="group flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-6 text-center shadow-sm card-hover-lift">
-            <span className="flex size-12 items-center justify-center rounded-xl bg-amber-400/15 text-amber-600 dark:text-amber-400 transition-transform duration-300 group-hover:scale-110">
-              <Wrench className="size-6" />
+          <div className="card-hover-lift group flex flex-col items-center justify-center rounded-2xl border border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-6 text-center text-white shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
+            <span className="flex size-12 items-center justify-center rounded-xl bg-white/20 text-white border border-white/30 shadow-md transition-transform duration-300 group-hover:scale-110">
+              <Wrench className="size-6 text-white" />
             </span>
-            <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">98%</p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">
+            <p className="mt-4 text-2xl font-bold tracking-tight text-white md:text-3xl">98%</p>
+            <p className="mt-1 text-xs font-semibold text-blue-100">
               {isAm ? 'የተግባር ላብራቶሪ ስልጠና' : 'Practical Lab Training'}
             </p>
           </div>
-          <div className="group flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-6 text-center shadow-sm card-hover-lift">
-            <span className="flex size-12 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-600 dark:text-emerald-400 transition-transform duration-300 group-hover:scale-110">
-              <ShieldCheck className="size-6" />
+          <div className="card-hover-lift group flex flex-col items-center justify-center rounded-2xl border border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-6 text-center text-white shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
+            <span className="flex size-12 items-center justify-center rounded-xl bg-white/20 text-white border border-white/30 shadow-md transition-transform duration-300 group-hover:scale-110">
+              <ShieldCheck className="size-6 text-emerald-300" />
             </span>
-            <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+            <p className="mt-4 text-2xl font-bold tracking-tight text-white md:text-3xl">
               {isAm ? '4 ራሳቸውን የቻሉ' : '4 Dedicated'}
             </p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">
+            <p className="mt-1 text-xs font-semibold text-blue-100">
               {isAm ? 'የሃርድዌር ጥገና ላብራቶሪዎች' : 'Hardware Repair Labs'}
             </p>
           </div>
-          <div className="group flex flex-col items-center justify-center rounded-2xl border border-border/80 bg-card p-6 text-center shadow-sm card-hover-lift">
-            <span className="flex size-12 items-center justify-center rounded-xl bg-sky-400/15 text-sky-600 dark:text-sky-400 transition-transform duration-300 group-hover:scale-110">
-              <BookOpen className="size-6" />
+          <div className="card-hover-lift group flex flex-col items-center justify-center rounded-2xl border border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-6 text-center text-white shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300">
+            <span className="flex size-12 items-center justify-center rounded-xl bg-white/20 text-white border border-white/30 shadow-md transition-transform duration-300 group-hover:scale-110">
+              <BookOpen className="size-6 text-sky-200" />
             </span>
-            <p className="mt-4 text-2xl font-bold tracking-tight text-foreground md:text-3xl">100%</p>
-            <p className="mt-1 text-xs font-semibold text-muted-foreground">
+            <p className="mt-4 text-2xl font-bold tracking-tight text-white md:text-3xl">100%</p>
+            <p className="mt-1 text-xs font-semibold text-blue-100">
               {isAm ? 'እውነተኛ የመመርመሪያ እቃዎች' : 'Real Diagnostic Tools'}
             </p>
           </div>

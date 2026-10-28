@@ -94,51 +94,65 @@ export function CompanyTrainingCTA() {
   return (
     <>
       {/* ── MINIMIZED INSTITUTIONAL & ENTERPRISE TRAINING SECTION ── */}
-      <section className="relative overflow-hidden border-y border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] px-5 py-16 text-white lg:px-8">
-        {/* Subtle background glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_25%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.22),transparent_45%)] pointer-events-none" />
-        <div className="tech-dot-bg absolute inset-0 opacity-15 pointer-events-none" />
-
+      <section className="px-5 py-20 lg:px-8">
         <div className="container relative mx-auto max-w-7xl">
-          <div className="grid items-center gap-10 lg:grid-cols-12">
-            {/* Left Column: Short & Precise Action Call */}
-            <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-1.5 text-xs font-bold text-white shadow-lg backdrop-blur-md mb-4">
-                <Building2 className="size-3.5 text-amber-300" />
-                <span>
+          {/* Centered Section Header on Transparent Page Background */}
+          <div className="mx-auto max-w-3xl mb-12 text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-extrabold uppercase tracking-widest text-primary shadow-xs mb-4">
+              <Building2 className="size-3.5" />
+              <span>
+                {isAm
+                  ? 'የተቋማትና የድርጅቶች የቴክኒክ ሰራተኞች'
+                  : 'Institutional & Enterprise Technical Workforce'}
+              </span>
+            </span>
+
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl lg:leading-tight">
+              {isAm
+                ? 'ለተቋማት ሰራተኞች የተዘጋጀ ብጁ የተግባር ስልጠና'
+                : 'Customized Technical Training for Institutional Employees'}
+            </h2>
+
+            <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground font-normal max-w-2xl mx-auto">
+              {isAm
+                ? 'ተቋምዎ ልዩ ማሽነሪዎችን ይጠቀማል? በሆስፒታሎች፣ በፋብሪካዎች፣ በዩኒቨርሲቲዎች፣ በቴሌኮም እና በባንኮች ውስጥ ለሚሰሩ ቴክኒሻኖች በእርስዎ መሳሪያዎች ዙሪያ የተዘጋጀ ብጁ ስልጠና በቦታው ወይም በላባችን እንሰጣለን።'
+                : 'Empower your technical workforce with tailor-made repair training built directly around your organization’s machinery, biomedical units, and IT hardware — delivered on-site or in our Bahir Dar labs.'}
+            </p>
+          </div>
+
+          {/* Blue Action Card */}
+          <div className="overflow-hidden rounded-3xl border border-blue-400/30 bg-[#0d2a75] bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-8 text-white shadow-2xl sm:p-12 lg:p-14 relative">
+            {/* Subtle background glow */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_25%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.22),transparent_45%)] pointer-events-none" />
+            <div className="tech-dot-bg absolute inset-0 opacity-15 pointer-events-none" />
+
+            <div className="relative grid items-center gap-10 lg:grid-cols-12">
+              {/* Left Column: Short & Precise Action Call */}
+              <div className="lg:col-span-7">
+                <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  {isAm ? 'የተቋምዎን የጥገና አቅም ያሳድጉ' : 'Upgrade Your Technical Infrastructure Readiness'}
+                </h3>
+                <p className="mt-3 text-sm sm:text-base leading-relaxed text-blue-100 font-normal">
                   {isAm
-                    ? 'የተቋማትና የድርጅቶች የቴክኒክ ሰራተኞች'
-                    : 'Institutional & Enterprise Technical Workforce'}
-                </span>
-              </div>
+                    ? 'በተቋምዎ ቅጥር ግቢ ወይም በባህር ዳር ማሰልጠኛ ላቦራቶሪያችን ለቴክኒክ ሰራተኞችዎ የተመቻቸ የፈረቃ ወይም የተጠናከረ ስልጠና እንሰጣለን።'
+                    : 'Flexible on-site workshops at your facility or intensive cohort bootcamps at our Bahir Dar practical engineering labs.'}
+                </p>
 
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.65rem] text-white leading-tight">
-                {isAm
-                  ? 'ለተቋማት ሰራተኞች የተዘጋጀ ብጁ የተግባር ስልጠና'
-                  : 'Customized Technical Training for Institutional Employees'}
-              </h2>
-
-              <p className="mt-4 text-base sm:text-lg leading-relaxed text-blue-100 font-normal max-w-xl">
-                {isAm
-                  ? 'ተቋምዎ ልዩ ማሽነሪዎችን ይጠቀማል? በሆስፒታሎች፣ በፋብሪካዎች፣ በዩኒቨርሲቲዎች፣ በቴሌኮም እና በባንኮች ውስጥ ለሚሰሩ ቴክኒሻኖች በእርስዎ መሳሪያዎች ዙሪያ የተዘጋጀ ብጁ ስልጠና በቦታው ወይም በላባችን እንሰጣለን።'
-                  : 'Empower your technical workforce with tailor-made repair training built directly around your organization’s machinery, biomedical units, and IT hardware — delivered on-site or in our Bahir Dar labs.'}
-              </p>
-
-              {/* Sector Tags Strip */}
-              <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold text-white/95">
-                <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm border border-white/20">
-                  🏥 {isAm ? 'ሆስፒታሎችና ባዮሜዲካል' : 'Hospitals & Healthcare'}
-                </span>
-                <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm border border-white/20">
-                  🏭 {isAm ? 'ፋብሪካዎችና PLCs' : 'Industries & PLCs'}
-                </span>
-                <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm border border-white/20">
-                  📡 {isAm ? 'ቴሌኮም፣ ሰርቨርና አይቲ' : 'Telecom & Enterprise IT'}
-                </span>
-                <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm border border-white/20">
-                  🎓 {isAm ? 'ዩኒቨርሲቲዎችና ላብራቶሪዎች' : 'Universities & Labs'}
-                </span>
-              </div>
+                {/* Sector Tags Strip */}
+                <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold text-white/95">
+                  <span className="rounded-lg bg-white/15 px-3 py-1.5 backdrop-blur-sm border border-white/20">
+                    🏥 {isAm ? 'ሆስፒታሎችና ባዮሜዲካል' : 'Hospitals & Healthcare'}
+                  </span>
+                  <span className="rounded-lg bg-white/15 px-3 py-1.5 backdrop-blur-sm border border-white/20">
+                    🏭 {isAm ? 'ፋብሪካዎችና PLCs' : 'Industries & PLCs'}
+                  </span>
+                  <span className="rounded-lg bg-white/15 px-3 py-1.5 backdrop-blur-sm border border-white/20">
+                    📡 {isAm ? 'ቴሌኮም፣ ሰርቨርና አይቲ' : 'Telecom & Enterprise IT'}
+                  </span>
+                  <span className="rounded-lg bg-white/15 px-3 py-1.5 backdrop-blur-sm border border-white/20">
+                    🎓 {isAm ? 'ዩኒቨርሲቲዎችና ላብራቶሪዎች' : 'Universities & Labs'}
+                  </span>
+                </div>
 
               {/* Direct Action to Call & Request Buttons */}
               <div className="mt-8 flex flex-wrap items-center gap-3.5">
@@ -212,7 +226,8 @@ export function CompanyTrainingCTA() {
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* ── MODAL: COMPANY INQUIRY (DEDICATED, NOT MERGED WITH NORMAL CONTACT US) ── */}
       {modalOpen && (

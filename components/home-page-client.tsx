@@ -101,94 +101,96 @@ export function HomePageClient({
     <SiteShell>
       <main>
         {/* ── HERO SECTION ── */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] text-white">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.22),transparent_45%)]" />
-          <div className="container relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 lg:grid-cols-[1.02fr_0.98fr] lg:px-8 lg:py-28">
-            <div className="animate-fade-in-up">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white animate-float-slow backdrop-blur-md shadow-lg shadow-blue-900/20">
-                <span className="flex size-2 rounded-full bg-white animate-ping mr-0.5" />
-                <CircuitBoard className="size-3.5" />
-                <span>
+        <section className="px-5 pt-4 pb-8 lg:px-8">
+          <div className="container relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-blue-400/30 bg-[#0d2a75] bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] text-white shadow-2xl relative">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.22),transparent_45%)]" />
+            <div className="relative grid items-center gap-12 px-6 py-16 sm:px-10 lg:grid-cols-[1.02fr_0.98fr] lg:px-14 lg:py-24">
+              <div className="animate-fade-in-up">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white animate-float-slow backdrop-blur-md shadow-lg shadow-blue-900/20">
+                  <span className="flex size-2 rounded-full bg-white animate-ping mr-0.5" />
+                  <CircuitBoard className="size-3.5" />
+                  <span>
+                    {isAm
+                      ? 'ቴክኒካዊ ትምህርት · በተግባር ላይ የተመሠረተ'
+                      : 'Technical Education · Built Around Practice'}
+                  </span>
+                </div>
+                <h1 className="max-w-2xl text-5xl font-extrabold tracking-[-0.04em] md:text-6xl lg:text-[4.35rem] lg:leading-[1.03]">
+                  {isAm ? 'ተግባራዊ ክህሎትን ያዳብሩ። ' : 'Build practical skills. '}
+                  <span className="text-white drop-shadow-sm">
+                    {isAm ? 'በልበ ሙሉነት ይጠግኑ።' : 'Repair with confidence.'}
+                  </span>
+                </h1>
+                <p className="mt-7 max-w-xl text-lg leading-8 text-blue-50">
                   {isAm
-                    ? 'ቴክኒካዊ ትምህርት · በተግባር ላይ የተመሠረተ'
-                    : 'Technical Education · Built Around Practice'}
-                </span>
-              </div>
-              <h1 className="max-w-2xl text-5xl font-extrabold tracking-[-0.04em] md:text-6xl lg:text-[4.35rem] lg:leading-[1.03]">
-                {isAm ? 'ተግባራዊ ክህሎትን ያዳብሩ። ' : 'Build practical skills. '}
-                <span className="text-white drop-shadow-sm">
-                  {isAm ? 'በልበ ሙሉነት ይጠግኑ።' : 'Repair with confidence.'}
-                </span>
-              </h1>
-              <p className="mt-7 max-w-xl text-lg leading-8 text-blue-50">
-                {isAm
-                  ? 'የሞባይል ስልክ ጥገናን፣ የኮምፒውተር ጥገናን፣ የኤሌክትሮኒክስ ዲያግኖስቲክስ እና የማይክሮ-ሶልደሪንግ ስራዎችን በባህር ዳር በተግባር ላይ ባተኮረ ጥራት ያለው ስልጠና ይማሩ።'
-                  : 'Learn mobile phone repair, computer maintenance, electronics troubleshooting, and micro-soldering through focused, hands-on technical practical training in Bahir Dar.'}
-              </p>
-              <div className="mt-9 flex flex-wrap gap-3">
-                <Link href="/#courses">
-                  <Button
-                    size="lg"
-                    className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]"
-                  >
-                    {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore courses'} <ArrowRight data-icon="inline-end" />
-                  </Button>
-                </Link>
-                <Link href="/contact">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="rounded-xl border-white/50 bg-white/10 px-6 font-semibold text-white transition duration-300 hover:border-white hover:bg-white/20 hover:text-white"
-                  >
-                    {isAm ? 'ያግኙን' : 'Contact us'}
-                  </Button>
-                </Link>
-              </div>
-              <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-blue-100">
-                <div className="flex items-center gap-2.5">
-                  <span className="flex size-6 items-center justify-center rounded-full bg-white/20 text-white">
-                    <Check className="size-3.5" />
-                  </span>
-                  <span>{isAm ? '100% የተግባር ላብራቶሪ ስልጠና' : '100% Practical Hands-on Labs'}</span>
+                    ? 'የሞባይል ስልክ ጥገናን፣ የኮምፒውተር ጥገናን፣ የኤሌክትሮኒክስ ዲያግኖስቲክስ እና የማይክሮ-ሶልደሪንግ ስራዎችን በባህር ዳር በተግባር ላይ ባተኮረ ጥራት ያለው ስልጠና ይማሩ።'
+                    : 'Learn mobile phone repair, computer maintenance, electronics troubleshooting, and micro-soldering through focused, hands-on technical practical training in Bahir Dar.'}
+                </p>
+                <div className="mt-9 flex flex-wrap gap-3">
+                  <Link href="/#courses">
+                    <Button
+                      size="lg"
+                      className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]"
+                    >
+                      {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore courses'} <ArrowRight data-icon="inline-end" />
+                    </Button>
+                  </Link>
+                  <Link href="/contact">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="rounded-xl border-white/50 bg-white/10 px-6 font-semibold text-white transition duration-300 hover:border-white hover:bg-white/20 hover:text-white"
+                    >
+                      {isAm ? 'ያግኙን' : 'Contact us'}
+                    </Button>
+                  </Link>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="flex size-6 items-center justify-center rounded-full bg-white/20 text-white">
-                    <Check className="size-3.5" />
-                  </span>
-                  <span>{isAm ? 'ሲግናል ሞል፣ ባህር ዳር' : 'Signal Mall, Bahir Dar Location'}</span>
+                <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-blue-100">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex size-6 items-center justify-center rounded-full bg-white/20 text-white">
+                      <Check className="size-3.5" />
+                    </span>
+                    <span>{isAm ? '100% የተግባር ላብራቶሪ ስልጠና' : '100% Practical Hands-on Labs'}</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex size-6 items-center justify-center rounded-full bg-white/20 text-white">
+                      <Check className="size-3.5" />
+                    </span>
+                    <span>{isAm ? 'ሲግናል ሞል፣ ባህር ዳር' : 'Signal Mall, Bahir Dar Location'}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Hero Image Visual with Interactive Depth */}
-            <div className="relative group">
-              <div className="overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-2xl shadow-blue-950/30 transition duration-500 group-hover:border-white/60">
-                <img
-                  src="/images/ems-hero-workbench.png"
-                  alt={isAm ? 'የኤሌክትሮኒክስ መመርመሪያ እና የጥገና ቤንች' : 'Circuit board and electronic components on a workbench'}
-                  className="aspect-[4/3] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0c3694]/80 via-transparent to-transparent" />
-              </div>
+              {/* Hero Image Visual with Interactive Depth */}
+              <div className="relative group">
+                <div className="overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-2xl shadow-blue-950/30 transition duration-500 group-hover:border-white/60">
+                  <img
+                    src="/images/ems-hero-workbench.png"
+                    alt={isAm ? 'የኤሌክትሮኒክስ መመርመሪያ እና የጥገና ቤንች' : 'Circuit board and electronic components on a workbench'}
+                    className="aspect-[4/3] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c3694]/80 via-transparent to-transparent" />
+                </div>
 
-              {/* Floating Benchmark Badge */}
-              <div className="absolute -bottom-5 -left-5 hidden rounded-2xl border border-white/25 bg-white/95 p-4.5 shadow-2xl backdrop-blur-md sm:block animate-float-slow text-slate-900">
-                <div className="flex items-center gap-3.5">
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-[#155DFC] text-white shadow-md shadow-blue-500/30">
-                    <Wrench className="size-5" />
-                  </span>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <p className="text-sm font-bold text-slate-900">
-                        {isAm ? 'የዲያግኖስቲክስና ጥገና ላብራቶሪ' : 'Diagnostic Workshop Labs'}
+                {/* Floating Benchmark Badge */}
+                <div className="absolute -bottom-5 -left-5 hidden rounded-2xl border border-white/25 bg-white/95 p-4.5 shadow-2xl backdrop-blur-md sm:block animate-float-slow text-slate-900">
+                  <div className="flex items-center gap-3.5">
+                    <span className="flex size-11 items-center justify-center rounded-xl bg-[#155DFC] text-white shadow-md shadow-blue-500/30">
+                      <Wrench className="size-5" />
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <p className="text-sm font-bold text-slate-900">
+                          {isAm ? 'የዲያግኖስቲክስና ጥገና ላብራቶሪ' : 'Diagnostic Workshop Labs'}
+                        </p>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-0.5">
+                        {isAm
+                          ? 'ትክክለኛ እቃዎች። ትክክለኛ ንድፎች። በራስ መተማመን።'
+                          : 'Real tools. Real schematics. Confidence.'}
                       </p>
                     </div>
-                    <p className="text-xs text-slate-600 mt-0.5">
-                      {isAm
-                        ? 'ትክክለኛ እቃዎች። ትክክለኛ ንድፎች። በራስ መተማመን።'
-                        : 'Real tools. Real schematics. Confidence.'}
-                    </p>
                   </div>
                 </div>
               </div>
@@ -217,43 +219,46 @@ export function HomePageClient({
                 {courses.map((course) => (
                   <article
                     key={course.id}
-                    className="group flex flex-col justify-between rounded-2xl border border-border/80 bg-card/85 backdrop-blur-md p-6 card-hover-lift hover:border-primary/50 shadow-sm transition-all"
+                    className="card-hover-lift group flex flex-col justify-between rounded-3xl border border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-6 text-white shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:border-white/50"
                   >
                     <div>
                       <div className="flex items-center justify-between">
-                        <CourseIcon name={course.icon as any} />
+                        <CourseIcon
+                          name={course.icon as any}
+                          className="bg-white/20 text-white border border-white/30 shadow-md group-hover:scale-110 transition-transform duration-300"
+                        />
                         {course.duration && (
-                          <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
-                            <Clock3 className="size-3.5 text-primary" />
+                          <span className="flex items-center gap-1 text-xs text-blue-100 font-semibold bg-white/15 px-2.5 py-1 rounded-full border border-white/20">
+                            <Clock3 className="size-3.5 text-sky-200" />
                             {course.duration}
                           </span>
                         )}
                       </div>
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-wider text-primary">
+                      <p className="mt-5 text-xs font-bold uppercase tracking-wider text-sky-200">
                         {course.category}
                       </p>
-                      <h3 className="mt-1.5 text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="mt-1.5 text-lg font-bold text-white transition-colors group-hover:text-blue-100">
                         {course.title}
                       </h3>
-                      <p className="mt-2.5 text-sm leading-6 text-muted-foreground line-clamp-3">
+                      <p className="mt-2.5 text-sm leading-6 text-blue-100/90 line-clamp-3">
                         {course.description}
                       </p>
                     </div>
 
-                    <div className="mt-6 border-t pt-4">
+                    <div className="mt-6 border-t border-white/20 pt-4">
                       {course.level && (
                         <div className="mb-3">
-                          <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          <span className="rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white border border-white/25">
                             {course.level}
                           </span>
                         </div>
                       )}
                       <Link
                         href={`/courses/${course.slug}`}
-                        className="inline-flex items-center gap-2 text-sm font-bold text-primary group-hover:underline"
+                        className="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-sky-200 group-hover:underline transition-colors"
                       >
                         {isAm ? 'ስልጠናውንና ካሪኩለሙን ይመልከቱ' : 'View course & curriculum'}{' '}
-                        <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1.5" />
+                        <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1.5 text-white" />
                       </Link>
                     </div>
                   </article>
@@ -268,21 +273,15 @@ export function HomePageClient({
         </section>
 
         {/* ── WHY CHOOSE US / THE PRACTICAL ADVANTAGE (USP) ── */}
-        <section className="relative overflow-hidden bg-[#091e54] bg-gradient-to-br from-[#091e54] via-[#0c2f86] to-[#1244b8] px-5 py-24 text-white lg:px-8 border-y border-blue-400/30 shadow-2xl">
-          {/* Circuit pattern overlay */}
-          <div className="absolute inset-0 circuit-grid-bg opacity-25 pointer-events-none" />
-          {/* Ambient glow orbs */}
-          <div className="absolute -right-24 -top-24 size-96 rounded-full bg-blue-400/20 blur-3xl pointer-events-none" />
-          <div className="absolute -left-24 bottom-1/4 size-96 rounded-full bg-sky-400/20 blur-3xl pointer-events-none" />
-
+        <section className="px-5 py-20 lg:px-8">
           <div className="container relative mx-auto max-w-7xl">
             {/* Header / Value Proposition Narrative */}
-            <div className="mx-auto max-w-3xl mb-12 text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-sky-300/30 bg-white/15 px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.18em] text-sky-200 backdrop-blur-md shadow-sm mb-4">
-                <CircuitBoard className="size-3.5 text-sky-300" />
+            <div className="mx-auto max-w-3xl mb-14 text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-extrabold uppercase tracking-[0.18em] text-primary shadow-xs mb-4">
+                <CircuitBoard className="size-3.5" />
                 <span>{isAm ? 'የተግባር ልህቀት' : 'The Practical Advantage'}</span>
               </span>
-              <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl lg:leading-tight">
+              <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl lg:leading-tight">
                 {isAm ? 'ለምን ሄሎ ቴክኖሎጂን ይመርጣሉ?' : 'Why Choose Hello Technology'}
               </h2>
             </div>
@@ -292,7 +291,7 @@ export function HomePageClient({
               {whyChooseUsUsps.map((item, index) => (
                 <div
                   key={item.title}
-                  className="card-hover-lift group relative flex flex-col justify-between rounded-2xl border border-white/20 bg-white/[0.09] p-6 shadow-lg backdrop-blur-md transition-all duration-300 hover:bg-white/[0.15] hover:border-sky-300/50 hover:shadow-2xl"
+                  className="card-hover-lift group relative flex flex-col justify-between rounded-3xl border border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-7 text-white shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:border-white/50"
                 >
                   <div>
                     {/* Top row: Icon + Number Index */}
@@ -301,33 +300,33 @@ export function HomePageClient({
                         name={item.icon as any}
                         className="bg-white/20 text-white border border-white/30 shadow-md group-hover:scale-110 transition-transform duration-300"
                       />
-                      <span className="text-xs font-black tracking-widest text-sky-300/80 bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                      <span className="text-xs font-black tracking-widest text-white/90 bg-white/20 px-2.5 py-1 rounded-full border border-white/25">
                         0{index + 1}
                       </span>
                     </div>
 
                     {/* USP Badge Pill */}
                     <div className="mt-5">
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-0.5 text-[11px] font-bold text-sky-200">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/15 px-2.5 py-0.5 text-[11px] font-bold text-white">
                         <Sparkles className="size-3 text-amber-300" />
                         {item.badge}
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="mt-3 text-lg font-bold text-white transition-colors group-hover:text-sky-200">
+                    <h3 className="mt-3 text-xl font-bold text-white transition-colors group-hover:text-blue-100">
                       {item.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="mt-2.5 text-sm leading-relaxed text-blue-100/85">
+                    <p className="mt-2.5 text-sm leading-relaxed text-blue-100">
                       {item.description}
                     </p>
                   </div>
 
                   {/* Feature Check Pill */}
-                  <div className="mt-5 pt-3.5 border-t border-white/10 flex items-center gap-2 text-xs font-semibold text-sky-200">
-                    <Check className="size-3.5 text-emerald-400 shrink-0" />
+                  <div className="mt-6 pt-4 border-t border-white/20 flex items-center gap-2 text-xs font-semibold text-white/95">
+                    <Check className="size-3.5 text-emerald-300 shrink-0" />
                     <span>{item.feature}</span>
                   </div>
                 </div>
@@ -347,100 +346,115 @@ export function HomePageClient({
         <TrustedBySection partners={trustedPartners} />
 
         {/* ── ONLINE LEARNING & DISTANCE STUDY CTA (SHORT & PRECISE) ── */}
-        <section className="border-y bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] px-5 py-16 text-white lg:px-8 relative overflow-hidden">
-          {/* Subtle background glow */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_25%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.22),transparent_45%)] pointer-events-none" />
-
+        <section className="px-5 py-20 lg:px-8">
           <div className="container relative mx-auto max-w-7xl">
-            <div className="grid items-center gap-10 lg:grid-cols-12">
-              {/* Left Column: Short & Precise Copy + Action to Call */}
-              <div className="lg:col-span-7">
-                <div className="inline-flex items-center gap-2 rounded-full border border-sky-300/40 bg-white/15 px-3.5 py-1 text-xs font-extrabold uppercase tracking-widest text-sky-200 mb-4 backdrop-blur-md shadow-sm">
-                  <Globe className="size-3.5 text-amber-300 animate-pulse" />
-                  <span>
+            {/* Centered Section Header on Transparent Page Background */}
+            <div className="mx-auto max-w-3xl mb-12 text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-extrabold uppercase tracking-widest text-primary shadow-xs mb-4">
+                <Globe className="size-3.5 animate-pulse" />
+                <span>
+                  {isAm
+                    ? 'የርቀት እና የኦንላይን ትምህርት · ዲጂታል አካዳሚ'
+                    : "Can't Attend In Person? Study Online Anywhere"}
+                </span>
+              </span>
+
+              <h2 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl lg:text-5xl lg:leading-tight">
+                {isAm
+                  ? 'በባህር ዳር በአካል መገኘት አልቻሉም? ከየትኛውም ቦታ በኦንላይን ይማሩ።'
+                  : "Can't Attend in Bahir Dar? Master Repair Skills Online at Your Own Pace."}
+              </h2>
+
+              <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground font-normal max-w-2xl mx-auto">
+                {isAm
+                  ? 'ከየትኛውም ከተማ ሆነው በስልክዎ ወይም በኮምፒውተርዎ የተግባር ቪዲዮዎችንና የሰርኪውት ንድፎችን በራስዎ ምቹ ሰዓት ይማሩ። አሁኑኑ ይደውሉልን ወይም በመስመር ላይ መማር ይጀምሩ።'
+                  : 'Study practical workbench video masterclasses and circuit schematics anywhere around your schedule. Call our admissions team today or start streaming online.'}
+              </p>
+            </div>
+
+            {/* Blue Action Card */}
+            <div className="overflow-hidden rounded-3xl border border-blue-400/30 bg-[#0d2a75] bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-8 text-white shadow-2xl sm:p-12 lg:p-14 relative">
+              {/* Subtle background glow */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_25%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.22),transparent_45%)] pointer-events-none" />
+
+              <div className="relative grid items-center gap-10 lg:grid-cols-12">
+                {/* Left Column: Short & Precise Copy + Action to Call */}
+                <div className="lg:col-span-7">
+                  <h3 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                    {isAm ? 'የቀጥታ ስልክ መስመር ወይም ኦንላይን ላይብረሪ' : 'Direct Admissions Helpline & Digital Vault'}
+                  </h3>
+                  <p className="mt-3 text-sm sm:text-base leading-relaxed text-blue-100 font-normal">
                     {isAm
-                      ? 'የርቀት እና የኦንላይን ትምህርት · ዲጂታል አካዳሚ'
-                      : "Can't Attend In Person? Study Online Anywhere"}
-                  </span>
+                      ? 'የስልጠና አማካሪዎቻችን ዝርዝር መረጃዎችን ይሰጡዎታል። እንዲሁም በዲጂታል ላይብረሪያችን የተመዘገቡ የቪዲዮ ትምህርቶችን ማግኘት ይችላሉ።'
+                      : 'Our admissions counselors are ready to answer your questions, or start learning immediately through our self-paced masterclasses.'}
+                  </p>
+
+                  {/* Direct Action to Call & Start Buttons */}
+                  <div className="mt-8 flex flex-wrap items-center gap-3.5">
+                    <a href={`tel:${schoolConfig.phone.replace(/\s+/g, '')}`}>
+                      <Button
+                        size="lg"
+                        className="rounded-xl bg-white px-6 font-bold text-[#155DFC] hover:bg-blue-50 shadow-xl hover:scale-[1.02] transition-all"
+                      >
+                        <Phone className="size-4 mr-2 text-[#155DFC]" />
+                        {isAm ? `በቀጥታ ይደውሉ፡ ${schoolConfig.phone}` : `Call Admissions: ${schoolConfig.phone}`}
+                      </Button>
+                    </a>
+
+                    <Link href="/library">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="rounded-xl border-white/50 bg-white/10 text-white hover:border-white hover:bg-white/20 transition-all font-semibold"
+                      >
+                        {isAm ? 'ኦንላይን ኮርሶችን ይጀምሩ' : 'Start Online Courses'}
+                        <ArrowRight className="size-4 ml-1.5" />
+                      </Button>
+                    </Link>
+
+                    <a
+                      href={`https://wa.me/251947747070?text=${encodeURIComponent(
+                        isAm
+                          ? 'ሰላም! በአካል ባህር ዳር መገኘት ስለማልችል የኦንላይን ስልጠናዎችን መከታተል እፈልጋለሁ። ተጨማሪ መረጃ ቢሰጡኝ?'
+                          : 'Hello! I cannot attend in Bahir Dar in person. I would like to inquire about online self-paced training programs.'
+                      )}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="rounded-xl border-emerald-400/40 bg-emerald-500/20 text-white hover:bg-emerald-500/30 transition-all font-semibold"
+                      >
+                        <MessageCircle className="size-4 mr-1.5 text-emerald-300" />
+                        {isAm ? 'WhatsApp' : 'WhatsApp'}
+                      </Button>
+                    </a>
+                  </div>
                 </div>
 
-                <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.65rem] text-white leading-tight">
-                  {isAm
-                    ? 'በባህር ዳር በአካል መገኘት አልቻሉም? ከየትኛውም ቦታ በኦንላይን ይማሩ።'
-                    : "Can't Attend in Bahir Dar? Master Repair Skills Online at Your Own Pace."}
-                </h2>
-
-                <p className="mt-4 text-base sm:text-lg leading-relaxed text-blue-100 font-normal max-w-xl">
-                  {isAm
-                    ? 'ከየትኛውም ከተማ ሆነው በስልክዎ ወይም በኮምፒውተርዎ የተግባር ቪዲዮዎችንና የሰርኪውት ንድፎችን በራስዎ ምቹ ሰዓት ይማሩ። አሁኑኑ ይደውሉልን ወይም በመስመር ላይ መማር ይጀምሩ።'
-                    : 'Study practical workbench video masterclasses and circuit schematics anywhere around your schedule. Call our admissions team today or start streaming online.'}
-                </p>
-
-                {/* Direct Action to Call & Start Buttons */}
-                <div className="mt-8 flex flex-wrap items-center gap-3.5">
-                  <a href={`tel:${schoolConfig.phone.replace(/\s+/g, '')}`}>
-                    <Button
-                      size="lg"
-                      className="rounded-xl bg-white px-6 font-bold text-[#155DFC] hover:bg-blue-50 shadow-xl hover:scale-[1.02] transition-all"
-                    >
-                      <Phone className="size-4 mr-2 text-[#155DFC]" />
-                      {isAm ? `በቀጥታ ይደውሉ፡ ${schoolConfig.phone}` : `Call Admissions: ${schoolConfig.phone}`}
-                    </Button>
-                  </a>
-
-                  <Link href="/library">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="rounded-xl border-white/50 bg-white/10 text-white hover:border-white hover:bg-white/20 transition-all font-semibold"
-                    >
-                      {isAm ? 'ኦንላይን ኮርሶችን ይጀምሩ' : 'Start Online Courses'}
-                      <ArrowRight className="size-4 ml-1.5" />
-                    </Button>
-                  </Link>
-
-                  <a
-                    href={`https://wa.me/251947747070?text=${encodeURIComponent(
-                      isAm
-                        ? 'ሰላም! በአካል ባህር ዳር መገኘት ስለማልችል የኦንላይን ስልጠናዎችን መከታተል እፈልጋለሁ። ተጨማሪ መረጃ ቢሰጡኝ?'
-                        : 'Hello! I cannot attend in Bahir Dar in person. I would like to inquire about online self-paced training programs.'
-                    )}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="rounded-xl border-emerald-400/40 bg-emerald-500/20 text-white hover:bg-emerald-500/30 transition-all font-semibold"
-                    >
-                      <MessageCircle className="size-4 mr-1.5 text-emerald-300" />
-                      {isAm ? 'WhatsApp' : 'WhatsApp'}
-                    </Button>
-                  </a>
-                </div>
-              </div>
-
-              {/* Right Column: Uploaded Image as the Trigger */}
-              <div className="lg:col-span-5">
-                <div className="relative group overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-2xl backdrop-blur-md">
-                  <img
-                    src="/images/online-learning-banner.png"
-                    alt={
-                      isAm
-                        ? 'የኦንላይን ትምህርት በሄሎ ቴክኖሎጂ'
-                        : "Can't Attend In Person? Study Online Anywhere"
-                    }
-                    className="aspect-[4/3] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white">
-                    <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#155DFC]/90 px-3.5 py-1.5 font-bold backdrop-blur-md shadow-md text-white border border-white/20">
-                      <Sparkles className="size-3.5 text-amber-300" />
-                      {isAm ? '24/7 የዲጂታል መዳረሻ' : '24/7 Digital Access'}
-                    </span>
-                    <span className="rounded-lg bg-black/60 px-3 py-1.5 text-[11px] font-semibold backdrop-blur-md border border-white/15">
-                      {isAm ? '100% በራስዎ ምቹ ሰዓት' : '100% Self-Paced'}
-                    </span>
+                {/* Right Column: Uploaded Image as the Trigger */}
+                <div className="lg:col-span-5">
+                  <div className="relative group overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-2xl backdrop-blur-md">
+                    <img
+                      src="/images/online-learning-banner.png"
+                      alt={
+                        isAm
+                          ? 'የኦንላይን ትምህርት በሄሎ ቴክኖሎጂ'
+                          : "Can't Attend In Person? Study Online Anywhere"
+                      }
+                      className="aspect-[4/3] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white">
+                      <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#155DFC]/90 px-3.5 py-1.5 font-bold backdrop-blur-md shadow-md text-white border border-white/20">
+                        <Sparkles className="size-3.5 text-amber-300" />
+                        {isAm ? '24/7 የዲጂታል መዳረሻ' : '24/7 Digital Access'}
+                      </span>
+                      <span className="rounded-lg bg-black/60 px-3 py-1.5 text-[11px] font-semibold backdrop-blur-md border border-white/15">
+                        {isAm ? '100% በራስዎ ምቹ ሰዓት' : '100% Self-Paced'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

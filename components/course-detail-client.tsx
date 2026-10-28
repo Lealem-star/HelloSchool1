@@ -19,61 +19,63 @@ export function CourseDetailClient({ course, allCourseTitles }: CourseDetailClie
   return (
     <SiteShell>
       <main>
-        <section className="relative overflow-hidden bg-[#0d2a75] bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] px-5 py-16 text-white lg:px-8 lg:py-24">
-          <div className="absolute inset-0 circuit-grid-bg opacity-30 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.2),transparent_45%)] pointer-events-none" />
-          <div className="container relative mx-auto max-w-7xl">
-            <Link
-              href="/#courses"
-              className="inline-flex items-center gap-2 text-sm text-blue-100 transition-colors hover:text-white"
-            >
-              <ArrowLeft className="size-4" /> {isAm ? 'ሁሉም ስልጠናዎች' : 'All courses'}
-            </Link>
-            <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_0.8fr] lg:items-center">
-              <div className="animate-fade-in-up">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white animate-float-slow backdrop-blur-md">
-                  <span className="size-2 rounded-full bg-white animate-pulse" />
-                  {course.category}
+        <section className="px-5 pt-4 pb-8 lg:px-8">
+          <div className="container relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-blue-400/30 bg-[#0d2a75] bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-8 text-white shadow-2xl sm:p-12 lg:p-16 relative">
+            <div className="absolute inset-0 circuit-grid-bg opacity-30 pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.2),transparent_45%)] pointer-events-none" />
+            <div className="relative">
+              <Link
+                href="/#courses"
+                className="inline-flex items-center gap-2 text-sm text-blue-100 transition-colors hover:text-white"
+              >
+                <ArrowLeft className="size-4" /> {isAm ? 'ሁሉም ስልጠናዎች' : 'All courses'}
+              </Link>
+              <div className="mt-10 grid gap-12 lg:grid-cols-[1fr_0.8fr] lg:items-center">
+                <div className="animate-fade-in-up">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-white animate-float-slow backdrop-blur-md">
+                    <span className="size-2 rounded-full bg-white animate-pulse" />
+                    {course.category}
+                  </div>
+                  <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl text-white">
+                    {course.title}
+                  </h1>
+                  <p className="mt-6 max-w-2xl text-lg leading-8 text-blue-50">{course.description}</p>
+                  <div className="mt-8 flex flex-wrap items-center gap-3">
+                    <Link href={`/cart?course=${course.slug}`}>
+                      <Button
+                        size="lg"
+                        className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]"
+                      >
+                        {isAm ? 'አሁኑኑ በኦንላይን ይጀምሩ' : 'Enroll Online Now'} <ArrowRight data-icon="inline-end" />
+                      </Button>
+                    </Link>
+                    <a href="#inquire">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="rounded-xl border-white/40 bg-white/10 text-white hover:bg-white/20 hover:border-white"
+                      >
+                        {isAm ? 'ፈጣን ጥያቄ' : 'Quick Question'}
+                      </Button>
+                    </a>
+                    {course.duration ? (
+                      <span className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white">
+                        <Clock3 className="size-4 text-white" /> {course.duration}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
-                <h1 className="mt-4 max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl text-white">
-                  {course.title}
-                </h1>
-                <p className="mt-6 max-w-2xl text-lg leading-8 text-blue-50">{course.description}</p>
-                <div className="mt-8 flex flex-wrap items-center gap-3">
-                  <Link href={`/cart?course=${course.slug}`}>
-                    <Button
-                      size="lg"
-                      className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]"
-                    >
-                      {isAm ? 'አሁኑኑ በኦንላይን ይጀምሩ' : 'Enroll Online Now'} <ArrowRight data-icon="inline-end" />
-                    </Button>
-                  </Link>
-                  <a href="#inquire">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="rounded-xl border-white/40 bg-white/10 text-white hover:bg-white/20 hover:border-white"
-                    >
-                      {isAm ? 'ፈጣን ጥያቄ' : 'Quick Question'}
-                    </Button>
-                  </a>
-                  {course.duration ? (
-                    <span className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white">
-                      <Clock3 className="size-4 text-white" /> {course.duration}
-                    </span>
-                  ) : null}
-                </div>
+                {course.image ? (
+                  <div className="relative group overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-2xl shadow-blue-950/30">
+                    <img
+                      src={course.image}
+                      alt={course.title}
+                      className="aspect-[4/3] w-full rounded-3xl object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0c3694]/60 via-transparent to-transparent" />
+                  </div>
+                ) : null}
               </div>
-              {course.image ? (
-                <div className="relative group overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-2xl shadow-blue-950/30">
-                  <img
-                    src={course.image}
-                    alt={course.title}
-                    className="aspect-[4/3] w-full rounded-3xl object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c3694]/60 via-transparent to-transparent" />
-                </div>
-              ) : null}
             </div>
           </div>
         </section>
