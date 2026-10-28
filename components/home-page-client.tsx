@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import {
   ArrowRight,
@@ -17,6 +17,8 @@ import {
   Globe,
   MessageCircle,
   Phone,
+  Volume2,
+  VolumeX,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CourseIcon, CTASection, SectionHeading, SiteShell, StatStrip } from '@/components/site'
@@ -38,6 +40,16 @@ export function HomePageClient({
 }: HomePageClientProps) {
   const { language } = useLanguage()
   const isAm = language === 'am'
+
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [isMuted, setIsMuted] = useState(true)
+
+  function toggleMute() {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted
+      setIsMuted(videoRef.current.muted)
+    }
+  }
 
 
   const whyChooseUsUsps = [
@@ -100,102 +112,120 @@ export function HomePageClient({
   return (
     <SiteShell>
       <main>
-        {/* ── HERO SECTION ── */}
-        <section className="px-5 pt-4 pb-8 lg:px-8">
-          <div className="container relative mx-auto max-w-7xl overflow-hidden rounded-3xl border border-blue-400/30 bg-[#0d2a75] bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] text-white shadow-2xl relative">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.22),transparent_45%)]" />
-            <div className="relative grid items-center gap-12 px-6 py-16 sm:px-10 lg:grid-cols-[1.02fr_0.98fr] lg:px-14 lg:py-24">
-              <div className="animate-fade-in-up">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white animate-float-slow backdrop-blur-md shadow-lg shadow-blue-900/20">
-                  <span className="flex size-2 rounded-full bg-white animate-ping mr-0.5" />
-                  <CircuitBoard className="size-3.5" />
-                  <span>
-                    {isAm
-                      ? 'ቴክኒካዊ ትምህርት · በተግባር ላይ የተመሠረተ'
-                      : 'Technical Education · Built Around Practice'}
-                  </span>
-                </div>
-                <h1 className="max-w-2xl text-5xl font-extrabold tracking-[-0.04em] md:text-6xl lg:text-[4.35rem] lg:leading-[1.03]">
-                  {isAm ? 'ተግባራዊ ክህሎትን ያዳብሩ። ' : 'Build practical skills. '}
-                  <span className="text-white drop-shadow-sm">
-                    {isAm ? 'በልበ ሙሉነት ይጠግኑ።' : 'Repair with confidence.'}
-                  </span>
-                </h1>
-                <p className="mt-7 max-w-xl text-lg leading-8 text-blue-50">
+        {/* ── HERO SECTION WITH FULL-SCREEN VIDEO BACKGROUND & TEXT OVERLAY ── */}
+        <section className="relative w-full overflow-hidden bg-slate-950 text-white min-h-[calc(100vh-62px)] flex items-center">
+          {/* Background Video (Hello.mp4) */}
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            className="absolute inset-0 size-full object-cover pointer-events-none"
+            src="/videos/Hello.mp4"
+          />
+
+          {/* Cinematic Gradient Scrims for Perfect Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/40 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_40%,rgba(21,93,252,0.35),transparent_65%)] pointer-events-none" />
+
+          {/* Overlay Text Content */}
+          <div className="relative z-10 container mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+            <div className="max-w-3xl animate-fade-in-up">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-3.5 py-1.5 text-xs font-bold text-white animate-float-slow backdrop-blur-md shadow-lg shadow-black/40">
+                <span className="flex size-2 rounded-full bg-emerald-400 animate-ping mr-0.5" />
+                <CircuitBoard className="size-3.5 text-sky-300" />
+                <span>
                   {isAm
-                    ? 'የሞባይል ስልክ ጥገናን፣ የኮምፒውተር ጥገናን፣ የኤሌክትሮኒክስ ዲያግኖስቲክስ እና የማይክሮ-ሶልደሪንግ ስራዎችን በባህር ዳር በተግባር ላይ ባተኮረ ጥራት ያለው ስልጠና ይማሩ።'
-                    : 'Learn mobile phone repair, computer maintenance, electronics troubleshooting, and micro-soldering through focused, hands-on technical practical training in Bahir Dar.'}
-                </p>
-                <div className="mt-9 flex flex-wrap gap-3">
-                  <Link href="/#courses">
-                    <Button
-                      size="lg"
-                      className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]"
-                    >
-                      {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore courses'} <ArrowRight data-icon="inline-end" />
-                    </Button>
-                  </Link>
-                  <Link href="/contact">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="rounded-xl border-white/50 bg-white/10 px-6 font-semibold text-white transition duration-300 hover:border-white hover:bg-white/20 hover:text-white"
-                    >
-                      {isAm ? 'ያግኙን' : 'Contact us'}
-                    </Button>
-                  </Link>
-                </div>
-                <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-blue-100">
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex size-6 items-center justify-center rounded-full bg-white/20 text-white">
-                      <Check className="size-3.5" />
-                    </span>
-                    <span>{isAm ? '100% የተግባር ላብራቶሪ ስልጠና' : '100% Practical Hands-on Labs'}</span>
-                  </div>
-                  <div className="flex items-center gap-2.5">
-                    <span className="flex size-6 items-center justify-center rounded-full bg-white/20 text-white">
-                      <Check className="size-3.5" />
-                    </span>
-                    <span>{isAm ? 'ሲግናል ሞል፣ ባህር ዳር' : 'Signal Mall, Bahir Dar Location'}</span>
-                  </div>
-                </div>
+                    ? 'ቴክኒካዊ ትምህርት · በተግባር ላይ የተመሠረተ'
+                    : 'Technical Education · Built Around Practice'}
+                </span>
               </div>
 
-              {/* Hero Image Visual with Interactive Depth */}
-              <div className="relative group">
-                <div className="overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-2xl shadow-blue-950/30 transition duration-500 group-hover:border-white/60">
-                  <img
-                    src="/images/ems-hero-workbench.png"
-                    alt={isAm ? 'የኤሌክትሮኒክስ መመርመሪያ እና የጥገና ቤንች' : 'Circuit board and electronic components on a workbench'}
-                    className="aspect-[4/3] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c3694]/80 via-transparent to-transparent" />
-                </div>
+              <h1 className="text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl lg:text-6xl text-white leading-tight drop-shadow-lg">
+                {isAm ? 'ተግባራዊ ክህሎትን ያዳብሩ። ' : 'Build practical skills. '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-sky-100 to-white">
+                  {isAm ? 'በልበ ሙሉነት ይጠግኑ።' : 'Repair with confidence.'}
+                </span>
+              </h1>
 
-                {/* Floating Benchmark Badge */}
-                <div className="absolute -bottom-5 -left-5 hidden rounded-2xl border border-white/25 bg-white/95 p-4.5 shadow-2xl backdrop-blur-md sm:block animate-float-slow text-slate-900">
-                  <div className="flex items-center gap-3.5">
-                    <span className="flex size-11 items-center justify-center rounded-xl bg-[#155DFC] text-white shadow-md shadow-blue-500/30">
-                      <Wrench className="size-5" />
-                    </span>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <p className="text-sm font-bold text-slate-900">
-                          {isAm ? 'የዲያግኖስቲክስና ጥገና ላብራቶሪ' : 'Diagnostic Workshop Labs'}
-                        </p>
-                      </div>
-                      <p className="text-xs text-slate-600 mt-0.5">
-                        {isAm
-                          ? 'ትክክለኛ እቃዎች። ትክክለኛ ንድፎች። በራስ መተማመን።'
-                          : 'Real tools. Real schematics. Confidence.'}
-                      </p>
-                    </div>
-                  </div>
+              <p className="mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-blue-50 font-normal drop-shadow-md">
+                {isAm
+                  ? 'የሞባይል ስልክ ጥገናን፣ የኮምፒውተር ጥገናን፣ የኤሌክትሮኒክስ ዲያግኖስቲክስ እና የማይክሮ-ሶልደሪንግ ስራዎችን በባህር ዳር በተግባር ላይ ባተኮረ ጥራት ያለው ስልጠና ይማሩ።'
+                  : 'Learn mobile phone repair, computer maintenance, electronics troubleshooting, and micro-soldering through focused, hands-on technical practical training in Bahir Dar.'}
+              </p>
+
+              {/* Direct Action Buttons */}
+              <div className="mt-9 flex flex-wrap items-center gap-3.5">
+                <Link href="/#courses">
+                  <Button
+                    size="lg"
+                    className="rounded-xl bg-white px-6 font-bold text-[#155DFC] hover:bg-blue-50 shadow-2xl transition duration-300 hover:scale-[1.02]"
+                  >
+                    {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore courses'} <ArrowRight className="size-4 ml-1.5" />
+                  </Button>
+                </Link>
+
+                <Link href="/contact">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-xl border-white/50 bg-white/10 px-6 font-semibold text-white transition duration-300 hover:border-white hover:bg-white/20 hover:text-white backdrop-blur-md"
+                  >
+                    {isAm ? 'ያግኙን' : 'Contact us'}
+                  </Button>
+                </Link>
+
+                <a href={`tel:${schoolConfig.phone.replace(/\s+/g, '')}`}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-xl border-emerald-400/40 bg-emerald-500/20 px-5 font-semibold text-white hover:bg-emerald-500/30 transition backdrop-blur-md"
+                  >
+                    <Phone className="size-4 mr-2 text-emerald-300" />
+                    {schoolConfig.phone}
+                  </Button>
+                </a>
+              </div>
+
+              {/* Trust Points */}
+              <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-blue-100 font-medium">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex size-6 items-center justify-center rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-400/30">
+                    <Check className="size-3.5" />
+                  </span>
+                  <span>{isAm ? '100% የተግባር ላብራቶሪ ስልጠና' : '100% Practical Hands-on Labs'}</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="flex size-6 items-center justify-center rounded-full bg-white/20 text-white border border-white/25">
+                    <Check className="size-3.5" />
+                  </span>
+                  <span>{isAm ? 'ሲግናል ሞል፣ ባህር ዳር' : 'Signal Mall, Bahir Dar Location'}</span>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Ambient Sound / Unmute Control in Bottom Right */}
+          <button
+            type="button"
+            onClick={toggleMute}
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+            className="absolute bottom-6 right-6 lg:bottom-8 lg:right-8 z-20 flex items-center gap-2 rounded-full border border-white/25 bg-black/50 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-md hover:bg-black/70 hover:border-white/40 transition shadow-lg"
+          >
+            {isMuted ? (
+              <>
+                <VolumeX className="size-4 text-white/80" />
+                <span>{isAm ? 'ድምፅ ክፈት' : 'Unmute'}</span>
+              </>
+            ) : (
+              <>
+                <Volume2 className="size-4 text-emerald-400 animate-pulse" />
+                <span>{isAm ? 'ድምፅ ዝጋ' : 'Mute'}</span>
+              </>
+            )}
+          </button>
         </section>
 
         {/* ── STAT STRIP ── */}
