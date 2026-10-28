@@ -87,23 +87,20 @@ export function CoursesCatalog({
     <SiteShell>
       <main className="container mx-auto max-w-7xl px-5 py-8 md:py-12 lg:px-8">
         {/* Top Header: What You Can Learn / Courses */}
-        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 mb-2">
-              <CircuitBoard className="size-3.5" />
-              <span>{isAm ? 'ምን መማር ይችላሉ' : 'What you can learn'}</span>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
-              {isAm ? 'ስልጠናዎቻችን እና ካሪኩለም' : 'Courses & Practical Curriculum'}
-            </h1>
-            <p className="mt-1.5 text-xs md:text-sm text-muted-foreground max-w-2xl">
-              {isAm
-                ? 'በሄሎ ቴክኖሎጂ የሚሰጡ የተግባር ስልጠናዎች ዝርዝር። በእያንዳንዱ ስልጠና ምን እንደሚማሩ፣ የሚካተቱ የካሪኩለም ክፍሎች እና የሚጨብጧቸውን የሞያ ክህሎቶች እዚህ ያገኛሉ።'
-                : 'Explore our accredited hands-on vocational courses and practical training curriculum. Discover what skills you will master, workshop equipment used, and syllabus modules.'}
-            </p>
+        <div className="mb-10 text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-sky-400 mb-2">
+            <CircuitBoard className="size-3.5" />
+            <span>{isAm ? 'ምን መማር ይችላሉ' : 'What you can learn'}</span>
           </div>
-
-          <div className="w-full md:w-72">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-foreground">
+            {isAm ? 'ስልጠናዎቻችን እና ካሪኩለም' : 'Courses & Practical Curriculum'}
+          </h1>
+          <p className="mt-2 text-xs md:text-sm text-muted-foreground mx-auto max-w-2xl">
+            {isAm
+              ? 'በሄሎ ቴክኖሎጂ የሚሰጡ የተግባር ስልጠናዎች ዝርዝር። በእያንዳንዱ ስልጠና ምን እንደሚማሩ፣ የሚካተቱ የካሪኩለም ክፍሎች እና የሚጨብጧቸውን የሞያ ክህሎቶች እዚህ ያገኛሉ።'
+              : 'Explore our accredited hands-on vocational courses and practical training curriculum. Discover what skills you will master, workshop equipment used, and syllabus modules.'}
+          </p>
+          <div className="mt-5 mx-auto max-w-md">
             <SearchField
               value={query}
               onChange={setQuery}

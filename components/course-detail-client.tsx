@@ -24,7 +24,7 @@ export function CourseDetailClient({ course, allCourseTitles }: CourseDetailClie
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.2),transparent_45%)] pointer-events-none" />
           <div className="container relative mx-auto max-w-7xl">
             <Link
-              href="/courses"
+              href="/#courses"
               className="inline-flex items-center gap-2 text-sm text-blue-100 transition-colors hover:text-white"
             >
               <ArrowLeft className="size-4" /> {isAm ? 'ሁሉም ስልጠናዎች' : 'All courses'}
@@ -82,7 +82,7 @@ export function CourseDetailClient({ course, allCourseTitles }: CourseDetailClie
         {course.syllabus && course.syllabus.length > 0 && (
           <section className="border-b bg-slate-50/70 dark:bg-card/50 py-16 lg:py-24 text-foreground">
             <div className="container mx-auto max-w-7xl px-5 lg:px-8">
-              <div className="max-w-3xl">
+              <div className="mx-auto max-w-3xl text-center">
                 <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-bold text-[#155DFC] dark:text-sky-400 mb-3">
                   <Layers className="size-3.5" />
                   <span>{isAm ? 'የተግባር ካሪኩለም ዝርዝር' : 'Hands-On Curriculum Outline'}</span>
@@ -90,7 +90,7 @@ export function CourseDetailClient({ course, allCourseTitles }: CourseDetailClie
                 <h2 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                   {isAm ? 'ደረጃ በደረጃ የተዋቀረ የስልጠና ፍኖተ ካርታ' : 'Step-by-step modular training roadmap'}
                 </h2>
-                <p className="mt-4 text-base text-muted-foreground">
+                <p className="mt-4 mx-auto max-w-2xl text-base text-muted-foreground">
                   {isAm
                     ? 'እያንዳንዱ ሞጁል የሰርኪውት ንድፈ-ሀሳብን ከተግባራዊ የላብራቶሪ ምዕራፎች ጋር ያጣምራል።'
                     : 'Each module pairs component-level circuit theory with independent practical lab milestones.'}

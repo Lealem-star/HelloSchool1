@@ -91,7 +91,7 @@ export function AboutPageClient({ instructors }: AboutPageClientProps) {
               )}
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/courses">
+              <Link href="/#courses">
                 <Button className="rounded-lg px-6 font-semibold">
                   {isAm ? 'ስልጠናዎቻችንን ይመልከቱ' : 'Explore our courses'} <ArrowRight data-icon="inline-end" />
                 </Button>

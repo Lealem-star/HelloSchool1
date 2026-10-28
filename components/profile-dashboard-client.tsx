@@ -331,7 +331,7 @@ export function ProfileDashboardClient({ initialTab = 'dashboard' }: ProfileDash
                   There is no data available for user dashboard
                 </p>
 
-                <Link href="/courses" className="mt-6">
+                <Link href="/#courses" className="mt-6">
                   <Button
                     variant="outline"
                     className="rounded-xl border-[#38bdf8] text-[#0284c7] hover:bg-sky-50 dark:hover:bg-sky-950/40 px-6 py-2.5 font-semibold text-sm transition"
@@ -620,7 +620,7 @@ export function ProfileDashboardClient({ initialTab = 'dashboard' }: ProfileDash
                 </p>
 
                 {/* Button matching Screenshot 3: Start Purchasing */}
-                <Link href="/courses" className="mt-6">
+                <Link href="/library" className="mt-6">
                   <Button
                     variant="outline"
                     className="rounded-xl border-[#38bdf8] text-[#0284c7] hover:bg-sky-50 dark:hover:bg-sky-950/40 px-6 py-2.5 font-semibold text-sm transition"

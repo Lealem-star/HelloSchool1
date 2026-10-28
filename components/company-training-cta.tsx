@@ -3,24 +3,14 @@
 import { useState } from 'react'
 import {
   Building2,
-  Stethoscope,
-  Factory,
-  GraduationCap,
-  Server,
   ArrowRight,
   CheckCircle2,
-  Sparkles,
-  Users,
   ShieldCheck,
-  Wrench,
-  Clock,
   X,
   Loader2,
   Send,
   PhoneCall,
-  Mail,
-  MapPin,
-  HelpCircle,
+  MessageCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { schoolConfig } from '@/lib/data'
@@ -34,57 +24,6 @@ export function CompanyTrainingCTA() {
   const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
-
-  const SECTORS = [
-    {
-      icon: Stethoscope,
-      title: isAm ? 'ሆስፒታሎችና የጤና ተቋማት' : 'Hospitals & Healthcare',
-      badge: isAm ? 'ባዮሜዲካል ቴክኒክ' : 'Biomedical Tech',
-      description: isAm
-        ? 'የታካሚ ሞኒተሮችን፣ የኢሲጂ (ECG) ማሽኖችን፣ የፓወር ሰፕላይ እና የሴንትሪፊውጅ ሰሌዳዎችን በሆስፒታሉ የውስጥ ባዮሜዲካል ኢንጂነሪንግ ሰራተኞች መጠገን።'
-        : 'Maintain patient monitors, ECG machines, power supplies, centrifuge boards, and diagnostic hospital equipment with internal biomedical engineering staff.',
-      skills: isAm
-        ? ['የባዮሜዲካል PCB ጥገና', 'የSMPS ፓወር ሰፕላይ ዲያግኖስቲክስ', 'የሴንሰር ቦርድ ዳግም ስራ']
-        : ['Biomedical PCB repair', 'SMPS power supply diagnostics', 'Sensor board rework'],
-      accent: 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30 text-emerald-400',
-    },
-    {
-      icon: Factory,
-      title: isAm ? 'ኢንዱስትሪዎችና የማምረቻ ፋብሪካዎች' : 'Industries & Manufacturing',
-      badge: isAm ? 'አውቶሜሽንና PLCs' : 'Automation & PLCs',
-      description: isAm
-        ? 'የፋብሪካ ቴክኒሻኖች የሞተር ድራይቭ ኢንቨርተሮችን፣ የPLC ኢንፑት/አውትፑት ሰርኪውቶችን፣ ኦፕቲካል ሴንሰሮችን እና ከባድ የኢንዱስትሪ መሳሪያዎችን በቦታው እንዲመረምሩ ማብቃት።'
-        : 'Empower plant technicians to troubleshoot motor drive inverters, PLC input/output circuitry, optical sensor boards, and heavy industrial instrumentation on-site.',
-      skills: isAm
-        ? ['የPLC ኮንትሮለር ሰርኪውት', 'የVFD ኢንቨርተር ዲያግኖስቲክስ', 'የኢንዱስትሪ ሴንሰር ካሊብሬሽን']
-        : ['PLC controller circuitry', 'VFD inverter diagnostics', 'Industrial sensor calibration'],
-      accent: 'from-amber-500/20 to-orange-500/10 border-amber-500/30 text-amber-400',
-    },
-    {
-      icon: GraduationCap,
-      title: isAm ? 'ዩኒቨርሲቲዎችና ቴክኒክ ኮሌጆች' : 'Universities & Technical Colleges',
-      badge: isAm ? 'የላብራቶሪ ቴክኒሻኖች' : 'Lab Technicians',
-      description: isAm
-        ? 'የላብራቶሪ ቴክኒሻኖችን፣ የኤሌክትሮኒክስ አውደ-ጥናት መምህራንን እና የካምፓስ ኢንጂነሪንግ ሰራተኞችን የመምሪያ መሳሪያዎችን እና መመርመሪያዎችን እንዲጠግኑ ማሰልጠን።'
-        : 'Upskill laboratory technicians, electronics workshop instructors, and university campus engineering staff to maintain department equipment and test instruments.',
-      skills: isAm
-        ? ['የኦስሲሎስኮፕ ካሊብሬሽን', 'የPCB ፕሮቶታይፕና ብየዳ', 'የላብራቶሪ እቃዎች አገልግሎት']
-        : ['Oscilloscope calibration', 'PCB prototyping & soldering', 'Lab equipment servicing'],
-      accent: 'from-blue-500/20 to-sky-500/10 border-blue-500/30 text-sky-400',
-    },
-    {
-      icon: Server,
-      title: isAm ? 'ባንኮች፣ ቴሌኮም እና ድርጅቶች' : 'Banks, Telecoms & Enterprises',
-      badge: isAm ? 'የድርጅት ሃርድዌር' : 'Enterprise Hardware',
-      description: isAm
-        ? 'የአይቲ ሃርድዌር ድጋፍ ሰጪ ኢንጂነሮችን የሰርቨር ማዘርቦርዶችን፣ የቴሌኮም ኖዶችን፣ የድርጅት ዩፒኤስ (UPS) ፓወር ሰርኪውቶችን እና የኤቲኤም ኤሌክትሮኒክስን እንዲመረምሩ ማሰልጠን።'
-        : 'Train IT hardware support engineers to diagnose server motherboards, telecom node units, enterprise UPS power circuitry, and automated teller electronics.',
-      skills: isAm
-        ? ['የሰርቨር ማዘርቦርድ ጥገና', 'የቴሌኮም ትራንስሲቨሮች', 'የUPS ቦርድ ዲያግኖስቲክስ']
-        : ['Server motherboard repair', 'Telecom transceivers', 'UPS board diagnostics'],
-      accent: 'from-purple-500/20 to-indigo-500/10 border-purple-500/30 text-purple-400',
-    },
-  ]
 
   // Form states
   const [form, setForm] = useState({
@@ -154,173 +93,120 @@ export function CompanyTrainingCTA() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#1048ca] via-[#155DFC] to-[#0c3694] py-20 text-white lg:py-28 border-t border-blue-400/30">
-        {/* Glow Gradients */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(255,255,255,0.18),transparent_70%),radial-gradient(circle_at_10%_90%,rgba(56,189,248,0.2),transparent_40%),radial-gradient(circle_at_90%_80%,rgba(255,255,255,0.12),transparent_40%)]" />
+      {/* ── MINIMIZED INSTITUTIONAL & ENTERPRISE TRAINING SECTION ── */}
+      <section className="relative overflow-hidden border-y border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] px-5 py-16 text-white lg:px-8">
+        {/* Subtle background glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_25%,rgba(255,255,255,0.18),transparent_40%),radial-gradient(circle_at_15%_75%,rgba(56,189,248,0.22),transparent_45%)] pointer-events-none" />
         <div className="tech-dot-bg absolute inset-0 opacity-15 pointer-events-none" />
 
-        <div className="container relative mx-auto max-w-7xl px-5 lg:px-8">
-          {/* Header Banner */}
-          <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-1.5 text-xs font-bold text-white shadow-lg backdrop-blur-md">
-              <Building2 className="size-3.5" />
-              <span>
-                {isAm
-                  ? 'የተቋማትና የድርጅቶች የቴክኒክ ሰራተኞች'
-                  : 'Institutional & Enterprise Technical Workforce'}
-              </span>
-            </div>
-
-            <h2 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl lg:leading-tight">
-              {isAm ? 'ለተቋማት ሰራተኞች የተዘጋጀ ' : 'Customized Technical Training for '}
-              <span className="text-white drop-shadow-sm">
-                {isAm ? 'ብጁ የተግባር ስልጠና' : 'Institutional Employees'}
-              </span>
-            </h2>
-
-            <p className="mt-5 text-base sm:text-lg leading-relaxed text-blue-50">
-              {isAm ? (
-                <>
-                  ተቋምዎ የራሱን ልዩ ሃርድዌርና ማሽነሪዎች ይጠቀማል? በ<strong>ሆስፒታሎች፣ በፋብሪካዎች፣ በዩኒቨርሲቲዎች፣ በቴሌኮም እና በፋይናንስ ተቋማት</strong> ውስጥ ለሚሰሩ ቴክኒሻኖች የተዘጋጀ ብጁ የተግባር ጥገና ስልጠና እንሰጣለን።
-                </>
-              ) : (
-                <>
-                  Does your institution maintain its own specialized hardware? We build tailored, hands-on repair curriculums designed specifically for technicians in <strong>hospitals, factories, universities, telecoms, and financial institutions</strong>.
-                </>
-              )}
-            </p>
-
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <Button
-                size="lg"
-                onClick={() => setModalOpen(true)}
-                className="group rounded-xl bg-white px-7 font-bold text-[#155DFC] shadow-xl transition-all duration-300 hover:bg-blue-50 hover:scale-[1.02] hover:shadow-2xl"
-              >
-                <Building2 className="size-4 mr-2" />
-                {isAm ? 'የተቋም ስልጠና ይጠይቁ' : 'Request Institutional Training'}
-                <ArrowRight className="size-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-              </Button>
-              <a
-                href={`tel:+251${schoolConfig.phone.replace(/^0/, '').replace(/\s+/g, '')}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/40 bg-white/10 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:border-white hover:bg-white/20"
-              >
-                <PhoneCall className="size-4 text-white" />
+        <div className="container relative mx-auto max-w-7xl">
+          <div className="grid items-center gap-10 lg:grid-cols-12">
+            {/* Left Column: Short & Precise Action Call */}
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-1.5 text-xs font-bold text-white shadow-lg backdrop-blur-md mb-4">
+                <Building2 className="size-3.5 text-amber-300" />
                 <span>
-                  {isAm ? 'ወደ ተቋማት ዴስክ ይደውሉ፡' : 'Call Institutional Desk:'} {schoolConfig.phone}
+                  {isAm
+                    ? 'የተቋማትና የድርጅቶች የቴክኒክ ሰራተኞች'
+                    : 'Institutional & Enterprise Technical Workforce'}
                 </span>
-              </a>
-            </div>
-          </div>
+              </div>
 
-          {/* 4 Pillars Grid */}
-          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {SECTORS.map((sector) => {
-              const Icon = sector.icon
-              return (
-                <div
-                  key={sector.title}
-                  className="group relative flex flex-col justify-between rounded-2xl border border-white/20 bg-white/10 p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-white/50 hover:bg-white/15 hover:shadow-2xl"
+              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[2.65rem] text-white leading-tight">
+                {isAm
+                  ? 'ለተቋማት ሰራተኞች የተዘጋጀ ብጁ የተግባር ስልጠና'
+                  : 'Customized Technical Training for Institutional Employees'}
+              </h2>
+
+              <p className="mt-4 text-base sm:text-lg leading-relaxed text-blue-100 font-normal max-w-xl">
+                {isAm
+                  ? 'ተቋምዎ ልዩ ማሽነሪዎችን ይጠቀማል? በሆስፒታሎች፣ በፋብሪካዎች፣ በዩኒቨርሲቲዎች፣ በቴሌኮም እና በባንኮች ውስጥ ለሚሰሩ ቴክኒሻኖች በእርስዎ መሳሪያዎች ዙሪያ የተዘጋጀ ብጁ ስልጠና በቦታው ወይም በላባችን እንሰጣለን።'
+                  : 'Empower your technical workforce with tailor-made repair training built directly around your organization’s machinery, biomedical units, and IT hardware — delivered on-site or in our Bahir Dar labs.'}
+              </p>
+
+              {/* Sector Tags Strip */}
+              <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold text-white/95">
+                <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm border border-white/20">
+                  🏥 {isAm ? 'ሆስፒታሎችና ባዮሜዲካል' : 'Hospitals & Healthcare'}
+                </span>
+                <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm border border-white/20">
+                  🏭 {isAm ? 'ፋብሪካዎችና PLCs' : 'Industries & PLCs'}
+                </span>
+                <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm border border-white/20">
+                  📡 {isAm ? 'ቴሌኮም፣ ሰርቨርና አይቲ' : 'Telecom & Enterprise IT'}
+                </span>
+                <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm border border-white/20">
+                  🎓 {isAm ? 'ዩኒቨርሲቲዎችና ላብራቶሪዎች' : 'Universities & Labs'}
+                </span>
+              </div>
+
+              {/* Direct Action to Call & Request Buttons */}
+              <div className="mt-8 flex flex-wrap items-center gap-3.5">
+                <a href={`tel:${schoolConfig.phone.replace(/\s+/g, '')}`}>
+                  <Button
+                    size="lg"
+                    className="rounded-xl bg-white px-6 font-bold text-[#155DFC] hover:bg-blue-50 shadow-xl hover:scale-[1.02] transition-all"
+                  >
+                    <PhoneCall className="size-4 mr-2 text-[#155DFC]" />
+                    {isAm
+                      ? `ወደ ተቋማት ዴስክ ይደውሉ፡ ${schoolConfig.phone}`
+                      : `Call Institutional Desk: ${schoolConfig.phone}`}
+                  </Button>
+                </a>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => setModalOpen(true)}
+                  className="rounded-xl border-white/50 bg-white/10 text-white hover:border-white hover:bg-white/20 transition-all font-semibold"
                 >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex size-11 items-center justify-center rounded-xl bg-white/20 border border-white/30 text-white transition-colors">
-                        <Icon className="size-5" />
-                      </div>
-                      <span className="rounded-md border border-white/30 bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                        {sector.badge}
-                      </span>
-                    </div>
+                  <Building2 className="size-4 mr-2" />
+                  {isAm ? 'የተቋም ስልጠና ይጠይቁ' : 'Request Institutional Training'}
+                  <ArrowRight className="size-4 ml-1.5" />
+                </Button>
 
-                    <h3 className="mt-5 text-lg font-bold text-white transition-colors">
-                      {sector.title}
-                    </h3>
-                    <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-blue-100">
-                      {sector.description}
-                    </p>
-                  </div>
-
-                  <div className="mt-6 border-t border-white/20 pt-4">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-blue-200 mb-2">
-                      {isAm ? 'ዋና ዋና ሞጁሎች፡' : 'Core Modules Include:'}
-                    </p>
-                    <ul className="space-y-1.5 text-xs text-white">
-                      {sector.skills.map((skill) => (
-                        <li key={skill} className="flex items-center gap-2">
-                          <CheckCircle2 className="size-3 text-emerald-300 shrink-0" />
-                          <span>{skill}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* Institutional Value Highlights Strip */}
-          <div className="mt-12 rounded-3xl border border-white/20 bg-white/10 p-6 sm:p-8 backdrop-blur-md">
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-center">
-              <div className="flex items-center gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30">
-                  <Wrench className="size-6" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-white">
-                    {isAm ? 'ትክክለኛው የእርስዎ ሃርድዌር' : 'Your Exact Hardware'}
-                  </h4>
-                  <p className="text-xs text-blue-100 mt-0.5">
-                    {isAm
-                      ? 'በተቋምዎ ማሽነሪዎች ዙሪያ የተገነቡ የተግባር ላቦራቶሪዎች።'
-                      : 'Custom labs built around your institutional machinery.'}
-                  </p>
-                </div>
+                <a
+                  href={`https://wa.me/${schoolConfig.whatsappPhone}?text=${encodeURIComponent(
+                    isAm
+                      ? 'ሰላም! ለተቋማችን ሰራተኞች የተዘጋጀ ብጁ የቴክኒክ ስልጠና መረጃ ማግኘት እንፈልጋለን።'
+                      : 'Hello! Our institution would like to inquire about customized technical training programs for our engineering staff.'
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="rounded-xl border-emerald-400/40 bg-emerald-500/20 text-white hover:bg-emerald-500/30 transition-all font-semibold"
+                  >
+                    <MessageCircle className="size-4 mr-1.5 text-emerald-300" />
+                    WhatsApp
+                  </Button>
+                </a>
               </div>
+            </div>
 
-              <div className="flex items-center gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30">
-                  <MapPin className="size-6" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-white">
-                    {isAm ? 'ተለዋዋጭ የስልጠና ቦታ' : 'Flexible Location'}
-                  </h4>
-                  <p className="text-xs text-blue-100 mt-0.5">
-                    {isAm
-                      ? 'በእርስዎ ተቋም ቅጥር ግቢ ወይም በባህር ዳር ማሰልጠኛ ላቦራቶሪያችን።'
-                      : 'On-site at your facility or in our Bahir Dar training labs.'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30">
-                  <Clock className="size-6" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-white">
-                    {isAm ? 'የተመቻቸ የጊዜ ሰሌዳ' : 'Tailored Scheduling'}
-                  </h4>
-                  <p className="text-xs text-blue-100 mt-0.5">
-                    {isAm
-                      ? 'በተዘዋዋሪ ፈረቃ፣ የሳምንት መጨረሻ ወይም የተጠናከረ የቡትካምፕ ክፍለ-ጊዜዎች።'
-                      : 'Rotational shifts, weekend cohorts or intensive bootcamps.'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-white border border-white/30">
-                  <ShieldCheck className="size-6" />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-white">
-                    {isAm ? 'የተረጋገጠ የብቃት ማረጋገጫ' : 'Certified Competency'}
-                  </h4>
-                  <p className="text-xs text-blue-100 mt-0.5">
-                    {isAm
-                      ? 'ዕውቅና ያለው ሰርተፍኬት እና የቴክኒክ ክህሎት ምዘና።'
-                      : 'Accredited certification and technical skill evaluations.'}
-                  </p>
+            {/* Right Column: Image Trigger Card */}
+            <div className="lg:col-span-5">
+              <div className="relative group overflow-hidden rounded-3xl border border-white/30 bg-white/10 shadow-2xl backdrop-blur-md">
+                <img
+                  src="/images/company-training-hero.jpg"
+                  alt={
+                    isAm
+                      ? 'የተቋማትና የድርጅቶች የተግባር ስልጠና'
+                      : 'Customized Company & Institutional Training'
+                  }
+                  className="aspect-[4/3] w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white">
+                  <span className="inline-flex items-center gap-1.5 rounded-xl bg-[#155DFC]/90 px-3.5 py-1.5 font-bold backdrop-blur-md shadow-md text-white border border-white/20">
+                    <ShieldCheck className="size-3.5 text-emerald-300" />
+                    {isAm ? 'በቦታው ወይም በላባችን' : 'On-Site or In-Lab'}
+                  </span>
+                  <span className="rounded-lg bg-black/60 px-3 py-1.5 text-[11px] font-semibold backdrop-blur-md border border-white/15">
+                    {isAm ? 'ብጁ የስልጠና ፕሮግራም' : 'Custom Cohorts'}
+                  </span>
                 </div>
               </div>
             </div>

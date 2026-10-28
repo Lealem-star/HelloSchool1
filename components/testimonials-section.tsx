@@ -156,37 +156,25 @@ export function TestimonialsSection() {
 
       <div className="container relative mx-auto max-w-7xl">
         {/* ── Section Header ── */}
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end mb-14">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-primary shadow-sm">
-              <Sparkles className="size-3.5 text-amber-500" />
-              <span>
-                {language === 'am'
-                  ? 'ተጨባጭ የስራ ስኬቶችና የተመራቂዎች ምስክርነት'
-                  : 'Trainee Testimonials & Success Stories'}
-              </span>
+        <div className="mx-auto max-w-3xl text-center mb-14">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-primary shadow-sm">
+            <Sparkles className="size-3.5 text-amber-500" />
+            <span>
+              {language === 'am'
+                ? 'ተጨባጭ የስራ ስኬቶችና የተመራቂዎች ምስክርነት'
+                : 'Trainee Testimonials & Success Stories'}
             </span>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-foreground md:text-5xl leading-tight">
-              {language === 'am'
-                ? 'ከመማሪያ ቤንች እስከ ስኬታማ የስራ ባለቤትነት'
-                : 'From Hands-On Workbench Practice to Thriving Careers'}
-            </h2>
-            <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground">
-              {language === 'am'
-                ? 'በሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል በተግባር የሰለጠኑ፣ የCOC ብቃት ማረጋገጫ የወሰዱ እና ዛሬ በባሕር ዳርና በመላው ኢትዮጵያ የራሳቸውን የጥገና ሱቆች የከፈቱ እንዲሁም በተለያዩ ተቋማት ውስጥ ተቀጥረው የሚሰሩ ሰልጣኞቻችንን እውነተኛ ታሪክ ይመልከቱ።'
-                : 'Meet our graduates who mastered hands-on diagnostic workflows in Bahir Dar, earned accredited certifications, and now run profitable workshops or work in telecom and enterprise networks.'}
-            </p>
-          </div>
-
-          <Link href="/library" className="shrink-0">
-            <Button
-              size="lg"
-              className="rounded-xl bg-primary px-7 font-bold text-primary-foreground shadow-lg hover:bg-primary/90 hover:scale-[1.02] transition-all"
-            >
-              {language === 'am' ? 'ኮርሶችን ይጀምሩ' : 'Explore Courses'}
-              <ArrowRight className="size-4 ml-2" />
-            </Button>
-          </Link>
+          </span>
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-foreground md:text-5xl leading-tight">
+            {language === 'am'
+              ? 'ከመማሪያ ቤንች እስከ ስኬታማ የስራ ባለቤትነት'
+              : 'From Hands-On Workbench Practice to Thriving Careers'}
+          </h2>
+          <p className="mt-4 mx-auto max-w-2xl text-base sm:text-lg leading-relaxed text-muted-foreground">
+            {language === 'am'
+              ? 'በሄሎ ቴክኖሎጂ ማሰልጠኛ ማዕከል በተግባር የሰለጠኑ፣ የCOC ብቃት ማረጋገጫ የወሰዱ እና ዛሬ በባሕር ዳርና በመላው ኢትዮጵያ የራሳቸውን የጥገና ሱቆች የከፈቱ እንዲሁም በተለያዩ ተቋማት ውስጥ ተቀጥረው የሚሰሩ ሰልጣኞቻችንን እውነተኛ ታሪክ ይመልከቱ።'
+              : 'Meet our graduates who mastered hands-on diagnostic workflows in Bahir Dar, earned accredited certifications, and now run profitable workshops or work in telecom and enterprise networks.'}
+          </p>
         </div>
 
         {/* ── FEATURED COHORT GRADUATION HERO CARD ── */}
@@ -353,7 +341,7 @@ export function TestimonialsSection() {
           </div>
 
           <div className="flex flex-wrap gap-3 shrink-0">
-            <Link href="/courses">
+            <Link href="/#courses">
               <Button
                 variant="outline"
                 className="rounded-xl border-border px-5 font-semibold hover:bg-muted"

@@ -80,7 +80,6 @@ export function Logo() {
 
 const navItems = [
   { href: '/', labelEn: 'Home', labelAm: 'መነሻ' },
-  { href: '/courses', labelEn: 'Courses', labelAm: 'ስልጠናዎች' },
   { href: '/library', labelEn: 'Online Courses', labelAm: 'ኦንላይን ኮርሶች' },
   { href: '/about', labelEn: 'About', labelAm: 'ስለ እኛ' },
   { href: '/contact', labelEn: 'Contact', labelAm: 'አግኙን' },
@@ -152,7 +151,7 @@ export function Header() {
       descEn: 'Register for 2+ courses and get 1 completely free this month.',
       time: '10m ago',
       unread: true,
-      link: '/courses',
+      link: '/#courses',
     },
     {
       id: '2',
@@ -781,7 +780,7 @@ export function Footer() {
             {language === 'am' ? 'አስስ' : 'Explore'}
           </h3>
           <div className="flex flex-col gap-3 text-sm text-blue-100">
-            <Link href="/courses" className="hover:text-white transition-colors">
+            <Link href="/#courses" className="hover:text-white transition-colors">
               {language === 'am' ? 'ስልጠናዎቻችን (ምን መማር ይችላሉ)' : 'Courses (What You Can Learn)'}
             </Link>
             <Link href="/library" className="hover:text-white transition-colors">
@@ -876,11 +875,26 @@ export function Footer() {
   )
 }
 
-export function PageIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
+export function PageIntro({
+  eyebrow,
+  title,
+  description,
+  align = 'center',
+}: {
+  eyebrow: string
+  title: string
+  description: string
+  align?: 'left' | 'center'
+}) {
   return (
     <section className="relative overflow-hidden border-b bg-muted/30 px-5 py-8 lg:px-8 lg:py-12 tech-dot-bg">
       <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background/80 pointer-events-none" />
-      <div className="container relative mx-auto max-w-7xl animate-fade-in-up">
+      <div
+        className={cn(
+          'container relative mx-auto max-w-7xl animate-fade-in-up',
+          align === 'center' && 'text-center flex flex-col items-center'
+        )}
+      >
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-primary mb-4 shadow-sm">
           <Sparkles className="size-3.5 text-primary" />
           <span>{eyebrow}</span>
@@ -896,12 +910,26 @@ export function PageIntro({ eyebrow, title, description }: { eyebrow: string; ti
   )
 }
 
-export function SectionHeading({ eyebrow, title, description, align = 'left' }: { eyebrow: string; title: string; description?: string; align?: 'left' | 'center' }) {
+export function SectionHeading({
+  eyebrow,
+  title,
+  description,
+  align = 'center',
+}: {
+  eyebrow: string
+  title: string
+  description?: string
+  align?: 'left' | 'center'
+}) {
   return (
-    <div className={cn('mb-10', align === 'center' && 'mx-auto max-w-2xl text-center')}>
+    <div className={cn('mb-10', align === 'center' ? 'mx-auto max-w-3xl text-center' : 'max-w-3xl')}>
       <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">{eyebrow}</p>
       <h2 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h2>
-      {description && <p className="mt-4 text-base leading-7 text-muted-foreground">{description}</p>}
+      {description && (
+        <p className={cn('mt-4 text-base leading-7 text-muted-foreground', align === 'center' && 'mx-auto max-w-2xl')}>
+          {description}
+        </p>
+      )}
     </div>
   )
 }
@@ -1266,7 +1294,7 @@ export function CTASection() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link href="/courses">
+            <Link href="/#courses">
               <Button className="rounded-xl bg-white px-6 font-bold text-[#155DFC] transition-all duration-300 hover:bg-blue-50 hover:shadow-xl hover:scale-[1.02]">
                 {isAm ? 'ስልጠናዎችን ይመልከቱ' : 'Explore courses'} <ArrowRight data-icon="inline-end" />
               </Button>

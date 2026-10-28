@@ -268,7 +268,7 @@ function CertificateVerifierContent() {
               <span className="text-muted-foreground">
                 Inquiries: <strong>{schoolConfig.phone}</strong> · {schoolConfig.email}
               </span>
-              <Link href="/courses">
+              <Link href="/#courses">
                 <Button variant="outline" size="sm" className="rounded-xl text-xs gap-1">
                   {isAm ? 'ሁሉንም ስልጠናዎች ይመልከቱ' : 'Explore Technical Programs'} <ChevronRight className="size-3.5" />
                 </Button>

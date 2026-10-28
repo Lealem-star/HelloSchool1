@@ -1,6 +1,5 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import Script from 'next/script'
 import './globals.css'
 import { getOrganizationSchema, JsonLd } from '@/lib/schema'
 import { AppProviders } from '@/components/providers'
@@ -83,9 +82,8 @@ export default function RootLayout({
   return (
     <html lang="am" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
-        <Script
+        <script
           id="theme-initializer"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(){
               try {

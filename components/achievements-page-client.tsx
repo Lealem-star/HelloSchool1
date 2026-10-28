@@ -123,7 +123,7 @@ export function AchievementsPageClient() {
 
             {/* Button matching Screenshot 3: Start Learning */}
             <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
-              <Link href="/courses">
+              <Link href="/#courses">
                 <Button
                   variant="outline"
                   className="rounded-xl border-[#38bdf8] text-[#0284c7] hover:bg-sky-50 dark:hover:bg-sky-950/40 px-6 py-2.5 font-semibold text-sm transition"
@@ -170,7 +170,7 @@ export function AchievementsPageClient() {
                     : 'Official TVET accredited competence credentials and certificates.'}
                 </p>
               </div>
-              <Link href="/courses">
+              <Link href="/#courses">
                 <Button variant="outline" size="sm" className="rounded-xl border-sky-400 text-sky-600 text-xs">
                   {isAm ? 'ተጨማሪ ስልጠናዎች' : 'Enroll In More Courses'}
                 </Button>

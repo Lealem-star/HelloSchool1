@@ -118,8 +118,8 @@ export async function getPublishedCourses(): Promise<PublicCourse[]> {
     if (courses && courses.length > 0) {
       return courses.map(toPublicCourse)
     }
-  } catch (err) {
-    console.error('getPublishedCourses DB error:', err)
+  } catch (err: any) {
+    console.warn('[Database offline, using local seed fallback]:', err?.message || err)
   }
 
   // Resilient fallback to seed-data.json
@@ -149,7 +149,7 @@ export async function getPublishedCourses(): Promise<PublicCourse[]> {
       }
     }
   } catch (fallbackErr) {
-    console.error('getPublishedCourses fallback error:', fallbackErr)
+    console.warn('getPublishedCourses fallback error:', fallbackErr)
   }
   return []
 }
@@ -160,8 +160,8 @@ export async function getPublishedCourseBySlug(slug: string): Promise<PublicCour
       where: { slug, published: true },
     })
     if (course) return toPublicCourse(course)
-  } catch (err) {
-    console.error('getPublishedCourseBySlug DB error:', err)
+  } catch (err: any) {
+    console.warn('[Database offline, using local seed fallback]:', err?.message || err)
   }
 
   try {
@@ -200,16 +200,35 @@ export async function getPublishedGallery(): Promise<PublicGalleryItem[]> {
       where: { published: true },
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
     })
-    return items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      description: item.description ?? '',
-      image: item.image,
-    }))
-  } catch (err) {
-    console.error('getPublishedGallery error:', err)
-    return []
+    if (items && items.length > 0) {
+      return items.map((item) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description ?? '',
+        image: item.image,
+      }))
+    }
+  } catch (err: any) {
+    console.warn('[Database offline, using local seed fallback]:', err?.message || err)
   }
+
+  try {
+    const fs = await import('fs')
+    const path = await import('path')
+    const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
+    if (fs.existsSync(seedPath)) {
+      const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
+      if (Array.isArray(data.trainingGallery) && data.trainingGallery.length > 0) {
+        return data.trainingGallery.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          description: item.description ?? '',
+          image: item.image,
+        }))
+      }
+    }
+  } catch (e) {}
+  return []
 }
 
 export async function getPublishedLibrary(): Promise<PublicLibraryItem[]> {
@@ -218,33 +237,69 @@ export async function getPublishedLibrary(): Promise<PublicLibraryItem[]> {
       where: { published: true },
       orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
     })
-    return items.map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      subtitle: item.subtitle ?? '',
-      category: item.category,
-      description: item.description ?? '',
-      format: item.format ?? 'Technical Repair Manual',
-      level: item.level ?? '',
-      status: item.status,
-      price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
-      priceETB: item.priceETB ?? 0,
-      pages: item.pages ?? '',
-      fileUrl: item.fileUrl ?? null,
-      thumbnailUrl: item.thumbnailUrl ?? null,
-      instructor: item.instructor ?? '',
-      instructorRole: item.instructorRole ?? '',
-      rating: item.rating ?? 4.9,
-      reviewCount: item.reviewCount ?? 120,
-      badgeText: item.badgeText ?? '',
-      skillsLearned: item.skillsLearned ?? null,
-      lessons: item.lessons ?? null,
-      chapters: item.chapters ?? null,
-    }))
-  } catch (err) {
-    console.error('getPublishedLibrary error:', err)
-    return []
+    if (items && items.length > 0) {
+      return items.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle ?? '',
+        category: item.category,
+        description: item.description ?? '',
+        format: item.format ?? 'Technical Repair Manual',
+        level: item.level ?? '',
+        status: item.status,
+        price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
+        priceETB: item.priceETB ?? 0,
+        pages: item.pages ?? '',
+        fileUrl: item.fileUrl ?? null,
+        thumbnailUrl: item.thumbnailUrl ?? null,
+        instructor: item.instructor ?? '',
+        instructorRole: item.instructorRole ?? '',
+        rating: item.rating ?? 4.9,
+        reviewCount: item.reviewCount ?? 120,
+        badgeText: item.badgeText ?? '',
+        skillsLearned: item.skillsLearned ?? null,
+        lessons: item.lessons ?? null,
+        chapters: item.chapters ?? null,
+      }))
+    }
+  } catch (err: any) {
+    console.warn('[Database offline, using local seed fallback]:', err?.message || err)
   }
+
+  try {
+    const fs = await import('fs')
+    const path = await import('path')
+    const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
+    if (fs.existsSync(seedPath)) {
+      const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
+      if (Array.isArray(data.digitalLibraryResources) && data.digitalLibraryResources.length > 0) {
+        return data.digitalLibraryResources.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          subtitle: item.subtitle ?? '',
+          category: item.category || 'General',
+          description: item.description ?? '',
+          format: item.format ?? 'Technical Repair Manual',
+          level: item.level ?? '',
+          status: item.status || 'Available',
+          price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
+          priceETB: item.priceETB ?? 0,
+          pages: item.pages ?? '',
+          fileUrl: item.fileUrl ?? null,
+          thumbnailUrl: item.thumbnailUrl ?? null,
+          instructor: item.instructor ?? '',
+          instructorRole: item.instructorRole ?? '',
+          rating: item.rating ?? 4.9,
+          reviewCount: item.reviewCount ?? 120,
+          badgeText: item.badgeText ?? '',
+          skillsLearned: item.skillsLearned ?? null,
+          lessons: item.lessons ?? null,
+          chapters: item.chapters ?? null,
+        }))
+      }
+    }
+  } catch (e) {}
+  return []
 }
 
 export async function getPublishedLibraryItem(id: string): Promise<PublicLibraryItem | null> {
@@ -252,34 +307,70 @@ export async function getPublishedLibraryItem(id: string): Promise<PublicLibrary
     const item = await prisma.libraryResource.findFirst({
       where: { id, published: true },
     })
-    if (!item) return null
-    return {
-      id: item.id,
-      title: item.title,
-      subtitle: item.subtitle ?? '',
-      category: item.category,
-      description: item.description ?? '',
-      format: item.format ?? 'Technical Repair Manual',
-      level: item.level ?? '',
-      status: item.status,
-      price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
-      priceETB: item.priceETB ?? 0,
-      pages: item.pages ?? '',
-      fileUrl: item.fileUrl ?? null,
-      thumbnailUrl: item.thumbnailUrl ?? null,
-      instructor: item.instructor ?? '',
-      instructorRole: item.instructorRole ?? '',
-      rating: item.rating ?? 4.9,
-      reviewCount: item.reviewCount ?? 120,
-      badgeText: item.badgeText ?? '',
-      skillsLearned: item.skillsLearned ?? null,
-      lessons: item.lessons ?? null,
-      chapters: item.chapters ?? null,
+    if (item) {
+      return {
+        id: item.id,
+        title: item.title,
+        subtitle: item.subtitle ?? '',
+        category: item.category,
+        description: item.description ?? '',
+        format: item.format ?? 'Technical Repair Manual',
+        level: item.level ?? '',
+        status: item.status,
+        price: item.price ?? (item.priceETB ? `${item.priceETB} ETB` : 'Free'),
+        priceETB: item.priceETB ?? 0,
+        pages: item.pages ?? '',
+        fileUrl: item.fileUrl ?? null,
+        thumbnailUrl: item.thumbnailUrl ?? null,
+        instructor: item.instructor ?? '',
+        instructorRole: item.instructorRole ?? '',
+        rating: item.rating ?? 4.9,
+        reviewCount: item.reviewCount ?? 120,
+        badgeText: item.badgeText ?? '',
+        skillsLearned: item.skillsLearned ?? null,
+        lessons: item.lessons ?? null,
+        chapters: item.chapters ?? null,
+      }
     }
-  } catch (err) {
-    console.error('getPublishedLibraryItem error:', err)
-    return null
+  } catch (err: any) {
+    console.warn('[Database offline, using local seed fallback]:', err?.message || err)
   }
+
+  try {
+    const fs = await import('fs')
+    const path = await import('path')
+    const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
+    if (fs.existsSync(seedPath)) {
+      const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
+      const found = data.digitalLibraryResources?.find((item: any) => item.id === id)
+      if (found) {
+        return {
+          id: found.id,
+          title: found.title,
+          subtitle: found.subtitle ?? '',
+          category: found.category || 'General',
+          description: found.description ?? '',
+          format: found.format ?? 'Technical Repair Manual',
+          level: found.level ?? '',
+          status: found.status || 'Available',
+          price: found.price ?? (found.priceETB ? `${found.priceETB} ETB` : 'Free'),
+          priceETB: found.priceETB ?? 0,
+          pages: found.pages ?? '',
+          fileUrl: found.fileUrl ?? null,
+          thumbnailUrl: found.thumbnailUrl ?? null,
+          instructor: found.instructor ?? '',
+          instructorRole: found.instructorRole ?? '',
+          rating: found.rating ?? 4.9,
+          reviewCount: found.reviewCount ?? 120,
+          badgeText: found.badgeText ?? '',
+          skillsLearned: found.skillsLearned ?? null,
+          lessons: found.lessons ?? null,
+          chapters: found.chapters ?? null,
+        }
+      }
+    }
+  } catch (e) {}
+  return null
 }
 
 export async function getCategoryNames(type: 'course' | 'library'): Promise<string[]> {
@@ -291,8 +382,8 @@ export async function getCategoryNames(type: 'course' | 'library'): Promise<stri
     if (items && items.length > 0) {
       return items.map((item) => item.name)
     }
-  } catch (err) {
-    console.error('getCategoryNames error:', err)
+  } catch (err: any) {
+    console.warn('[Database offline, using local seed fallback]:', err?.message || err)
   }
 
   try {
@@ -479,8 +570,8 @@ export async function getPublishedTrustedPartners(): Promise<PublicTrustedPartne
         description: p.description,
       }))
     }
-  } catch (err) {
-    console.error('Error fetching trusted partners:', err)
+  } catch (err: any) {
+    console.warn('[Database offline, using fallback trusted partners]:', err?.message || err)
   }
 
   return DEFAULT_PARTNERS
