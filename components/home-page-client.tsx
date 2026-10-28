@@ -27,7 +27,7 @@ import { TrustedBySection } from '@/components/trusted-by-marquee'
 import { TestimonialsSection } from '@/components/testimonials-section'
 import { useLanguage } from '@/components/language-provider'
 import { schoolConfig } from '@/lib/data'
-import type { PublicCourse, PublicTrustedPartner } from '@/lib/content'
+import { getFallbackCourseImage, type PublicCourse, type PublicTrustedPartner } from '@/lib/content'
 
 interface HomePageClientProps {
   courses: PublicCourse[]
@@ -246,53 +246,73 @@ export function HomePageClient({
             />
             {courses.length ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                {courses.map((course) => (
-                  <article
-                    key={course.id}
-                    className="card-hover-lift group flex flex-col justify-between rounded-3xl border border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] p-6 text-white shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:border-white/50"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <CourseIcon
-                          name={course.icon as any}
-                          className="bg-white/20 text-white border border-white/30 shadow-md group-hover:scale-110 transition-transform duration-300"
+                {courses.map((course) => {
+                  const courseImg =
+                    course.image && course.image.trim().length > 0
+                      ? course.image
+                      : getFallbackCourseImage(course.slug, course.category)
+
+                  return (
+                    <article
+                      key={course.id}
+                      className="card-hover-lift group flex flex-col justify-between overflow-hidden rounded-3xl border border-blue-400/30 bg-gradient-to-br from-[#0c2f86] via-[#1048ca] to-[#155DFC] text-white shadow-xl backdrop-blur-md transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:border-white/50"
+                    >
+                      {/* Top of Card Image */}
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900/60">
+                        <img
+                          src={courseImg}
+                          alt={course.title}
+                          className="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                          loading="lazy"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0c2f86] via-transparent to-black/25 pointer-events-none" />
+
+                        {/* Category badge */}
+                        <span className="absolute top-3 left-3 z-10 rounded-lg bg-black/60 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white border border-white/20">
+                          {course.category}
+                        </span>
+
+                        {/* Period / Duration badge */}
                         {course.duration && (
-                          <span className="flex items-center gap-1 text-xs text-blue-100 font-semibold bg-white/15 px-2.5 py-1 rounded-full border border-white/20">
-                            <Clock3 className="size-3.5 text-sky-200" />
+                          <span className="absolute top-3 right-3 z-10 flex items-center gap-1 rounded-lg bg-black/60 backdrop-blur-md px-2.5 py-1 text-[11px] font-semibold text-sky-200 border border-white/20">
+                            <Clock3 className="size-3 text-sky-300" />
                             {course.duration}
                           </span>
                         )}
                       </div>
-                      <p className="mt-5 text-xs font-bold uppercase tracking-wider text-sky-200">
-                        {course.category}
-                      </p>
-                      <h3 className="mt-1.5 text-lg font-bold text-white transition-colors group-hover:text-blue-100">
-                        {course.title}
-                      </h3>
-                      <p className="mt-2.5 text-sm leading-6 text-blue-100/90 line-clamp-3">
-                        {course.description}
-                      </p>
-                    </div>
 
-                    <div className="mt-6 border-t border-white/20 pt-4">
-                      {course.level && (
-                        <div className="mb-3">
-                          <span className="rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white border border-white/25">
-                            {course.level}
-                          </span>
+                      {/* Card Body */}
+                      <div className="flex flex-1 flex-col justify-between p-5">
+                        <div>
+                          <h3 className="text-base sm:text-lg font-bold text-white transition-colors group-hover:text-blue-100 line-clamp-2 leading-snug">
+                            {course.title}
+                          </h3>
+                          <p className="mt-2 text-xs sm:text-sm leading-relaxed text-blue-100/85 line-clamp-2">
+                            {course.description}
+                          </p>
                         </div>
-                      )}
-                      <Link
-                        href={`/courses/${course.slug}`}
-                        className="inline-flex items-center gap-2 text-sm font-bold text-white hover:text-sky-200 group-hover:underline transition-colors"
-                      >
-                        {isAm ? 'ስልጠናውንና ካሪኩለሙን ይመልከቱ' : 'View course & curriculum'}{' '}
-                        <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1.5 text-white" />
-                      </Link>
-                    </div>
-                  </article>
-                ))}
+
+                        {/* Footer with Level & View Details Button */}
+                        <div className="mt-4 flex items-center justify-between gap-3 border-t border-white/20 pt-3">
+                          {course.level ? (
+                            <span className="rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white border border-white/25">
+                              {course.level}
+                            </span>
+                          ) : (
+                            <span />
+                          )}
+                          <Link
+                            href={`/courses/${course.slug}`}
+                            className="ml-auto inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-blue-950/40 border border-blue-300/40 transition-all duration-200 hover:scale-[1.03] group/btn"
+                          >
+                            <span>{isAm ? 'ዝርዝሩን ይመልከቱ' : 'View Details'}</span>
+                            <ArrowRight className="size-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5" />
+                          </Link>
+                        </div>
+                      </div>
+                    </article>
+                  )
+                })}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">

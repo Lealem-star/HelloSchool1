@@ -240,7 +240,7 @@ export function CoursesCatalog({
                         href={`/courses/${course.slug}`}
                         className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs md:text-sm py-2.5 transition shadow-sm flex items-center justify-center gap-2 group/btn"
                       >
-                        <span>{isAm ? 'ስልጠናውንና ካሪኩለሙን ይመልከቱ' : 'View Course & Curriculum Details'}</span>
+                        <span>{isAm ? 'ዝርዝሩን ይመልከቱ' : 'View Details'}</span>
                         <ArrowRight className="size-4 transition-transform group-hover/btn:translate-x-1" />
                       </Link>
                     </div>

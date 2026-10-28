@@ -3545,6 +3545,7 @@ function CourseEditor({
   const [previewOpen, setPreviewOpen] = useState(false)
   const [skillInput, setSkillInput] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [uploadingImage, setUploadingImage] = useState(false)
   const isEdit = !!initial.id
 
   useEffect(() => {
@@ -3899,13 +3900,52 @@ function CourseEditor({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Cover Image URL">
-            <input
-              className={inputCls}
-              value={form.image || ''}
-              onChange={(e) => update('image', e.target.value || null)}
-              placeholder="https://... or /images/..."
-            />
+          <Field label="Cover Image (URL or Upload)">
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  className={inputCls}
+                  value={form.image || ''}
+                  onChange={(e) => update('image', e.target.value || null)}
+                  placeholder="https://... or /images/..."
+                />
+                <label className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-xl border border-border bg-muted/60 px-3 py-2 text-xs font-semibold hover:bg-muted transition">
+                  <Upload className="size-3.5" />
+                  {uploadingImage ? '...' : 'Upload'}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/avif"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const f = e.target.files?.[0]
+                      if (!f) return
+                      const fd = new FormData()
+                      fd.append('file', f)
+                      fd.append('folder', 'courses')
+                      try {
+                        setUploadingImage(true)
+                        const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+                        const d = await res.json()
+                        if (d.url) {
+                          update('image', d.url)
+                        } else {
+                          alert(d.error || 'Failed to upload image')
+                        }
+                      } catch (err: any) {
+                        alert(err?.message || 'Upload failed')
+                      } finally {
+                        setUploadingImage(false)
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+              {form.image && (
+                <div className="relative h-20 w-36 overflow-hidden rounded-xl border border-border bg-slate-900 shadow-xs">
+                  <img src={form.image} alt="Cover Preview" className="h-full w-full object-cover" />
+                </div>
+              )}
+            </div>
           </Field>
           <Field label="Status">
             <div className="flex h-11 items-center">
