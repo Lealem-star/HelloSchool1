@@ -100,25 +100,85 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
     }
   }, [resource.id])
 
-  // Automatically navigate to cart if redirected with ?checkout=1
+  const isFree =
+    resource.priceETB === 0 ||
+    resource.price === 'Free' ||
+    resource.price === '0 ETB' ||
+    Boolean(resource.price && resource.price.toLowerCase().includes('free')) ||
+    Boolean(resource.priceDisplay && resource.priceDisplay.toLowerCase().includes('free')) ||
+    Boolean(resource.isFreeForTVET)
+
+  // Automatically navigate to cart or auto-enroll free course when returning from login
   useEffect(() => {
     if (searchParams.get('checkout') === '1') {
       router.push(`/cart?course=${resource.id}`)
+    } else if (searchParams.get('enroll') === 'free' && student && !hasPurchased) {
+      fetch('/api/chapa/initialize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resourceId: resource.id, amount: 0 }),
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.success || d.isFree) {
+            setHasPurchased(true)
+            router.push(`/student/dashboard?enrolled=${resource.id}`)
+          }
+        })
+        .catch(() => {})
     }
-  }, [searchParams, resource.id, router])
+  }, [searchParams, resource.id, router, student, hasPurchased])
 
   // Handle Get Started button click
-  const handleGetStarted = () => {
+  const handleGetStarted = async () => {
     if (hasPurchased) {
       router.push(`/student/dashboard?enrolled=${resource.id}`)
       return
     }
 
+    if (isFree) {
+      if (student) {
+        // Direct free unlock without Chapa
+        try {
+          const res = await fetch('/api/chapa/initialize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ resourceId: resource.id, amount: 0 }),
+          })
+          const data = await res.json()
+          if (data.success || data.isFree) {
+            setHasPurchased(true)
+            router.push(`/student/dashboard?enrolled=${resource.id}`)
+            return
+          }
+        } catch {
+          router.push(`/student/dashboard?enrolled=${resource.id}`)
+          return
+        }
+      } else {
+        // Not logged in: save course and redirect to login
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('hellotvet_cart_course', resource.id)
+          localStorage.setItem('hellotvet_pending_redirect', `/library/${resource.id}?enroll=free`)
+        }
+        router.push(
+          `/student/login?redirect=${encodeURIComponent(`/library/${resource.id}?enroll=free`)}&course=${encodeURIComponent(resource.id)}`
+        )
+        return
+      }
+    }
+
+    // Paid course
     if (student) {
-      // Existing logged-in user: navigate to cart review step
       router.push(`/cart?course=${resource.id}`)
     } else {
-      router.push(`/student/login`)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('hellotvet_cart_course', resource.id)
+        localStorage.setItem('hellotvet_pending_redirect', `/cart?course=${resource.id}`)
+      }
+      router.push(
+        `/student/login?redirect=${encodeURIComponent(`/cart?course=${resource.id}`)}&course=${encodeURIComponent(resource.id)}`
+      )
     }
   }
 

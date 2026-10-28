@@ -62,6 +62,8 @@ export type PublicLibraryItem = {
   status: string
   price: string
   priceETB?: number
+  priceDisplay?: string
+  isFreeForTVET?: boolean
   pages: string
   fileUrl?: string | null
   thumbnailUrl?: string | null

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   GraduationCap,
@@ -10,23 +10,23 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  Sparkles,
-  ShieldCheck,
   AlertCircle,
   Loader2,
-  BookOpen,
-  ArrowLeft,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Header, Footer } from '@/components/site'
 import { useLanguage } from '@/components/language-provider'
 
-export default function StudentLoginPage() {
+function StudentLoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectParam = searchParams.get('redirect')
+  const courseParam = searchParams.get('course')
+  const identifierParam = searchParams.get('identifier')
   const { language } = useLanguage()
   const isAm = language === 'am'
 
-  const [identifier, setIdentifier] = useState('')
+  const [identifier, setIdentifier] = useState(identifierParam || '')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -54,7 +54,31 @@ export default function StudentLoginPage() {
         )
       }
 
-      router.push('/student/dashboard')
+      // Check stored or passed redirect to resume enrollment
+      const savedRedirect =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('hellotvet_pending_redirect')
+          : null
+      const savedCourse =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('hellotvet_cart_course')
+          : null
+
+      const targetRedirect =
+        redirectParam ||
+        savedRedirect ||
+        (courseParam ? `/cart?course=${encodeURIComponent(courseParam)}` : null) ||
+        (savedCourse ? `/cart?course=${encodeURIComponent(savedCourse)}` : null)
+
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('hellotvet_pending_redirect')
+      }
+
+      if (targetRedirect && targetRedirect.startsWith('/')) {
+        router.push(targetRedirect)
+      } else {
+        router.push('/student/dashboard')
+      }
     } catch (err: any) {
       setError(
         err.message ||
@@ -99,54 +123,62 @@ export default function StudentLoginPage() {
             </p>
           </div>
 
-          {/* Form Card */}
-          <div className="rounded-2xl border border-border/80 bg-card/95 p-6 sm:p-7 shadow-xl backdrop-blur-xl">
+          {/* Login Card */}
+          <div className="rounded-2xl border border-border/80 bg-card p-6 shadow-xl backdrop-blur-md">
             {error && (
-              <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive animate-shake">
+              <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
                 <AlertCircle className="size-4 shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-3.5">
-              <label className="flex flex-col gap-1.5 text-xs font-semibold text-foreground/90">
-                <span>{isAm ? 'ኢሜይል ወይም ስልክ ቁጥር' : 'Email or phone number'}</span>
+              <label className="block space-y-1">
+                <span className="text-xs font-semibold text-foreground">
+                  {isAm ? 'ኢሜይል፣ ስልክ ቁጥር ወይም የተማሪ መለያ' : 'Email, Phone Number, or Student ID'}
+                </span>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <input
                     type="text"
+                    required
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder={
-                      isAm
-                        ? 'ለምሳሌ፡ 09... ወይም youremail@gmail.com'
-                        : 'e.g. 0911... or youremail@gmail.com'
+                      isAm ? '0912345678 ወይም ስም@hellotvet.com' : '0912345678 or name@hellotvet.com'
                     }
-                    className="h-10 w-full rounded-xl border border-input bg-background/80 pl-10 pr-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                    required
-                    autoFocus
+                    className="w-full h-10 rounded-xl border border-input bg-background/80 pl-10 pr-3.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
               </label>
 
-              <label className="flex flex-col gap-1.5 text-xs font-semibold text-foreground/90">
-                <span>{isAm ? 'የይለፍ ቃል' : 'Password'}</span>
+              <label className="block space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-foreground">
+                    {isAm ? 'የይለፍ ቃል' : 'Password'}
+                  </span>
+                  <a
+                    href="tel:+251947747070"
+                    className="text-[11px] font-medium text-blue-600 dark:text-sky-400 hover:underline"
+                  >
+                    {isAm ? 'የይለፍ ቃል ረሱ?' : 'Forgot Password?'}
+                  </a>
+                </div>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="h-10 w-full rounded-xl border border-input bg-background/80 pl-10 pr-10 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                    required
+                    className="w-full h-10 rounded-xl border border-input bg-background/80 pl-10 pr-10 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-1 transition"
-                    tabIndex={-1}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Toggle password visibility"
                   >
                     {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
@@ -176,7 +208,13 @@ export default function StudentLoginPage() {
             <div className="mt-4 text-center text-xs text-muted-foreground">
               {isAm ? 'እስካሁን የተመዘገበ አካውንት የለዎትም?' : 'Don\'t have an account yet?'}{' '}
               <Link
-                href="/register"
+                href={
+                  redirectParam
+                    ? `/register?redirect=${encodeURIComponent(redirectParam)}`
+                    : courseParam
+                    ? `/register?course=${encodeURIComponent(courseParam)}`
+                    : '/register'
+                }
                 className="font-bold text-blue-600 dark:text-sky-400 hover:underline inline-flex items-center gap-1"
               >
                 {isAm ? 'አዲስ አካውንት ይክፈቱ' : 'Create an Account'} <ArrowRight className="size-3" />
@@ -188,5 +226,19 @@ export default function StudentLoginPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function StudentLoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
+          <Loader2 className="size-8 animate-spin text-sky-500" />
+        </div>
+      }
+    >
+      <StudentLoginForm />
+    </Suspense>
   )
 }

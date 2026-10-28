@@ -59,12 +59,54 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
 
-  // Direct checkout handler (redirects to Chapa official hosted checkout page)
+  // Direct checkout handler (free enrollment or redirect to Chapa hosted checkout)
   const handlePayNow = async () => {
     if (!cartResource) return
     setIsRedirecting(true)
     setCheckoutError(null)
 
+    // 1. Require student login before payment or free enrollment
+    if (!student) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('hellotvet_cart_course', cartResource.id)
+        localStorage.setItem('hellotvet_pending_redirect', `/cart?course=${cartResource.id}`)
+      }
+      router.push(
+        `/student/login?redirect=${encodeURIComponent(`/cart?course=${cartResource.id}`)}&course=${encodeURIComponent(cartResource.id)}`
+      )
+      return
+    }
+
+    // 2. Free Course: Direct instant unlock without Chapa
+    if (finalPrice === 0) {
+      try {
+        const res = await fetch('/api/chapa/initialize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            resourceId: cartResource.id,
+            amount: 0,
+          }),
+        })
+        const data = await res.json()
+        if (data.success || data.isFree) {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('hellotvet_cart_course')
+            localStorage.removeItem('hellotvet_pending_redirect')
+          }
+          router.push(`/student/dashboard?enrolled=${cartResource.id}`)
+          return
+        } else {
+          throw new Error(data.error || 'Failed to enroll free course')
+        }
+      } catch (err: any) {
+        setCheckoutError(err.message || 'Free enrollment error. Please try again.')
+        setIsRedirecting(false)
+        return
+      }
+    }
+
+    // 3. Paid Course: Initialize Chapa payment
     try {
       const res = await fetch('/api/chapa/initialize', {
         method: 'POST',
@@ -73,7 +115,10 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
           resourceId: cartResource.id,
           amount: finalPrice,
           phone: student?.phone || '0934551781',
-          email: student?.personalEmail || student?.institutionalEmail || 'mekonenalemayehu95@gmail.com',
+          email:
+            student?.personalEmail ||
+            student?.institutionalEmail ||
+            'mekonenalemayehu95@gmail.com',
           fullName: student?.fullName || 'Mekonen Alemayehu',
         }),
       })
@@ -436,7 +481,24 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
                   )}
                 </div>
 
-                {/* Big Green "Pay Now" Button - directly opens Chapa Official Checkout */}
+                {/* Sign-in prompt if not logged in */}
+                {!student && (
+                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between gap-2">
+                    <span>
+                      {isAm
+                        ? 'ኮርሱን ወደ አካውንትዎ ለማያያዝ እባክዎ ይግቡ ወይም ይመዝገቡ።'
+                        : 'Sign in to link this course enrollment to your student account.'}
+                    </span>
+                    <Link
+                      href={`/student/login?redirect=${encodeURIComponent(`/cart?course=${cartResource.id}`)}&course=${encodeURIComponent(cartResource.id)}`}
+                      className="font-bold text-blue-600 dark:text-sky-400 hover:underline shrink-0"
+                    >
+                      {isAm ? 'ግባ' : 'Sign In'}
+                    </Link>
+                  </div>
+                )}
+
+                {/* Big Action Button (Pay Now or Free Instant Enrollment) */}
                 <div className="space-y-2">
                   <Button
                     onClick={handlePayNow}
@@ -446,8 +508,20 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
                     {isRedirecting ? (
                       <span className="flex items-center justify-center gap-2">
                         <Loader2 className="size-5 animate-spin" />
-                        <span>{isAm ? 'ወደ ቻፓ በማቅናት ላይ...' : 'Connecting to Chapa...'}</span>
+                        <span>
+                          {finalPrice === 0
+                            ? isAm
+                              ? 'በነጻ በመመዝገብ ላይ...'
+                              : 'Enrolling free access...'
+                            : isAm
+                            ? 'ወደ ቻፓ በማቅናት ላይ...'
+                            : 'Connecting to Chapa...'}
+                        </span>
                       </span>
+                    ) : !student ? (
+                      isAm ? 'ይግቡና ይመዝገቡ (Sign In to Enroll)' : 'Sign In to Complete Enrollment'
+                    ) : finalPrice === 0 ? (
+                      isAm ? 'በነጻ ይመዝገቡ (Enroll for Free)' : 'Enroll for Free (Instant Access)'
                     ) : (
                       isAm ? 'አሁን ይክፈሉ (Pay Now)' : 'Pay Now'
                     )}
