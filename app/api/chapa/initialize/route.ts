@@ -70,31 +70,49 @@ export async function POST(request: Request) {
     // Free resources can be unlocked directly without Chapa gateway
     if (amount === 0) {
       const freeTx = `FREE-${Date.now().toString(36).toUpperCase()}`
-      await (prisma as any).digitalPurchase.upsert({
-        where: {
-          studentId_resourceId: {
+      let savedPurchase: any = null
+      try {
+        savedPurchase = await (prisma as any).digitalPurchase.upsert({
+          where: {
+            studentId_resourceId: {
+              studentId: student.id,
+              resourceId,
+            },
+          },
+          update: { status: 'Active', updatedAt: new Date() },
+          create: {
             studentId: student.id,
             resourceId,
+            resourceType: (dbResource?.format || '').toLowerCase().includes('video') ? 'video_course' : 'manual',
+            title,
+            amount: 0,
+            paymentMethod: 'free_grant',
+            transactionRef: freeTx,
+            status: 'Active',
+            progress: 0,
+            completedLessons: JSON.stringify([]),
           },
-        },
-        update: { status: 'Active', updatedAt: new Date() },
-        create: {
+        })
+      } catch (err) {
+        console.warn('DigitalPurchase upsert warning:', err)
+      }
+
+      return NextResponse.json({
+        success: true,
+        isFree: true,
+        purchase: savedPurchase || {
+          id: `DP-${Date.now()}`,
           studentId: student.id,
           resourceId,
           resourceType: (dbResource?.format || '').toLowerCase().includes('video') ? 'video_course' : 'manual',
           title,
           amount: 0,
-          paymentMethod: 'free_grant',
+          paymentMethod: 'Free Enrollment',
           transactionRef: freeTx,
           status: 'Active',
           progress: 0,
-          completedLessons: JSON.stringify([]),
+          createdAt: new Date().toISOString(),
         },
-      }).catch(() => {})
-
-      return NextResponse.json({
-        success: true,
-        isFree: true,
         message: 'Free resource unlocked successfully!',
       })
     }

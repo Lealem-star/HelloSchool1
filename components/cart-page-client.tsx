@@ -91,6 +91,25 @@ export function CartPageClient({ initialResources }: CartPageClientProps) {
         const data = await res.json()
         if (data.success || data.isFree) {
           if (typeof window !== 'undefined') {
+            try {
+              const newPurchase = data.purchase || {
+                id: `DP-${Date.now()}`,
+                studentId: student?.id,
+                resourceId: cartResource.id,
+                resourceType: isVideo ? 'video_course' : 'manual',
+                title: cartResource.title,
+                amount: 0,
+                paymentMethod: 'Free Enrollment',
+                status: 'Active',
+                progress: 0,
+                thumbnailUrl: cartResource.thumbnailUrl,
+                createdAt: new Date().toISOString(),
+              }
+              const existing = JSON.parse(localStorage.getItem('hellotvet_student_purchases') || '[]')
+              const filtered = existing.filter((p: any) => p.resourceId !== cartResource.id)
+              filtered.unshift(newPurchase)
+              localStorage.setItem('hellotvet_student_purchases', JSON.stringify(filtered))
+            } catch {}
             localStorage.removeItem('hellotvet_cart_course')
             localStorage.removeItem('hellotvet_pending_redirect')
           }

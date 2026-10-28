@@ -121,13 +121,32 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
         .then((r) => r.json())
         .then((d) => {
           if (d.success || d.isFree) {
+            try {
+              const newPurchase = d.purchase || {
+                id: `DP-${Date.now()}`,
+                studentId: student?.id,
+                resourceId: resource.id,
+                resourceType: isVideo ? 'video_course' : 'manual',
+                title: resource.title,
+                amount: 0,
+                paymentMethod: 'Free Enrollment',
+                status: 'Active',
+                progress: 0,
+                thumbnailUrl: resource.thumbnailUrl,
+                createdAt: new Date().toISOString(),
+              }
+              const existing = JSON.parse(localStorage.getItem('hellotvet_student_purchases') || '[]')
+              const filtered = existing.filter((p: any) => p.resourceId !== resource.id)
+              filtered.unshift(newPurchase)
+              localStorage.setItem('hellotvet_student_purchases', JSON.stringify(filtered))
+            } catch {}
             setHasPurchased(true)
             router.push(`/student/dashboard?enrolled=${resource.id}`)
           }
         })
         .catch(() => {})
     }
-  }, [searchParams, resource.id, router, student, hasPurchased])
+  }, [searchParams, resource.id, router, student, hasPurchased, isVideo, resource.title, resource.thumbnailUrl])
 
   // Handle Get Started button click
   const handleGetStarted = async () => {
@@ -147,6 +166,25 @@ export function LibraryDetailClient({ resource }: LibraryDetailClientProps) {
           })
           const data = await res.json()
           if (data.success || data.isFree) {
+            try {
+              const newPurchase = data.purchase || {
+                id: `DP-${Date.now()}`,
+                studentId: student?.id,
+                resourceId: resource.id,
+                resourceType: isVideo ? 'video_course' : 'manual',
+                title: resource.title,
+                amount: 0,
+                paymentMethod: 'Free Enrollment',
+                status: 'Active',
+                progress: 0,
+                thumbnailUrl: resource.thumbnailUrl,
+                createdAt: new Date().toISOString(),
+              }
+              const existing = JSON.parse(localStorage.getItem('hellotvet_student_purchases') || '[]')
+              const filtered = existing.filter((p: any) => p.resourceId !== resource.id)
+              filtered.unshift(newPurchase)
+              localStorage.setItem('hellotvet_student_purchases', JSON.stringify(filtered))
+            } catch {}
             setHasPurchased(true)
             router.push(`/student/dashboard?enrolled=${resource.id}`)
             return
