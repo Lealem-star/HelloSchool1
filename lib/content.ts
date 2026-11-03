@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import prisma from './prisma'
 
 function parseSkills(skills: string): string[] {
@@ -77,22 +79,7 @@ export type PublicLibraryItem = {
   chapters?: any
 }
 
-export function getFallbackCourseImage(slug?: string | null, category?: string | null): string {
-  const s = (slug || '').toLowerCase()
-  const c = (category || '').toLowerCase()
-  if (s.includes('mobile') || c.includes('mobile')) return 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('tv') || c.includes('tv')) return 'https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('computer') || s.includes('laptop') || c.includes('computer') || c.includes('laptop')) return 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('refrigerator') || s.includes('fridge') || c.includes('appliance')) return 'https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('electric') || c.includes('electric')) return 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('network') || c.includes('network')) return 'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('dish') || c.includes('dish')) return 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('video') || c.includes('video')) return 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('animation') || c.includes('animation')) return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('coding') || s.includes('program') || c.includes('software')) return 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=900&q=85'
-  if (s.includes('industrial') || c.includes('industrial')) return 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?auto=format&fit=crop&w=900&q=85'
-  return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=900&q=85'
-}
+export { getFallbackCourseImage } from './utils'
 
 function toPublicCourse(course: {
   id: string
@@ -143,8 +130,6 @@ export async function getPublishedCourses(): Promise<PublicCourse[]> {
 
   // Resilient fallback to seed-data.json
   try {
-    const fs = await import('fs')
-    const path = await import('path')
     const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
     if (fs.existsSync(seedPath)) {
       const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
@@ -184,8 +169,6 @@ export async function getPublishedCourseBySlug(slug: string): Promise<PublicCour
   }
 
   try {
-    const fs = await import('fs')
-    const path = await import('path')
     const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
     if (fs.existsSync(seedPath)) {
       const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
@@ -232,8 +215,6 @@ export async function getPublishedGallery(): Promise<PublicGalleryItem[]> {
   }
 
   try {
-    const fs = await import('fs')
-    const path = await import('path')
     const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
     if (fs.existsSync(seedPath)) {
       const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
@@ -286,8 +267,6 @@ export async function getPublishedLibrary(): Promise<PublicLibraryItem[]> {
   }
 
   try {
-    const fs = await import('fs')
-    const path = await import('path')
     const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
     if (fs.existsSync(seedPath)) {
       const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
@@ -356,8 +335,6 @@ export async function getPublishedLibraryItem(id: string): Promise<PublicLibrary
   }
 
   try {
-    const fs = await import('fs')
-    const path = await import('path')
     const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
     if (fs.existsSync(seedPath)) {
       const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
@@ -406,8 +383,6 @@ export async function getCategoryNames(type: 'course' | 'library'): Promise<stri
   }
 
   try {
-    const fs = await import('fs')
-    const path = await import('path')
     const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
     if (fs.existsSync(seedPath)) {
       const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
@@ -439,28 +414,54 @@ export type PublicInstructor = {
 }
 
 export async function getPublishedInstructors(): Promise<PublicInstructor[]> {
-  const instructors = await prisma.instructor.findMany({
-    where: { published: true },
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-  })
-  return instructors.map((inst) => {
-    let specialties: string[] = []
-    try {
-      const parsed = JSON.parse(inst.specialties)
-      if (Array.isArray(parsed)) specialties = parsed.map(String)
-    } catch {
-      specialties = []
+  try {
+    const instructors = await prisma.instructor.findMany({
+      where: { published: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+    })
+    if (instructors && instructors.length > 0) {
+      return instructors.map((inst) => {
+        let specialties: string[] = []
+        try {
+          const parsed = JSON.parse(inst.specialties)
+          if (Array.isArray(parsed)) specialties = parsed.map(String)
+        } catch {
+          specialties = []
+        }
+        return {
+          id: inst.id,
+          name: inst.name,
+          role: inst.role,
+          experience: inst.experience || '',
+          bio: inst.bio || '',
+          specialties,
+          image: inst.image || '',
+        }
+      })
     }
-    return {
-      id: inst.id,
-      name: inst.name,
-      role: inst.role,
-      experience: inst.experience || '',
-      bio: inst.bio || '',
-      specialties,
-      image: inst.image || '',
+  } catch (err: any) {
+    console.warn('[Database offline, using local instructors fallback]:', err?.message || err)
+  }
+
+  try {
+    const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
+    if (fs.existsSync(seedPath)) {
+      const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
+      if (Array.isArray(data.instructors) && data.instructors.length > 0) {
+        return data.instructors.map((inst: any) => ({
+          id: inst.id || inst.name,
+          name: inst.name,
+          role: inst.role,
+          experience: inst.experience || '',
+          bio: inst.bio || '',
+          specialties: Array.isArray(inst.specialties) ? inst.specialties : [],
+          image: inst.image || '',
+        }))
+      }
     }
-  })
+  } catch (e) {}
+
+  return []
 }
 
 export type PublicFacility = {
@@ -472,17 +473,41 @@ export type PublicFacility = {
 }
 
 export async function getPublishedFacilities(): Promise<PublicFacility[]> {
-  const facilities = await prisma.workshopFacility.findMany({
-    where: { published: true },
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-  })
-  return facilities.map((fac) => ({
-    id: fac.id,
-    title: fac.title,
-    description: fac.description || '',
-    icon: fac.icon || 'Wrench',
-    image: fac.image || undefined,
-  }))
+  try {
+    const facilities = await prisma.workshopFacility.findMany({
+      where: { published: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+    })
+    if (facilities && facilities.length > 0) {
+      return facilities.map((fac) => ({
+        id: fac.id,
+        title: fac.title,
+        description: fac.description || '',
+        icon: fac.icon || 'Wrench',
+        image: fac.image || undefined,
+      }))
+    }
+  } catch (err: any) {
+    console.warn('[Database offline, using local facilities fallback]:', err?.message || err)
+  }
+
+  try {
+    const seedPath = path.join(process.cwd(), 'prisma', 'seed-data.json')
+    if (fs.existsSync(seedPath)) {
+      const data = JSON.parse(fs.readFileSync(seedPath, 'utf8'))
+      if (Array.isArray(data.facilities) && data.facilities.length > 0) {
+        return data.facilities.map((fac: any) => ({
+          id: fac.id || fac.title,
+          title: fac.title,
+          description: fac.description || '',
+          icon: fac.icon || 'Wrench',
+          image: fac.image || undefined,
+        }))
+      }
+    }
+  } catch (e) {}
+
+  return []
 }
 
 export type PublicStudentProject = {
@@ -500,23 +525,31 @@ export type PublicStudentProject = {
 }
 
 export async function getPublishedStudentProjects(): Promise<PublicStudentProject[]> {
-  const projects = await prisma.studentProject.findMany({
-    where: { published: true },
-    orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-  })
-  return projects.map((proj) => ({
-    id: proj.id,
-    title: proj.title,
-    category: proj.category || 'Repair Project',
-    device: proj.device || '',
-    fault: proj.fault || '',
-    diagnosticProcess: proj.diagnosticProcess || '',
-    solution: proj.solution || '',
-    outcome: proj.outcome || '',
-    technician: proj.technician || '',
-    badge: proj.badge || 'Case Study',
-    image: proj.image || undefined,
-  }))
+  try {
+    const projects = await prisma.studentProject.findMany({
+      where: { published: true },
+      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+    })
+    if (projects && projects.length > 0) {
+      return projects.map((proj) => ({
+        id: proj.id,
+        title: proj.title,
+        category: proj.category || 'Repair Project',
+        device: proj.device || '',
+        fault: proj.fault || '',
+        diagnosticProcess: proj.diagnosticProcess || '',
+        solution: proj.solution || '',
+        outcome: proj.outcome || '',
+        technician: proj.technician || '',
+        badge: proj.badge || 'Case Study',
+        image: proj.image || undefined,
+      }))
+    }
+  } catch (err: any) {
+    console.warn('[Database offline, using local student projects fallback]:', err?.message || err)
+  }
+
+  return []
 }
 
 export type PublicTrustedPartner = {

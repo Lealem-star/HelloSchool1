@@ -7,8 +7,7 @@ import { CourseDetailClient } from '@/components/course-detail-client'
 export const revalidate = 60
 
 export async function generateStaticParams() {
-  const courses = await getPublishedCourses()
-  return courses.map((course) => ({ slug: course.slug }))
+  return []
 }
 
 export async function generateMetadata({

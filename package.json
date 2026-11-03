@@ -5,13 +5,15 @@
   "packageManager": "pnpm@12.3.4",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "prisma:generate": "prisma generate",
+    "prisma:db-push": "prisma db push",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "db:seed": "npx tsx scripts/sync-data.ts",
-    "db:sync": "npx tsx scripts/sync-data.ts"
+    "db:sync": "npx tsx scripts/sync-data.ts",
+    "cpanel:setup": "prisma generate && prisma db push"
   },
   "prisma": {
     "seed": "npx tsx scripts/sync-data.ts"

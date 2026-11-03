@@ -7,8 +7,7 @@ import { LibraryDetailClient } from '@/components/library-detail-client'
 export const revalidate = 60
 
 export async function generateStaticParams() {
-  const items = await getPublishedLibrary()
-  return items.map((item) => ({ id: item.id }))
+  return []
 }
 
 export async function generateMetadata({

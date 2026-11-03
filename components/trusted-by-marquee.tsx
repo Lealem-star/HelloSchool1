@@ -1,6 +1,6 @@
 'use client'
 
-import { PublicTrustedPartner } from '@/lib/content'
+import type { PublicTrustedPartner } from '@/lib/content'
 import { Building2, ExternalLink, ShieldCheck, Sparkles } from 'lucide-react'
 import { useLanguage } from '@/components/language-provider'
 

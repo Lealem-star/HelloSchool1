@@ -27,7 +27,8 @@ import { TrustedBySection } from '@/components/trusted-by-marquee'
 import { TestimonialsSection } from '@/components/testimonials-section'
 import { useLanguage } from '@/components/language-provider'
 import { schoolConfig } from '@/lib/data'
-import { getFallbackCourseImage, type PublicCourse, type PublicTrustedPartner } from '@/lib/content'
+import { getFallbackCourseImage } from '@/lib/utils'
+import type { PublicCourse, PublicTrustedPartner } from '@/lib/content'
 
 interface HomePageClientProps {
   courses: PublicCourse[]
